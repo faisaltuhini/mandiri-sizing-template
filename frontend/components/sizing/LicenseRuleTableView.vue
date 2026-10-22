@@ -340,7 +340,7 @@
               </div>
               <div>
                 <h3 class="modal-heading">{{ isEditing ? 'Ubah Aturan Lisensi Software' : 'Tambah Aturan Lisensi Baru' }}</h3>
-                <p class="modal-subheading">Panduan konfigurasi cara perhitungan, syarat arsitektur cluster, dan tarif resmi Bank Mandiri</p>
+                <p class="modal-subheading">Panduan konfigurasi cara perhitungan, syarat arsitektur cluster, dan tarif resmi Enterprise Architecture</p>
               </div>
             </div>
             <button type="button" class="modal-close-btn" @click="showModal = false" title="Tutup">&times;</button>
@@ -482,7 +482,7 @@
                 <div class="adjuster-icon">🛡️</div>
                 <div class="adjuster-content">
                   <label class="adjuster-title">Syarat Minimal Node Cluster (Quorum High Availability):</label>
-                  <p class="adjuster-hint">Ketentuan arsitektur HA Bank Mandiri mewajibkan minimal 3 node untuk auto-failover sentinel/raft.</p>
+                  <p class="adjuster-hint">Ketentuan arsitektur HA Enterprise Architecture mewajibkan minimal 3 node untuk auto-failover sentinel/raft.</p>
                 </div>
                 <div class="adjuster-input-wrap">
                   <input
@@ -511,7 +511,7 @@
                 <div class="form-group">
                   <div class="form-label-row">
                     <label class="form-label">
-                      Tautan SKU Katalog Bank Mandiri
+                      Tautan SKU Katalog Enterprise Architecture
                       <span class="req">*</span>
                     </label>
                     <span v-if="matchedCatalogItem" class="label-match-tag match-yes">
@@ -538,7 +538,7 @@
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                           <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        Tersinkronisasi Master Katalog Mandiri
+                        Tersinkronisasi Master Katalog Enterprise
                       </span>
                       <span class="matched-env-badge">{{ matchedCatalogItem.environment || 'Production' }}</span>
                     </div>
@@ -558,10 +558,10 @@
                   <div v-else-if="form.pricing_sku" class="sku-custom-card">
                     <span class="custom-sku-badge">ℹ️ SKU Kustom</span>
                     <span class="custom-sku-text">
-                      Kode <strong>{{ form.pricing_sku }}</strong> tidak ada di katalog master pricing Bank Mandiri.
+                      Kode <strong>{{ form.pricing_sku }}</strong> tidak ada di katalog master pricing Enterprise Architecture.
                     </span>
                   </div>
-                  <span v-else class="field-hint">Ketik untuk mencari SKU dari database katalog resmi Bank Mandiri</span>
+                  <span v-else class="field-hint">Ketik untuk mencari SKU dari database katalog resmi Enterprise Architecture</span>
                 </div>
 
                 <!-- TARIF SATUAN RESMI (READ-ONLY, MURNI DARI KATALOG) -->
@@ -588,7 +588,7 @@
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <polyline points="20 6 9 17 4 12"></polyline>
                       </svg>
-                      <span>Tarif resmi aktif otomatis terkunci dari katalog master Bank Mandiri</span>
+                      <span>Tarif resmi aktif otomatis terkunci dari katalog master Enterprise Architecture</span>
                     </div>
                     <div v-else class="price-sync-status status-pending">
                       <span>⚠️ Belum ada tarif kontrak (Menunggu konfirmasi Tim STA / Procurement)</span>
@@ -606,7 +606,7 @@
                 <span class="section-step-num">4</span>
                 <div>
                   <h4 class="section-title-text">Status &amp; Dokumen Kontrak Pengadaan</h4>
-                  <p class="section-desc-text">Status operasional dan catatan nomor kontrak Bank Mandiri</p>
+                  <p class="section-desc-text">Status operasional dan catatan nomor kontrak Enterprise Architecture</p>
                 </div>
               </div>
 
@@ -946,7 +946,7 @@ const pricingSkuOptions = computed<AutocompleteOption[]>(() => {
       category: item.category ? item.category.toUpperCase() : 'SKU',
       badge: item.environment || (item.category === 'license' ? 'LISENSI RESMI' : 'KATALOG'),
       badgeType: item.category === 'license' ? 'primary' : 'default',
-      description: `Tarif: ${priceText} / ${item.unit || 'Unit'} • Ref: ${item.source || 'Katalog Bank Mandiri'}`,
+      description: `Tarif: ${priceText} / ${item.unit || 'Unit'} • Ref: ${item.source || 'Katalog Enterprise Architecture'}`,
       icon: getSkuIcon(item.sku),
       meta: item
     }
@@ -1191,7 +1191,7 @@ function getMetricExplanation(metric: string | undefined, packSize: number | und
       return 'Dihitung per Node / Instance Database aktif. Setiap server database (Master maupun Standby / Replica) membutuhkan 1 Database Visibility Agent.'
     case 'per_shard':
       const mn = minNode || 3
-      return `Dihitung berdasarkan jumlah Shard data memori. Ketentuan arsitektur High Availability (HA) Bank Mandiri mewajibkan minimal ${mn} Node server untuk menjamin Sentinel / Quorum auto-failover cluster.`
+      return `Dihitung berdasarkan jumlah Shard data memori. Ketentuan arsitektur High Availability (HA) Enterprise Architecture mewajibkan minimal ${mn} Node server untuk menjamin Sentinel / Quorum auto-failover cluster.`
     case 'per_worker':
       return 'Dihitung HANYA pada node Worker aktif yang menjalankan container aplikasi. Server Control Plane (Master Node), Infra Router, dan Bastion bersifat GRATIS (Free of Charge).'
     case 'per_core':

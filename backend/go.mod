@@ -1,4 +1,4 @@
-module mandiri/sizing-apps-backend
+module enterprise/sizing-apps-backend
 
 go 1.26.5
 

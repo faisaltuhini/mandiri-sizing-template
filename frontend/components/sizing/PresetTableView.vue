@@ -25,7 +25,7 @@
           type="button"
           class="btn-reset-defaults"
           @click="$emit('reset-to-official-defaults')"
-          title="Reset semua preset ke standar baseline resmi Bank Mandiri"
+          title="Reset semua preset ke standar baseline resmi Enterprise Architecture"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
@@ -602,7 +602,7 @@
                   <input type="checkbox" v-model="form.moderate.backupEnabled" class="custom-chk-big" />
                   <div class="chk-desc-wrap">
                     <span class="chk-title">Sertakan NetBackup NBU</span>
-                    <span class="chk-sub">Pencadangan harian otomatis enterprise Bank Mandiri.</span>
+                    <span class="chk-sub">Pencadangan harian otomatis enterprise Enterprise Architecture.</span>
                   </div>
                 </label>
               </div>
@@ -761,7 +761,7 @@
                   <input type="checkbox" v-model="form.critical.backupEnabled" class="custom-chk-big" />
                   <div class="chk-desc-wrap">
                     <span class="chk-title">Sertakan NetBackup NBU</span>
-                    <span class="chk-sub">Pencadangan harian otomatis enterprise Bank Mandiri.</span>
+                    <span class="chk-sub">Pencadangan harian otomatis enterprise Enterprise Architecture.</span>
                   </div>
                 </label>
               </div>
@@ -1051,7 +1051,7 @@ const layerOptions = computed<AutocompleteOption[]>(() => {
   const set = new Set<string>()
   const list: AutocompleteOption[] = []
 
-  // Standard architectural layers at Bank Mandiri
+  // Standard architectural layers at Enterprise Architecture
   const standardLayers = [
     { label: 'Web Ingress', icon: '🌐', desc: 'Reverse proxy, SSL termination, and rate limiting entry layer.' },
     { label: 'App Container', icon: '📦', desc: 'Microservices orchestration cluster on OpenShift / Kubernetes.' },
@@ -1145,7 +1145,7 @@ const componentOptions = computed<AutocompleteOption[]>(() => {
         value: p.component,
         icon: p.icon || '⚙️',
         category: p.layer,
-        badge: 'Preset Bank Mandiri',
+        badge: 'Preset Enterprise Architecture',
         description: p.notes || `Layer: ${p.layer}`,
         meta: {
           layer: p.layer,
@@ -1236,7 +1236,7 @@ const licenseEnterpriseOptions = computed<AutocompleteOption[]>(() => {
           category: 'Katalog SKU',
           badge: pi.sku,
           badgeType: 'primary',
-          description: `Lisensi Resmi Bank Mandiri (${pi.sku})`
+          description: `Lisensi Resmi Enterprise Architecture (${pi.sku})`
         })
       }
     }

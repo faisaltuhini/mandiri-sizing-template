@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────
-   Clean & Simple Executive Theme — Bank Mandiri
+   Clean & Simple Executive Theme — Enterprise Architecture
    ───────────────────────────────────────────── */
 :root {
   --bg: #f8fafc;
@@ -14,7 +14,7 @@
   --text3: #64748b;
 
   --navy: #0f2b48;
-  --mandiri-blue: #003b73;
+  --brand-blue: #003b73;
   --blue: #2563eb;
   --blue-soft: #eff6ff;
   --green: #16a34a;
@@ -112,7 +112,7 @@ a {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   text-transform: uppercase;
   margin-bottom: 3px;
 }
@@ -131,7 +131,7 @@ a {
   margin-top: 8px;
   background: var(--blue-soft);
   border: 1px solid rgba(37, 99, 235, 0.15);
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   font-size: 10.5px;
   font-weight: 600;
   padding: 2.5px 8px;
@@ -206,7 +206,7 @@ a {
 
 .nav-item.active .nav-tag {
   background: rgba(37, 99, 235, 0.15);
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
 }
 
 /* ── EAWG Box ── */
@@ -223,7 +223,7 @@ a {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   margin-bottom: 7px;
 }
 
@@ -379,7 +379,7 @@ a {
 }
 
 .sa-workflow-step.clickable:hover {
-  border-color: var(--mandiri-blue);
+  border-color: var(--brand-blue);
   background: var(--blue-soft);
   transform: translateX(2px);
 }
@@ -397,14 +397,14 @@ a {
   border-radius: 4px;
   background: var(--surface);
   border: 1px solid var(--border2);
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   transition: all 0.15s;
 }
 
 .sa-workflow-step:hover .step-open-btn {
-  background: var(--mandiri-blue);
+  background: var(--brand-blue);
   color: #ffffff;
-  border-color: var(--mandiri-blue);
+  border-color: var(--brand-blue);
 }
 
 .step-desc {
@@ -699,7 +699,7 @@ a {
 
 .features-list li::before {
   content: '•';
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   font-size: 14px;
   line-height: 1;
   flex-shrink: 0;
@@ -735,8 +735,8 @@ a {
 }
 
 .doc-filter-tab.active {
-  background: var(--mandiri-blue);
-  border-color: var(--mandiri-blue);
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
   color: #ffffff;
 }
 
@@ -1006,8 +1006,8 @@ a {
 }
 
 .dir-item:hover {
-  border-color: var(--mandiri-blue);
-  color: var(--mandiri-blue);
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
   background: var(--blue-soft);
 }
 

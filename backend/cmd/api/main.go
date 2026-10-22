@@ -13,9 +13,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 
-	"mandiri/sizing-apps-backend/internal/handler"
-	"mandiri/sizing-apps-backend/internal/platform/db"
-	"mandiri/sizing-apps-backend/internal/service"
+	"enterprise/sizing-apps-backend/internal/handler"
+	"enterprise/sizing-apps-backend/internal/platform/db"
+	"enterprise/sizing-apps-backend/internal/service"
 )
 
 func main() {

@@ -4,7 +4,7 @@
       <div
         class="brand-shield"
         @click="$emit('toggle-collapse')"
-        :title="isCollapsed ? 'Klik untuk memperluas sidebar' : 'Bank Mandiri Sizing Suite'"
+        :title="isCollapsed ? 'Klik untuk memperluas sidebar' : 'Enterprise Architecture Sizing Suite'"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M12 2L3 7V12C3 17.5 7 21.5 12 22C17 21.5 21 17.5 21 12V7L12 2Z" fill="#D4A017" fill-opacity="0.25" stroke="#D4A017" stroke-width="2"/>
@@ -12,7 +12,7 @@
         </svg>
       </div>
       <div v-if="!isCollapsed" class="brand-text">
-        <span class="bank-lbl">BANK MANDIRI</span>
+        <span class="bank-lbl">ENTERPRISE</span>
         <span class="app-lbl">Sizing Suite</span>
       </div>
     </div>

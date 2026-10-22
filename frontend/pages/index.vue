@@ -384,13 +384,13 @@ async function handleDeletePresetItem(itemId: string) {
 }
 
 async function handleResetPresetDefaults() {
-  if (confirm('Kembalikan semua preset dan formula layer ke standar resmi pabrik Bank Mandiri?')) {
+  if (confirm('Kembalikan semua preset dan formula layer ke standar resmi pabrik Enterprise Architecture?')) {
     presetItems.value = JSON.parse(JSON.stringify(DEFAULT_PRESET_ITEMS))
     for (const item of DEFAULT_PRESET_ITEMS) {
       layerConfigs[item.id] = parseBaselineSpec(item, tierFilter.value)
     }
     await setDbItem('sizing_presets', JSON.parse(JSON.stringify(DEFAULT_PRESET_ITEMS)))
-    showToast('Semua preset dikembalikan ke standar resmi Bank Mandiri!', 'success')
+    showToast('Semua preset dikembalikan ke standar resmi Enterprise Architecture!', 'success')
     triggerQuoteCalculation()
   }
 }
@@ -846,7 +846,7 @@ function formatSimpleIDR(val?: number | null): string {
 async function copyGeneratedSummary() {
   if (!quoteResponse.value) return
   const q = quoteResponse.value
-  const summaryText = `BANK MANDIRI - ESTIMASI SIZING & BOQ ARSITEKTUR
+  const summaryText = `ENTERPRISE - ESTIMASI SIZING & BOQ ARSITEKTUR
 Project: ${projectName.value}
 Environment: ${q.environment} | DRC: ${q.include_drc ? 'Active-Active (2x)' : 'Single DC'}
 Total Nodes: ${q.total_nodes} Node | Total vCPU: ${q.total_vcpu} Core | Total Storage: ${(q.total_storage_gb / 1000).toFixed(1)} TB
@@ -898,13 +898,13 @@ async function downloadOfficialExcel() {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `Mandiri_Sizing_BOQ_${new Date().toISOString().slice(0, 10)}.xlsx`
+    link.download = `Enterprise_Sizing_BOQ_${new Date().toISOString().slice(0, 10)}.xlsx`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     window.URL.revokeObjectURL(url)
 
-    showToast('Template Sizing (.xlsx) resmi Bank Mandiri berhasil diunduh!', 'success')
+    showToast('Template Sizing (.xlsx) resmi Enterprise Architecture berhasil diunduh!', 'success')
   } catch (err: any) {
     console.error('Download Excel error:', err)
     showToast(`Gagal mengunduh Excel: ${err.message || 'Koneksi error'}`, 'error')

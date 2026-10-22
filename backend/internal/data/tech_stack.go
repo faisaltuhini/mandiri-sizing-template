@@ -1,6 +1,6 @@
 package data
 
-import "mandiri/sizing-apps-backend/internal/model"
+import "enterprise/sizing-apps-backend/internal/model"
 
 // GetKPISummaries returns executive KPIs
 func GetKPISummaries() []model.KPISummary {

@@ -349,7 +349,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     component: 'SFTP / Object Storage / BDM',
     icon: '📁',
     licenseFree: 'MinIO Community (OSS)',
-    licenseEnterprise: 'MinIO Enterprise / Bank Mandiri Doc Storage',
+    licenseEnterprise: 'MinIO Enterprise / Enterprise Architecture Doc Storage',
     notes: 'Long-term electronic customer statement and KYC store.',
     contractRef: 'ECM Storage Master',
     moderate: {

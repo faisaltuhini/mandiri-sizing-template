@@ -11,10 +11,10 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"mandiri/sizing-apps-backend/internal/excel"
-	"mandiri/sizing-apps-backend/internal/model"
-	"mandiri/sizing-apps-backend/internal/quote"
-	"mandiri/sizing-apps-backend/internal/service"
+	"enterprise/sizing-apps-backend/internal/excel"
+	"enterprise/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/quote"
+	"enterprise/sizing-apps-backend/internal/service"
 )
 
 type SizingHandler struct {
@@ -80,7 +80,7 @@ func (h *SizingHandler) RegisterRoutes(app *fiber.App) {
 func (h *SizingHandler) HealthCheck(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status":  "ok",
-		"service": "Enterprise Capacity Planning & Sizing Engine (Bank Mandiri)",
+		"service": "Enterprise Capacity Planning & Sizing Engine (Enterprise Architecture)",
 		"version": "1.0.0",
 	})
 }
@@ -380,7 +380,7 @@ func (h *SizingHandler) CreatePricingItem(c *fiber.Ctx) error {
 		if err := h.db.First(&version).Error; err != nil {
 			version = model.PriceListVersion{
 				ID:            uuid.New(),
-				Name:          "Katalog Harga Master Mandiri",
+				Name:          "Katalog Harga Master Enterprise",
 				EffectiveDate: time.Now(),
 				Status:        "active",
 				CreatedAt:     time.Now(),
@@ -716,7 +716,7 @@ func (h *SizingHandler) ExportQuoteExcel(c *fiber.Ctx) error {
 	}
 
 	if req.ProjectName == "" {
-		req.ProjectName = "Sizing Arsitektur Bank Mandiri"
+		req.ProjectName = "Sizing Arsitektur Enterprise Architecture"
 	}
 
 	pricing, err := h.getCachedPricingItems()
@@ -743,7 +743,7 @@ func (h *SizingHandler) ExportQuoteExcel(c *fiber.Ctx) error {
 		})
 	}
 
-	fileName := fmt.Sprintf("Mandiri_Sizing_BOQ_%s.xlsx", time.Now().Format("20060102_150405"))
+	fileName := fmt.Sprintf("Enterprise_Sizing_BOQ_%s.xlsx", time.Now().Format("20060102_150405"))
 	c.Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
 

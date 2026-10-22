@@ -55,7 +55,7 @@
               type="button"
               class="btn-reset-baseline"
               @click="$emit('reset-active-layer')"
-              title="Kembalikan konfigurasi layer ini ke standar resmi Bank Mandiri"
+              title="Kembalikan konfigurasi layer ini ke standar resmi Enterprise Architecture"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
@@ -102,7 +102,7 @@
             <div class="field-hdr-wrap">
               <div class="title-with-desc">
                 <span class="field-title-lbl">Jumlah Server Aktif:</span>
-                <span class="field-sub-hint">Berapa unit server mandiri yang dialokasikan</span>
+                <span class="field-sub-hint">Berapa unit server dedicated yang dialokasikan</span>
               </div>
               <BaseHelpTip
                 title="Jumlah Server (Nodes)"
@@ -248,7 +248,7 @@
                 />
                 <div class="backup-text-wrap">
                   <span class="backup-main-title">Aktifkan Backup Otomatis Harian (NetBackup)</span>
-                  <span class="backup-desc">Pencadangan data berkala terpusat Bank Mandiri (Tarif: Rp 27.000 / GB / tahun).</span>
+                  <span class="backup-desc">Pencadangan data berkala terpusat Enterprise Architecture (Tarif: Rp 27.000 / GB / tahun).</span>
                 </div>
               </label>
             </div>
@@ -417,7 +417,7 @@
         <BaseSectionCard
           step-number="5"
           title="Acuan Standar Baseline &amp; Catatan EA Forum"
-          guide-question="Spesifikasi acuan resmi Bank Mandiri dan justifikasi Enterprise Architecture"
+          guide-question="Spesifikasi acuan resmi Enterprise Architecture dan justifikasi Enterprise Architecture"
           technical-label="Baseline Standard"
           :collapsible="true"
           :default-collapsed="false"

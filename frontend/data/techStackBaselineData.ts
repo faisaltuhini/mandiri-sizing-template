@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// BASELINE TECHNOLOGY STACK & SIZING PATTERN (BANK MANDIRI)
+// BASELINE TECHNOLOGY STACK & SIZING PATTERN (ENTERPRISE)
 // Standar Arsitektur: Tier Moderate (IHSP & RMT) vs Tier Critical (Livin' Merchant)
 // ─────────────────────────────────────────────────────────────────────────────
 

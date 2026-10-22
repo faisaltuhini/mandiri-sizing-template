@@ -290,8 +290,8 @@ function openLocal(pathStr: string, app: 'antigravity' | 'vscode' | 'finder') {
 }
 
 .tab-btn.active {
-  color: var(--mandiri-blue);
-  border-bottom-color: var(--mandiri-blue);
+  color: var(--brand-blue);
+  border-bottom-color: var(--brand-blue);
 }
 
 .catalog-view {
@@ -459,10 +459,10 @@ function openLocal(pathStr: string, app: 'antigravity' | 'vscode' | 'finder') {
 }
 
 .download-btn {
-  background: var(--mandiri-blue);
+  background: var(--brand-blue);
   color: #ffffff;
 
-  border-color: var(--mandiri-blue);
+  border-color: var(--brand-blue);
   flex: 1;
 }
 

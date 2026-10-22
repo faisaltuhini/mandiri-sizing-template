@@ -3,11 +3,11 @@
     <!-- Header Banner -->
     <div class="boq-header">
       <div>
-        <div class="boq-badge">Standar Pengadaan & Anggaran IT Bank Mandiri</div>
+        <div class="boq-badge">Standar Pengadaan & Anggaran IT Enterprise Architecture</div>
         <h2 class="boq-title">Estimasi Bill of Quantity (BOQ) & Anggaran Infrastruktur Tahunan</h2>
         <p class="boq-subtitle">
           Kalkulasi otomatis biaya pengadaan vCPU, SAN Storage, NetBackup, Server Bare Metal, dan Lisensi Enterprise
-          berdasarkan standar tarif resmi Bank Mandiri (Template Sizing.xlsx).
+          berdasarkan standar tarif resmi Enterprise Architecture (Template Sizing.xlsx).
         </p>
       </div>
 

@@ -4,7 +4,7 @@ PORT ?= 8089
 
 dev:
 	@echo "=================================================="
-	@echo "🚀 Starting Mandiri Architecture Sizing Suite..."
+	@echo "🚀 Starting Enterprise Architecture Sizing Suite..."
 	@echo "📡 Backend (Go):     http://localhost:$(PORT)"
 	@echo "💻 Frontend (Nuxt):  http://localhost:5454"
 	@echo "=================================================="

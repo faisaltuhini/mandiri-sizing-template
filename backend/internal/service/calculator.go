@@ -3,8 +3,8 @@ package service
 import (
 	"math"
 
-	"mandiri/sizing-apps-backend/internal/data"
-	"mandiri/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/data"
+	"enterprise/sizing-apps-backend/internal/model"
 )
 
 type CalculatorService struct{}
@@ -13,7 +13,7 @@ func NewCalculatorService() *CalculatorService {
 	return &CalculatorService{}
 }
 
-// CalculateCapacity computes capacity planning metrics based on Bank Mandiri EAWG standards
+// CalculateCapacity computes capacity planning metrics based on Enterprise Architecture EAWG standards
 func (s *CalculatorService) CalculateCapacity(req model.CalculateRequest) model.CalculateResponse {
 	// Defaults if 0
 	if req.DailyTransactions <= 0 {

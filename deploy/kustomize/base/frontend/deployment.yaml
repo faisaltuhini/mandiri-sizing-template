@@ -32,7 +32,7 @@ spec:
       containers:
         - name: sizing-frontend
           image: sizing-frontend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 3000

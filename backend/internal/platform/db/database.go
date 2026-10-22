@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"mandiri/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/model"
 )
 
 var DB *gorm.DB
@@ -158,13 +158,13 @@ func SeedMasterData(db *gorm.DB) error {
 		return nil // already seeded
 	}
 
-	log.Println("🌱 Seeding Bank Mandiri Pricing Catalog & 13 Architecture Layers...")
+	log.Println("🌱 Seeding Enterprise Architecture Pricing Catalog & 13 Architecture Layers...")
 
 	// 1. Create Active Master Price List Version
 	versionID := uuid.New()
 	version := model.PriceListVersion{
 		ID:            versionID,
-		Name:          "Katalog Resmi Bank Mandiri (Template Sizing.xlsx)",
+		Name:          "Katalog Resmi Enterprise Architecture (Template Sizing.xlsx)",
 		EffectiveDate: time.Now(),
 		Status:        "active",
 		CreatedAt:     time.Now(),
@@ -443,7 +443,7 @@ func SeedLicenseRules(db *gorm.DB) error {
 					Unit:               "5 Pods / Thn",
 					UnitPriceIDR:       int64Ptr(8392364),
 					IsConfirmed:        true,
-					Source:             "Kontrak Cisco / AppDynamics Bank Mandiri (TIF.DDL/GH.2410/2024)",
+					Source:             "Kontrak Cisco / AppDynamics Enterprise Architecture (TIF.DDL/GH.2410/2024)",
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				},
@@ -457,7 +457,7 @@ func SeedLicenseRules(db *gorm.DB) error {
 					Unit:               "DB Node / Thn",
 					UnitPriceIDR:       int64Ptr(7514100),
 					IsConfirmed:        true,
-					Source:             "Kontrak Cisco / AppDynamics Bank Mandiri (TIF.DDL/GH.2410/2024)",
+					Source:             "Kontrak Cisco / AppDynamics Enterprise Architecture (TIF.DDL/GH.2410/2024)",
 					CreatedAt:          time.Now(),
 					UpdatedAt:          time.Now(),
 				},

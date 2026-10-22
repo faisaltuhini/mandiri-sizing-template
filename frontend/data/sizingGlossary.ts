@@ -13,7 +13,7 @@ export const SIZING_GLOSSARY: Record<string, GlossaryEntry> = {
   nodeCount: {
     term: 'Jumlah Node / Server',
     friendlyName: 'Unit Server Aktif',
-    shortDesc: 'Berapa banyak server mandiri yang dialokasikan untuk menjalankan komponen ini.',
+    shortDesc: 'Berapa banyak server dedicated yang dialokasikan untuk menjalankan komponen ini.',
     businessImpact: 'Semakin banyak server (misal 2N = 2 server aktif), semakin minim risiko sistem mati mendadak saat salah satu server gangguan (High Availability).'
   },
   vcpu: {
@@ -49,7 +49,7 @@ export const SIZING_GLOSSARY: Record<string, GlossaryEntry> = {
   backupNBU: {
     term: 'NetBackup (NBU)',
     friendlyName: 'Proteksi Cadangan Harian',
-    shortDesc: 'Sistem backup otomatis harian enterprise terpusat Bank Mandiri.',
+    shortDesc: 'Sistem backup otomatis harian enterprise terpusat Enterprise Architecture.',
     businessImpact: 'Menjamin data dapat dipulihkan utuh jika terjadi bencana atau kerusakan data (RPO/RTO ketat).'
   },
   computeVM: {

@@ -17,7 +17,7 @@
           </button>
           <h1 class="page-title">Katalog Harga &amp; Master Data SKU</h1>
         </div>
-        <p class="page-subtitle">Master tarif infrastruktur &amp; lisensi software Bank Mandiri (Template Sizing.xlsx)</p>
+        <p class="page-subtitle">Master tarif infrastruktur &amp; lisensi software Enterprise Architecture (Template Sizing.xlsx)</p>
       </div>
 
       <div class="topbar-filters">

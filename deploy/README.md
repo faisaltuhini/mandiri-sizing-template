@@ -1,4 +1,4 @@
-# 🚀 Panduan Deployment OpenShift (Bank Mandiri)
+# 🚀 Panduan Deployment OpenShift (Enterprise Architecture)
 ## Enterprise Architecture Sizing & Capacity Hub
 
 Panduan resmi untuk melakukan containerization dan deployment aplikasi Sizing Suite (Go Backend + Nuxt 3 Frontend) ke cluster **Red Hat OpenShift Container Platform (OCP) 4.x** menggunakan **Kustomize**.
@@ -72,17 +72,17 @@ docker build -t sizing-backend:1.0.0 -f backend/Dockerfile backend/
 # 2. Build Frontend Image
 docker build -t sizing-frontend:1.0.0 -f frontend/Dockerfile frontend/
 
-# 3. Tag & Push ke Image Registry OpenShift (atau Nexus / Harbor Mandiri)
+# 3. Tag & Push ke Image Registry OpenShift (atau Nexus / Harbor Enterprise)
 # Login ke registry OpenShift:
-podman login -u $(oc whoami) -p $(oc whoami -t) default-route-openshift-image-registry.apps.mandiri.co.id
+podman login -u $(oc whoami) -p $(oc whoami -t) default-route-openshift-image-registry.apps.enterprise.local
 
 # Tag ke namespace target (contoh: sizing-dev):
-docker tag sizing-backend:1.0.0 default-route-openshift-image-registry.apps.mandiri.co.id/sizing-dev/sizing-backend:dev-latest
-docker tag sizing-frontend:1.0.0 default-route-openshift-image-registry.apps.mandiri.co.id/sizing-dev/sizing-frontend:dev-latest
+docker tag sizing-backend:1.0.0 default-route-openshift-image-registry.apps.enterprise.local/sizing-dev/sizing-backend:dev-latest
+docker tag sizing-frontend:1.0.0 default-route-openshift-image-registry.apps.enterprise.local/sizing-dev/sizing-frontend:dev-latest
 
 # Push:
-docker push default-route-openshift-image-registry.apps.mandiri.co.id/sizing-dev/sizing-backend:dev-latest
-docker push default-route-openshift-image-registry.apps.mandiri.co.id/sizing-dev/sizing-frontend:dev-latest
+docker push default-route-openshift-image-registry.apps.enterprise.local/sizing-dev/sizing-backend:dev-latest
+docker push default-route-openshift-image-registry.apps.enterprise.local/sizing-dev/sizing-frontend:dev-latest
 ```
 
 #### Opsi B: Menggunakan OpenShift Binary Build (Langsung dari source)
@@ -167,7 +167,7 @@ curl -k https://$(oc get route sizing-backend -n sizing-dev -o jsonpath='{.spec.
 Output yang diharapkan:
 ```json
 {
-  "service": "Enterprise Capacity Planning & Sizing Engine (Bank Mandiri)",
+  "service": "Enterprise Capacity Planning & Sizing Engine (Enterprise Architecture)",
   "status": "ok",
   "version": "1.0.0"
 }

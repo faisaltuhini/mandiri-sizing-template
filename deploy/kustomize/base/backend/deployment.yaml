@@ -32,7 +32,7 @@ spec:
       containers:
         - name: sizing-backend
           image: sizing-backend:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 8089

@@ -3,7 +3,7 @@
 // Stores layer adjustments, tier, license filter, environment, and DRC topology
 // ─────────────────────────────────────────────
 
-const DB_NAME = 'MandiriSizingSuiteDB'
+const DB_NAME = 'EnterpriseSizingSuiteDB'
 const DB_VERSION = 1
 const STORE_NAME = 'sizing_configs'
 

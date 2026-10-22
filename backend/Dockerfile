@@ -1,6 +1,6 @@
 # =========================================================================
 # Sizing Backend Dockerfile (OpenShift & Kubernetes Enterprise Ready)
-# Multi-stage build for Bank Mandiri Architecture & Sizing Hub
+# Multi-stage build for Enterprise Architecture Architecture & Sizing Hub
 # Compatible with OpenShift 4.x Restricted-v2 SCC (Arbitrary UID / GID 0)
 # =========================================================================
 
@@ -28,7 +28,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
 # Stage 2: Minimal runtime image
 FROM alpine:3.21 AS runner
 
-LABEL maintainer="Enterprise Architecture & Sizing Team Bank Mandiri" \
+LABEL maintainer="Enterprise Architecture & Sizing Team Enterprise Architecture" \
       app="sizing-backend" \
       description="Enterprise Architecture Sizing & Capacity Engine"
 

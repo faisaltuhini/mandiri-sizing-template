@@ -15,7 +15,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'Enterprise Sizing & Capacity Planning Hub — Bank Mandiri',
+      title: 'Enterprise Sizing & Capacity Planning Hub — Enterprise Architecture',
       meta: [
         { name: 'description', content: 'Enterprise Sizing, Power-Law scaling, and EAWG Capacity Planning Hub' },
         { charset: 'utf-8' },

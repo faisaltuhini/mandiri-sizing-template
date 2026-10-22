@@ -17,7 +17,7 @@
             </svg>
             <div>
               <h3>{{ isEditingPricing ? 'Edit Item Harga' : 'Tambah Item SKU Baru' }}</h3>
-              <p class="modal-hdr-sub">Master tarif infrastruktur &amp; lisensi resmi Bank Mandiri</p>
+              <p class="modal-hdr-sub">Master tarif infrastruktur &amp; lisensi resmi Enterprise Architecture</p>
             </div>
           </div>
           <button type="button" class="modal-close" @click="$emit('close-pricing-modal')">✕</button>
@@ -92,7 +92,7 @@
                 v-model="pricingForm.is_confirmed"
                 class="custom-chk"
               />
-              <span class="chk-text">Harga Resmi Terkonfirmasi oleh Tim STA / Procurement Bank Mandiri</span>
+              <span class="chk-text">Harga Resmi Terkonfirmasi oleh Tim STA / Procurement Enterprise Architecture</span>
             </label>
             <span v-if="!pricingForm.is_confirmed" class="sta-warn-hint">
               ⚠ Jika belum dikonfirmasi, harga akan disimpan sebagai pending dan muncul sebagai peringatan resmi pada Sizing BOQ.
@@ -221,7 +221,7 @@
             <div class="drop-text">
               <strong>Klik untuk memilih berkas</strong> atau seret file ke sini
             </div>
-            <span class="drop-sub">Mendukung file .xlsx resmi Bank Mandiri &amp; .csv SolarWinds</span>
+            <span class="drop-sub">Mendukung file .xlsx resmi Enterprise Architecture &amp; .csv SolarWinds</span>
 
             <button
               type="button"
@@ -260,7 +260,7 @@
             </svg>
             <div>
               <h3>Hasil Generate Sizing &amp; Bill of Quantity (BOQ)</h3>
-              <p class="modal-hdr-sub">Rekapitulasi 13 Layer Arsitektur &amp; Proyeksi Biaya Resmi Bank Mandiri</p>
+              <p class="modal-hdr-sub">Rekapitulasi 13 Layer Arsitektur &amp; Proyeksi Biaya Resmi Enterprise Architecture</p>
             </div>
           </div>
           <button type="button" class="modal-close" @click="$emit('close-generate-modal')">✕</button>
@@ -403,7 +403,7 @@
                 <line x1="12" y1="9" x2="12" y2="13"/>
                 <line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
-              <strong>Perhatian Tim Procurement / STA (Bank Mandiri):</strong>
+              <strong>Perhatian Tim Procurement / STA (Enterprise Architecture):</strong>
             </div>
             <ul class="warning-list">
               <li v-for="(warn, wIdx) in quoteResponse.warnings" :key="wIdx">{{ warn }}</li>

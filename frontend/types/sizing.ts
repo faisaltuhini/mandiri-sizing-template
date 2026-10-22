@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────
-// Sizing & Catalog Data Types (Bank Mandiri Sizing Suite)
+// Sizing & Catalog Data Types (Enterprise Architecture Sizing Suite)
 // ─────────────────────────────────────────────
 
 export interface LayerAdjusterConfig {

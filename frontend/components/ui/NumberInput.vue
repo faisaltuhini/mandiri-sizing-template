@@ -337,7 +337,7 @@ function onKeyDown(e: KeyboardEvent) {
 }
 
 .stepper-btn:active {
-  background: var(--mandiri-blue, #003b73);
+  background: var(--brand-blue, #003b73);
   color: #ffffff;
 }
 

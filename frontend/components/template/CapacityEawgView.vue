@@ -3,7 +3,7 @@
     <!-- Preset & Mode Toolbar -->
     <div class="eawg-toolbar">
       <div class="toolbar-left">
-        <span class="doc-badge">🏛️ Bank Mandiri EAWG Standard Format</span>
+        <span class="doc-badge">🏛️ Enterprise Architecture EAWG Standard Format</span>
         <h3 class="doc-title-mini">Bab 10. Business Capacity Plan Deliverable</h3>
       </div>
 
@@ -89,7 +89,7 @@
             <label>Batas Aman CPU (U<sub>max</sub>)</label>
             <select v-model.number="grafanaConfig.safeCpuUtil">
               <option :value="0.30">30% (Critical SLA)</option>
-              <option :value="0.40">40% (Standar Bank Mandiri)</option>
+              <option :value="0.40">40% (Standar Enterprise Architecture)</option>
               <option :value="0.50">50% (Moderat)</option>
               <option :value="0.60">60% (Agresif)</option>
             </select>
@@ -576,7 +576,7 @@
               <input
                 v-model="grafanaApiForm.url"
                 type="text"
-                placeholder="https://grafana.mandiri.co.id"
+                placeholder="https://grafana.enterprise.co.id"
                 class="form-input"
               />
             </div>
@@ -614,7 +614,7 @@
             <div class="aggr-selector">
               <label class="radio-label">
                 <input v-model="grafanaApiForm.aggregation" type="radio" value="p95" />
-                <span><strong>Percentile 95 (P95 SLA)</strong> — Rekomendasi Standar Bank Mandiri</span>
+                <span><strong>Percentile 95 (P95 SLA)</strong> — Rekomendasi Standar Enterprise Architecture</span>
               </label>
               <label class="radio-label">
                 <input v-model="grafanaApiForm.aggregation" type="radio" value="max" />
@@ -678,7 +678,7 @@ const timeSpanOptions = [
 
 // Grafana API Modal Form
 const grafanaApiForm = reactive({
-  url: 'https://grafana.mandiri.co.id',
+  url: 'https://grafana.enterprise.co.id',
   token: '',
   timeSpan: '1y' as '1y' | '6M' | '90d' | '30d' | '7d',
   aggregation: 'p95' as 'max' | 'p95' | 'avg',
@@ -984,7 +984,7 @@ function copyFullAsdfDoc() {
 
 function downloadEawgJson() {
   const payload = {
-    title: 'Bank Mandiri EAWG Business Capacity Plan (Bab 10)',
+    title: 'Enterprise Architecture EAWG Business Capacity Plan (Bab 10)',
     timestamp: new Date().toISOString(),
     preset: activeData,
     grafanaSync: isGrafanaSynced.value ? lastSyncMeta : null,
@@ -1332,7 +1332,7 @@ function downloadEawgJson() {
 }
 
 .doc-section-header {
-  border-bottom: 2px solid var(--mandiri-blue, #003b73);
+  border-bottom: 2px solid var(--brand-blue, #003b73);
   padding-bottom: 12px;
 }
 
@@ -1424,9 +1424,9 @@ function downloadEawgJson() {
 }
 
 .mini-btn:hover {
-  background: var(--mandiri-blue);
+  background: var(--brand-blue);
   color: #ffffff;
-  border-color: var(--mandiri-blue);
+  border-color: var(--brand-blue);
 }
 
 .add-btn {
@@ -1912,7 +1912,7 @@ function downloadEawgJson() {
   font-size: 12px;
   font-weight: 700;
   padding: 8px 16px;
-  background: var(--mandiri-blue, #003b73);
+  background: var(--brand-blue, #003b73);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm);

@@ -1,6 +1,6 @@
 package data
 
-import "mandiri/sizing-apps-backend/internal/model"
+import "enterprise/sizing-apps-backend/internal/model"
 
 // GetPricingCatalog returns the exact pricing items matching Template Sizing.xlsx
 func GetPricingCatalog() []model.LegacyPricingItem {

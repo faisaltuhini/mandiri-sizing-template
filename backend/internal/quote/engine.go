@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"mandiri/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/model"
 )
 
-// Engine handles the pricing calculation for Bank Mandiri infrastructure & licenses
+// Engine handles the pricing calculation for Enterprise Architecture infrastructure & licenses
 type Engine struct {
 	pricingMap   map[string]model.PricingItem
 	componentMap map[string]model.CatalogComponent
@@ -237,7 +237,7 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 		grandCompute *= drcMultiplier
 		grandStorage *= drcMultiplier
 		grandBackup *= drcMultiplier
-		// Note: Software licenses in Bank Mandiri are negotiated based on active/passive or dual-DC policy.
+		// Note: Software licenses in Enterprise Architecture are negotiated based on active/passive or dual-DC policy.
 		// For transparency, we double infrastructure costs while keeping license per core/cluster rule.
 	}
 

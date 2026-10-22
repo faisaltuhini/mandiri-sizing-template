@@ -1,6 +1,6 @@
 # =========================================================================
 # Sizing Frontend Dockerfile (Nuxt 3 - OpenShift & Kubernetes Ready)
-# Multi-stage build for Bank Mandiri Architecture & Sizing Hub
+# Multi-stage build for Enterprise Architecture Architecture & Sizing Hub
 # Compatible with OpenShift 4.x Restricted-v2 SCC (Arbitrary UID / GID 0)
 # =========================================================================
 
@@ -25,7 +25,7 @@ RUN pnpm build
 # Stage 2: Minimal runtime image
 FROM node:22-alpine AS runner
 
-LABEL maintainer="Enterprise Architecture & Sizing Team Bank Mandiri" \
+LABEL maintainer="Enterprise Architecture & Sizing Team Enterprise Architecture" \
       app="sizing-frontend" \
       description="Enterprise Architecture Sizing & Capacity Hub Frontend"
 

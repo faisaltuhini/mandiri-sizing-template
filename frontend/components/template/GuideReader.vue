@@ -6,7 +6,7 @@
         <span class="guide-badge">📖 Enterprise Architecture Manual</span>
         <h2>Panduan Komprehensif Rumus, Teori & Metodologi Capacity Planning</h2>
         <p class="guide-subtitle">
-          Dokumen standar metodologi matematis arsitektur IT Digital Channel Delivery — Bank Mandiri
+          Dokumen standar metodologi matematis arsitektur IT Digital Channel Delivery — Enterprise Architecture
         </p>
       </div>
       <div class="header-actions">
@@ -480,13 +480,13 @@ function renderInline(text?: string): string {
 }
 
 .toc-link:hover {
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   background: var(--bg3);
 }
 
 .toc-bullet {
   font-size: 10px;
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
 }
 
 .toc-bullet.sub {
@@ -528,7 +528,7 @@ h1.content-heading {
 h2.content-heading {
   font-size: 18px;
   font-weight: 700;
-  color: var(--mandiri-blue);
+  color: var(--brand-blue);
   border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
   margin-top: 24px;

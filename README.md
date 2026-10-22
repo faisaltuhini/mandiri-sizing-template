@@ -1,4 +1,4 @@
-# Enterprise Sizing & Capacity Planning Hub — Bank Mandiri
+# Enterprise Sizing & Capacity Planning Hub — Enterprise Architecture
 
 Aplikasi terdedikasi untuk **Enterprise Sizing & Capacity Planning**, arsitektur baseline 13-layer, ekstrapolasi non-linear Power-Law ($a \cdot \text{TPS}^b$), analitik telemetri SolarWinds database multi-node, dan deliverable EAWG.
 

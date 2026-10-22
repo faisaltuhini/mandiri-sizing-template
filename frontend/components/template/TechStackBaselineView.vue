@@ -1,16 +1,16 @@
 <template>
   <div class="tech-stack-baseline-view">
-    <!-- Top Executive Banner (Mandiri Deep Navy & Brushed Gold) -->
+    <!-- Top Executive Banner (Enterprise Deep Navy & Brushed Gold) -->
     <div class="baseline-header">
       <div class="header-content">
         <div class="header-badges">
-          <span class="badge-mandiri">Bank Mandiri EA Forum Standard</span>
+          <span class="badge-enterprise">Enterprise Architecture EA Forum Standard</span>
           <span class="badge-accent">Arsitektur Baseline Resmi</span>
           <span class="badge-count">13 Layer Arsitektur</span>
         </div>
         <h1 class="header-title">Standar Teknologi & Sizing Infrastruktur</h1>
         <p class="header-subtitle">
-          Pedoman resmi penentuan spesifikasi server, lisensi, dan kapasitas komputasi Bank Mandiri untuk
+          Pedoman resmi penentuan spesifikasi server, lisensi, dan kapasitas komputasi Enterprise Architecture untuk
           <strong>Tier Moderate (IHSP & RMT)</strong> vs <strong>Tier Critical (Livin' Merchant & Super App)</strong>.
         </p>
       </div>
@@ -410,7 +410,7 @@
                 <span class="lic-badge lic-free">{{ selectedItemData.license.free }}</span>
               </div>
               <div class="lic-col">
-                <span class="lic-sub-lbl">Lisensi Resmi Bank Mandiri:</span>
+                <span class="lic-sub-lbl">Lisensi Resmi Enterprise Architecture:</span>
                 <span class="lic-badge lic-ent">{{ selectedItemData.license.enterprise }}</span>
               </div>
             </div>
@@ -554,7 +554,7 @@ async function copyTableMarkdown() {
   margin-bottom: 10px;
 }
 
-.badge-mandiri {
+.badge-enterprise {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;

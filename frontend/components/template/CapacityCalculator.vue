@@ -256,7 +256,7 @@
             <label>Max Safe CPU Utilization (U<sub>max</sub>)</label>
             <select v-model.number="params.maxCpuUtil">
               <option :value="0.30">30% (Sangat Aman / Critical SLA)</option>
-              <option :value="0.40">40% (Standar Enterprise Bank Mandiri)</option>
+              <option :value="0.40">40% (Standar Enterprise Enterprise Architecture)</option>
               <option :value="0.50">50% (Moderat)</option>
               <option :value="0.60">60% (Agresif)</option>
             </select>
@@ -1224,7 +1224,7 @@ function downloadJson() {
   font-size: 12px;
   font-weight: 600;
   padding: 8px 16px;
-  background: var(--mandiri-blue);
+  background: var(--brand-blue);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-sm);

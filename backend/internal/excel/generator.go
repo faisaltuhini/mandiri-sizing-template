@@ -7,14 +7,14 @@ import (
 
 	"github.com/xuri/excelize/v2"
 
-	"mandiri/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/model"
 )
 
 // GenerateQuoteWorkbook creates a 100% database-driven spreadsheet matching Sizing_SCM_Inhouse_Architecture.xlsx:
 // 1. Cover & HLD Architecture (Dynamic from Catalog Components & Baselines in DB)
 // 2. Opsi Sizing SCM (Dynamic from user selection & live pricing lookup formulas)
 // 3. Pricing (100% Dynamic from PricingItem table in DB)
-// 4. Formula (Bank Mandiri standard architecture sizing rules)
+// 4. Formula (Enterprise Architecture standard architecture sizing rules)
 func GenerateQuoteWorkbook(
 	quote model.QuoteResponse,
 	rawReq model.QuoteRequest,
@@ -74,7 +74,7 @@ func GenerateQuoteWorkbook(
 }
 
 // -----------------------------------------------------------------------------
-// STYLES & THEME (Bank Mandiri Deep Navy, Corporate Blue, Gold/Rust)
+// STYLES & THEME (Bank Enterprise Deep Navy, Corporate Blue, Gold/Rust)
 // -----------------------------------------------------------------------------
 
 type workbookStyles struct {
@@ -289,7 +289,7 @@ func buildCoverSheet(
 	_ = f.MergeCell(sh, "B4", "I4")
 
 	_ = f.SetCellValue(sh, "B2", "INFRASTRUCTURE SIZING & HIGH LEVEL DESIGN (HLD)")
-	_ = f.SetCellValue(sh, "B3", fmt.Sprintf("PROJECT: %s - BANK MANDIRI", strings.ToUpper(projectName)))
+	_ = f.SetCellValue(sh, "B3", fmt.Sprintf("PROJECT: %s - ENTERPRISE", strings.ToUpper(projectName)))
 	_ = f.SetCellValue(sh, "B4", "Modernization: Web NGINX, OCP Microservices, Core DB, Redis Sharding, Kafka & Observability")
 
 	_ = f.SetRowHeight(sh, 2, 24)
@@ -310,7 +310,7 @@ func buildCoverSheet(
 		{"Nama Sistem", projectName, "Lingkungan Target", targetEnvDesc},
 		{"Model Arsitektur", "High Availability Active-Standby Cross-DC & Multi-Node Cluster", "Database Replication", "Oracle Real Application Clusters (RAC) + ASM Shared SAN"},
 		{"Container Platform", "Red Hat OpenShift (OCP) Container Platform / Baremetal", "Middleware & Caching", "Redis Enterprise 2-Shard Cluster + Confluent Kafka"},
-		{"Dokumen Acuan", "Katalog Resmi Bank Mandiri (Template Sizing.xlsx)", "Status Dokumen", "Final Proposed Infrastructure & License Sizing"},
+		{"Dokumen Acuan", "Katalog Resmi Enterprise Architecture (Template Sizing.xlsx)", "Status Dokumen", "Final Proposed Infrastructure & License Sizing"},
 	}
 
 	for idx, m := range meta {
@@ -500,7 +500,7 @@ func buildPricingSheet(
 	// 2. Software License Table
 	licHeaderR := hwRowStart + len(hwPricing) + 2
 	_ = f.MergeCell(sh, fmt.Sprintf("B%d", licHeaderR), fmt.Sprintf("F%d", licHeaderR))
-	_ = f.SetCellValue(sh, fmt.Sprintf("B%d", licHeaderR), "STANDAR HARGA LISENSI SOFTWARE (ACUAN RESMI BANK MANDIRI)")
+	_ = f.SetCellValue(sh, fmt.Sprintf("B%d", licHeaderR), "STANDAR HARGA LISENSI SOFTWARE (ACUAN RESMI ENTERPRISE)")
 	_ = f.SetCellStyle(sh, fmt.Sprintf("B%d", licHeaderR), fmt.Sprintf("F%d", licHeaderR), st.fontCardTitle)
 	_ = f.SetRowHeight(sh, licHeaderR, 26)
 
@@ -530,7 +530,7 @@ func buildPricingSheet(
 
 		note := p.Unit
 		if !p.IsConfirmed {
-			note = "Belum confirm ke STA / DBA Mandiri"
+			note = "Belum confirm ke STA / DBA Enterprise"
 		}
 		_ = f.SetCellValue(sh, fmt.Sprintf("F%d", r), note)
 

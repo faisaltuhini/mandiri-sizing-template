@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"mandiri/sizing-apps-backend/internal/data"
-	"mandiri/sizing-apps-backend/internal/model"
+	"enterprise/sizing-apps-backend/internal/data"
+	"enterprise/sizing-apps-backend/internal/model"
 )
 
 type SizingService struct{}

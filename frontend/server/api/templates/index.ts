@@ -22,7 +22,7 @@ export default defineEventHandler(async () => {
     },
     TECH_STACK: {
       name: 'Baseline Tech Stack & Sizing Pattern',
-      description: 'Template Excel Baseline Arsitektur Bank Mandiri, Komparasi Tier Moderate (IHSP/RMT) vs Critical (Livin Merchant), BOQ Sizing, dan Pricing Matrix.',
+      description: 'Template Excel Baseline Arsitektur Enterprise Architecture, Komparasi Tier Moderate (IHSP/RMT) vs Critical (Livin Merchant), BOQ Sizing, dan Pricing Matrix.',
       icon: '🏛️',
     },
     PENGADAAN: {

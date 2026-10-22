@@ -20,7 +20,7 @@ def build_template_tech_stack_workbook(output_file):
     ws_formula = wb.create_sheet(title="Formula & Guidelines")
     
     # -------------------------------------------------------------------------
-    # STYLES DEFINITION (Bank Mandiri Corporate Design System)
+    # STYLES DEFINITION (Enterprise Architecture Corporate Design System)
     # -------------------------------------------------------------------------
     font_main_title = Font(name='Segoe UI', size=15, bold=True, color='FFFFFF')
     font_sub_title = Font(name='Segoe UI', size=10, bold=False, color='E0E8F5')
@@ -42,9 +42,9 @@ def build_template_tech_stack_workbook(output_file):
     font_badge_blue = Font(name='Calibri', size=10, bold=True, color='1F4E79')
     
     # Color Fills
-    fill_navy = PatternFill(start_color='1B365D', end_color='1B365D', fill_type='solid')       # Mandiri Deep Navy
+    fill_navy = PatternFill(start_color='1B365D', end_color='1B365D', fill_type='solid')       # Enterprise Deep Navy
     fill_blue_hdr = PatternFill(start_color='305496', end_color='305496', fill_type='solid')    # Corporate Blue
-    fill_gold_hdr = PatternFill(start_color='C65911', end_color='C65911', fill_type='solid')    # Rust / Mandiri Gold
+    fill_gold_hdr = PatternFill(start_color='C65911', end_color='C65911', fill_type='solid')    # Rust / Enterprise Gold
     fill_accent_blue = PatternFill(start_color='418AB3', end_color='418AB3', fill_type='solid') # Accent Blue
     fill_teal_hdr = PatternFill(start_color='205D67', end_color='205D67', fill_type='solid')
     fill_dc1_dc2 = PatternFill(start_color='DDEBF7', end_color='DDEBF7', fill_type='solid')     # Light Blue
@@ -264,7 +264,7 @@ def build_template_tech_stack_workbook(output_file):
 
     # Row 1: Title Banner
     ws_m.merge_cells('B1:M1')
-    ws_m.cell(1, 2, "BASELINE TECHNOLOGY STACK & SIZING PATTERN (BANK MANDIRI)").font = font_title_bold
+    ws_m.cell(1, 2, "BASELINE TECHNOLOGY STACK & SIZING PATTERN (ENTERPRISE)").font = font_title_bold
     for c in range(2, 14):
         ws_m.cell(1, c).fill = fill_navy
     ws_m.row_dimensions[1].height = 28
@@ -880,7 +880,7 @@ def build_template_tech_stack_workbook(output_file):
         (4, "Pemisahan Logstash & Elasticsearch", "Node Segregation (Tier Critical)", "Logstash shipper dipisahkan ke server tersendiri di luar cluster Elasticsearch.", "Tier Critical memisahkan Logstash (PVLMEL) dari Elasticsearch Master (PVLMEM) dan Hot Data (PVLMDH) agar resource parsing Grok tidak memicu Out of Memory (OOM) pada heap JVM Elasticsearch."),
         (5, "Biaya vCPU Tahunan", "Total vCPU * Tarif vCPU", "Total vCPU dikalikan tarif standar tahunan (Production atau Dev).", "Mengacu sheet Pricing: Production Rp 8.250.000/vCPU/thn (=7.500.000*110%), Dev Rp 7.150.000/vCPU/thn (=6.500.000*110%)."),
         (6, "Biaya Storage Tahunan", "Total Storage * Tarif Storage", "Total GB dikalikan tarif Storage SAN Tier 2 tahunan.", "Mengacu sheet Pricing: Production Tier 2 Rp 33.000/GB/thn, Dev Rp 28.600/GB/thn."),
-        (7, "Biaya Backup Netbackup", "Storage * 50% * 80% * Tarif NBU", "Storage dikalikan 50% (asumsi data aktif), 80% (deduplikasi), dan tarif Rp 27.000/GB.", "Formula standar Bank Mandiri untuk proteksi dan pencadangan data berkala."),
+        (7, "Biaya Backup Netbackup", "Storage * 50% * 80% * Tarif NBU", "Storage dikalikan 50% (asumsi data aktif), 80% (deduplikasi), dan tarif Rp 27.000/GB.", "Formula standar Enterprise Architecture untuk proteksi dan pencadangan data berkala."),
         (8, "Biaya Pengadaan Bare Metal", "# Unit BM * Tarif Server", "Jumlah unit physical server dikalikan tarif pengadaan Rp 794.000.000.", "Digunakan khusus Tier Critical (Oracle RAC Bare Metal & Dedicated OCP Worker BM)."),
         (9, "Pola Database: Single Node vs RAC", "Pola Arsitektur Database", "Moderate: Single Node VM Data Guard | Critical: Oracle RAC Bare Metal", "Tier Moderate mengoptimalkan biaya lisensi core database melalui Single Node Data Guard; Tier Critical wajib Oracle RAC Bare Metal untuk menangani beban transaksi tinggi dengan zero downtime failover.")
     ]
