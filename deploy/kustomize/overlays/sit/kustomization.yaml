@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sizing-sit
+
+resources:
+  - ../../base
+
+labels:
+  - pairs:
+      environment: sit
+
+# 2 replicas for SIT High Availability testing
+patches:
+  - target:
+      kind: Deployment
+      name: sizing-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: sizing-frontend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+images:
+  - name: sizing-backend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-sit/sizing-backend
+    newTag: sit-latest
+  - name: sizing-frontend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-sit/sizing-frontend
+    newTag: sit-latest

@@ -1,0 +1,19 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: sizing-backend
+  labels:
+    app: sizing-backend
+    app.kubernetes.io/name: sizing-backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: sizing-apps
+spec:
+  to:
+    kind: Service
+    name: sizing-backend
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

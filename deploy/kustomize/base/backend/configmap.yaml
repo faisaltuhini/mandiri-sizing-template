@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sizing-backend-config
+  labels:
+    app: sizing-backend
+    app.kubernetes.io/name: sizing-backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: sizing-apps
+data:
+  PORT: "8089"
+  TEMPLATES_DIR: "/app/templates"
+  CORS_ORIGINS: "*"

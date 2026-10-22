@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sizing-frontend-config
+  labels:
+    app: sizing-frontend
+    app.kubernetes.io/name: sizing-frontend
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: sizing-apps
+data:
+  # Base URL untuk akses API backend dari browser client / SSR
+  # Ganti sesuai URL Route OpenShift backend di masing-masing environment
+  API_BASE: "http://sizing-backend:8089"
+  NUXT_PUBLIC_API_BASE: "http://sizing-backend:8089"

@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sizing-uat
+
+resources:
+  - ../../base
+
+labels:
+  - pairs:
+      environment: uat
+
+# 2 replicas for UAT High Availability testing
+patches:
+  - target:
+      kind: Deployment
+      name: sizing-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: sizing-frontend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+images:
+  - name: sizing-backend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-uat/sizing-backend
+    newTag: uat-latest
+  - name: sizing-frontend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-uat/sizing-frontend
+    newTag: uat-latest

@@ -1,0 +1,7 @@
+bin/
+api
+*.log
+.git
+.DS_Store
+tmp/
+.env

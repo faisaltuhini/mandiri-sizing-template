@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sizing-prod
+
+resources:
+  - ../../base
+  - hpa.yaml
+
+labels:
+  - pairs:
+      environment: prod
+
+# Production base replicas (HPA handles scaling between 3 - 10)
+patches:
+  - target:
+      kind: Deployment
+      name: sizing-backend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 2Gi
+  - target:
+      kind: Deployment
+      name: sizing-frontend
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests
+        value:
+          cpu: 500m
+          memory: 512Mi
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits
+        value:
+          cpu: 2000m
+          memory: 1536Mi
+
+# Production OpenShift Image Registry tags
+images:
+  - name: sizing-backend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-prod/sizing-backend
+    newTag: "1.0.0"
+  - name: sizing-frontend
+    newName: image-registry.openshift-image-registry.svc:5000/sizing-prod/sizing-frontend
+    newTag: "1.0.0"
