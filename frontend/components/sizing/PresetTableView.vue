@@ -814,6 +814,7 @@ import BaseHelpTip from '~/components/base/BaseHelpTip.vue'
 import BaseStepper from '~/components/base/BaseStepper.vue'
 import BaseAutocomplete, { type AutocompleteOption } from '~/components/base/BaseAutocomplete.vue'
 import { SIZING_GLOSSARY } from '~/data/sizingGlossary'
+import { useBackendBaseUrl } from '~/composables/useSizingApi'
 
 const glossary = SIZING_GLOSSARY
 const modalActiveTab = ref<'general' | 'moderate' | 'critical'>('general')
@@ -867,8 +868,7 @@ const backendComponents = ref<BackendCatalogComponent[]>([])
 
 onMounted(async () => {
   try {
-    const config = useRuntimeConfig()
-    const apiBase = (config.public?.apiBase as string) || 'http://localhost:8089'
+    const apiBase = useBackendBaseUrl()
     const res = await $fetch<{ data: BackendCatalogComponent[] }>(`${apiBase}/api/v1/catalog/components`)
     if (res && res.data) {
       backendComponents.value = res.data

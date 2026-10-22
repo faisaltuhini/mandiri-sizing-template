@@ -1,6 +1,13 @@
-export function useSizingApi() {
+export function useBackendBaseUrl(): string {
   const config = useRuntimeConfig()
-  const backendBase = (config.public?.apiBase as string) || 'http://localhost:8089'
+  if (import.meta.server && process.env.BACKEND_URL) {
+    return process.env.BACKEND_URL.replace(/\/$/, '')
+  }
+  return ((config.public?.apiBase as string) ?? '').replace(/\/$/, '')
+}
+
+export function useSizingApi() {
+  const backendBase = useBackendBaseUrl()
 
   async function checkHealth() {
     return await $fetch(`${backendBase}/api/health`)

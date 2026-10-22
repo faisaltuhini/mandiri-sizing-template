@@ -702,6 +702,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import BaseAutocomplete, { type AutocompleteOption } from '~/components/base/BaseAutocomplete.vue'
+import { useBackendBaseUrl } from '~/composables/useSizingApi'
 
 interface LicenseRule {
   id: string
@@ -739,8 +740,7 @@ const emit = defineEmits<{
   (e: 'toggle-sidebar'): void
 }>()
 
-const config = useRuntimeConfig()
-const apiBase = config.public?.apiBase || 'http://localhost:8089'
+const apiBase = useBackendBaseUrl()
 
 // State
 const rules = ref<LicenseRule[]>([])

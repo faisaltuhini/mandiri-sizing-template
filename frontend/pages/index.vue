@@ -151,14 +151,14 @@ import PresetTableView from '~/components/sizing/PresetTableView.vue'
 import LicenseRuleTableView from '~/components/sizing/LicenseRuleTableView.vue'
 import SizingModals from '~/components/sizing/SizingModals.vue'
 import { useLocalOpen } from '~/composables/useLocalOpen'
+import { useBackendBaseUrl } from '~/composables/useSizingApi'
 import { useSizingIndexedDB } from '~/composables/useSizingIndexedDB'
 import { DEFAULT_PRESET_ITEMS } from '~/data/defaultPresetItems'
 import type { AppMenu, SizingPresetItem } from '~/types/sizing'
 
 const { showToast } = useLocalOpen()
 const { setItem: setDbItem, getItem: getDbItem } = useSizingIndexedDB()
-const config = useRuntimeConfig()
-const apiBase = config.public.apiBase || 'http://localhost:8089'
+const apiBase = useBackendBaseUrl()
 
 // ==========================================
 // ROUTER & QUERY PARAM PERSISTENCE

@@ -4,6 +4,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { ref, onMounted } from 'vue'
+import { useBackendBaseUrl } from '~/composables/useSizingApi'
 
 export interface BackendStatus {
   connected: boolean
@@ -27,8 +28,7 @@ export interface CalculateParams {
 }
 
 export function useSizingBackend() {
-  const config = useRuntimeConfig()
-  const apiBase = (config.public?.apiBase as string) || 'http://localhost:8088'
+  const apiBase = useBackendBaseUrl()
 
   const backendStatus = ref<BackendStatus>({
     connected: false,
