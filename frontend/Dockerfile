@@ -9,11 +9,11 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Enable corepack for pnpm package manager
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable corepack for pnpm package manager (matching lockfile 9.0)
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 # Cache dependencies
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 # Copy frontend source code
