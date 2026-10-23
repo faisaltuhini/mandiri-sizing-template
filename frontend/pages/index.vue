@@ -32,14 +32,18 @@
           :active-item="activeItem"
           :active-config="activeConfig"
           :active-layer-cost="activeLayerCost"
+          :all-layer-costs="quoteResponse?.items"
           :tier-filter="tierFilter"
           :license-filter="licenseFilter"
           :is-layer-customized="isLayerCustomized"
           :pricing-list="pricingList"
           @select-layer="activeItemId = $event"
           @reset-active-layer="resetActiveLayerToBaseline"
+          @reset-default-layers="handleResetPresetDefaults"
           @add-catalog-to-sizing="handleAddCatalogToSizing"
           @remove-custom-layer="handleDeletePresetItem"
+          @update:tier="setTierFilter"
+          @update:license="setLicenseFilter"
         />
 
         <!-- STICKY ARCHITECTURE COST SUMMARY BAR (BOTTOM) -->
@@ -455,12 +459,14 @@ async function handleSavePresetItem(item: SizingPresetItem) {
 }
 
 async function handleDeletePresetItem(itemId: string) {
+  const found = presetItems.value.find(p => p.id === itemId)
+  const layerName = found ? found.component : 'Layer'
   presetItems.value = presetItems.value.filter(p => p.id !== itemId)
   delete layerConfigs[itemId]
   if (activeItemId.value === itemId && presetItems.value.length > 0) {
     activeItemId.value = presetItems.value[0].id
   }
-  showToast('Preset layer kustom berhasil dihapus!', 'info')
+  showToast(`Layer "${layerName}" berhasil dihapus dari Sizing!`, 'info')
   await setDbItem('sizing_presets', JSON.parse(JSON.stringify(presetItems.value)))
   triggerQuoteCalculation()
 }

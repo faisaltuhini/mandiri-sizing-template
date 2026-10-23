@@ -4,19 +4,36 @@
       v-for="opt in options"
       :key="opt.value"
       class="choice-card"
-      :class="{ active: modelValue === opt.value, disabled: opt.disabled }"
+      :class="{
+        active: modelValue === opt.value,
+        recommended: opt.recommended && modelValue !== opt.value,
+        disabled: opt.disabled
+      }"
       @click="!opt.disabled && $emit('update:modelValue', opt.value)"
     >
       <div class="card-top">
-        <span v-if="opt.icon" class="opt-icon">{{ opt.icon }}</span>
-        <div class="opt-title-wrap">
-          <span class="opt-title">{{ opt.title }}</span>
-          <span v-if="opt.technicalLabel" class="opt-tech-pill">{{ opt.technicalLabel }}</span>
+        <div class="card-top-left">
+          <span v-if="opt.icon" class="opt-icon">{{ opt.icon }}</span>
+          <div class="opt-title-wrap">
+            <span class="opt-title">{{ opt.title }}</span>
+            <span v-if="opt.technicalLabel" class="opt-tech-pill">{{ opt.technicalLabel }}</span>
+          </div>
         </div>
+
+        <!-- Clear Selection Radio / Checkmark Indicator for Non-Tech Users -->
+        <span class="selection-indicator" :class="{ checked: modelValue === opt.value }">
+          <svg v-if="modelValue === opt.value" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </span>
       </div>
+
       <p class="opt-desc">{{ opt.description }}</p>
-      <div v-if="opt.badge" class="opt-badge-strip">
-        <span :class="['opt-badge', opt.badgeType || 'info']">{{ opt.badge }}</span>
+
+      <div v-if="opt.badge || opt.recommended || modelValue === opt.value" class="opt-badge-strip">
+        <span v-if="modelValue === opt.value" class="opt-badge selected-pill">Terpilih</span>
+        <span v-if="opt.recommended" class="opt-badge std-pill">★ Standar EA</span>
+        <span v-if="opt.badge" :class="['opt-badge', opt.badgeType || 'info']">{{ opt.badge }}</span>
       </div>
     </div>
   </div>
@@ -31,6 +48,7 @@ export interface ChoiceOption {
   icon?: string
   badge?: string
   badgeType?: 'info' | 'success' | 'warning'
+  recommended?: boolean
   disabled?: boolean
 }
 
@@ -53,25 +71,32 @@ defineEmits<{
 
 .choice-card {
   background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  padding: 12px 14px;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 9px;
+  padding: 13px 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 8px;
   position: relative;
   text-align: left;
 }
 
 .choice-card:hover:not(.disabled) {
-  border-color: #94A3B8;
+  border-color: #64748B;
   background: #F8FAFC;
+  transform: translateY(-1px);
+}
+
+.choice-card.recommended {
+  border-color: #FCD34D;
+  background: #FFFDF7;
 }
 
 .choice-card.active {
-  background: #EFF6FF;
+  background: #F0F6FF;
   border-color: #002060;
   box-shadow: 0 0 0 2px rgba(0, 32, 96, 0.12);
 }
@@ -83,48 +108,96 @@ defineEmits<{
 
 .card-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
 }
 
+.card-top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .opt-icon {
-  font-size: 16px;
+  font-size: 17px;
+  flex-shrink: 0;
 }
 
 .opt-title-wrap {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .opt-title {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 800;
   color: #0F172A;
+  line-height: 1.25;
 }
 
 .opt-tech-pill {
-  font-size: 9px;
+  font-size: 9.5px;
   font-family: 'JetBrains Mono', monospace;
   color: #64748B;
+  margin-top: 1px;
+}
+
+.selection-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #CBD5E1;
+  background: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #FFFFFF;
+  transition: all 0.15s ease;
+}
+
+.selection-indicator.checked {
+  background: #002060;
+  border-color: #002060;
 }
 
 .opt-desc {
   margin: 0;
   font-size: 11px;
   color: #475569;
-  line-height: 1.4;
+  line-height: 1.45;
+  flex: 1;
 }
 
 .opt-badge-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
   margin-top: 2px;
 }
 
 .opt-badge {
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 2px 6px;
-  border-radius: 3px;
+  border-radius: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.opt-badge.selected-pill {
+  background: #002060;
+  color: #FFFFFF;
+}
+
+.opt-badge.std-pill {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
 }
 
 .opt-badge.info {

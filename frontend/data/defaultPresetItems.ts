@@ -9,7 +9,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🌐',
     licenseFree: 'NGINX Community (OSS)',
     licenseEnterprise: 'NGINX Plus (F5 Enterprise)',
-    notes: 'Reverse proxy, SSL termination, and rate limiting entry layer.',
+    notes: 'Pintu gerbang utama pengatur lalu lintas akses pengguna & pengaman koneksi web.',
     contractRef: 'TIF.DDL/GH.9076/2025',
     moderate: {
       nodeCount: 2,
@@ -40,7 +40,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '📦',
     licenseFree: 'OKD (Community OSS)',
     licenseEnterprise: 'Red Hat OpenShift Platform Plus Baremetal',
-    notes: 'Microservices orchestration cluster on OpenShift.',
+    notes: 'Mesin utama tempat seluruh layanan & fitur aplikasi dijalankan (Microservices).',
     contractRef: 'TIF.DDL/GH.1993/2025',
     moderate: {
       nodeCount: 1,
@@ -71,7 +71,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🔀',
     licenseFree: 'Included in OCP',
     licenseEnterprise: 'Included in OCP Platform Plus',
-    notes: 'Ingress routing & HA proxy pods for container workloads.',
+    notes: 'Pengatur jalur komunikasi internal antar-layanan di dalam klaster aplikasi.',
     contractRef: 'Included in OCP',
     moderate: {
       nodeCount: 7,
@@ -102,7 +102,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🗄️',
     licenseFree: 'PostgreSQL / MySQL Community',
     licenseEnterprise: 'Oracle Database Enterprise Edition (RAC + ADG)',
-    notes: 'High-availability transaction database engine.',
+    notes: 'Mesin database utama penyimpan data transaksi nasabah & catatan finansial.',
     contractRef: 'TIF.DDL/SCD.3585/2025',
     moderate: {
       nodeCount: 1,
@@ -133,7 +133,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '💾',
     licenseFree: 'LVM / Linux Software RAID',
     licenseEnterprise: 'Oracle ASM (Enterprise Storage Management)',
-    notes: 'Low-latency SAN block storage with ASM redundancy.',
+    notes: 'Ruang penyimpanan disk berkecepatan tinggi khusus untuk menampung data database utama.',
     contractRef: 'SAN Master Contract',
     moderate: {
       nodeCount: 1,
@@ -164,7 +164,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '⚡',
     licenseFree: 'Redis Community OSS',
     licenseEnterprise: 'Redis Enterprise Software (Active-Active)',
-    notes: 'High-speed session storage & API response caching.',
+    notes: 'Memori penyimpan sementara super cepat agar aplikasi merespons instan tanpa membebani database.',
     contractRef: 'TIF.DDL/GH.2984/2025',
     moderate: {
       nodeCount: 2,
@@ -195,7 +195,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🛡️',
     licenseFree: 'Redis Sentinel OSS',
     licenseEnterprise: 'Included in Redis Enterprise',
-    notes: 'Automated failover & master election for Redis.',
+    notes: 'Penjaga otomatis yang memindahkan jalur memori cepat jika terjadi gangguan server.',
     contractRef: 'Included in Redis',
     moderate: {
       nodeCount: 3,
@@ -226,7 +226,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '📨',
     licenseFree: 'Apache Kafka Community OSS',
     licenseEnterprise: 'Confluent Enterprise Platform (Kora Engine)',
-    notes: 'Event-driven backbone for transaction streaming.',
+    notes: 'Jalur antrean pesan agar ribuan transaksi dapat diproses berurutan tanpa macet.',
     contractRef: 'TIF.DDL/GH.4412/2025',
     moderate: {
       nodeCount: 3,
@@ -257,7 +257,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🔍',
     licenseFree: 'OpenSearch / Elastic Basic',
     licenseEnterprise: 'Elasticsearch Enterprise Platinum Subscription',
-    notes: 'Hot-warm audit trail search & real-time analytics.',
+    notes: 'Mesin pencari & analisis riwayat aktivitas sistem untuk keperluan audit dan pelacakan masalah.',
     contractRef: 'TIF.DDL/GH.8821/2025',
     moderate: {
       nodeCount: 2,
@@ -288,7 +288,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '🚚',
     licenseFree: 'Logstash OSS',
     licenseEnterprise: 'Included in Elastic Platinum',
-    notes: 'Log ingest pipeline, parsing, and normalization buffer.',
+    notes: 'Pengumpul dan pengirim catatan aktivitas (log) dari aplikasi ke mesin analitik.',
     contractRef: 'Included in Elastic',
     moderate: {
       nodeCount: 1,
@@ -319,7 +319,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '📊',
     licenseFree: 'OpenSearch Dashboards / Kibana Basic',
     licenseEnterprise: 'Included in Elastic Platinum',
-    notes: 'Visualization dashboards and alerting gateway.',
+    notes: 'Layar dasbor visual untuk memantau kesehatan sistem dan riwayat log secara real-time.',
     contractRef: 'Included in Elastic',
     moderate: {
       nodeCount: 1,
@@ -350,7 +350,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '📁',
     licenseFree: 'MinIO Community (OSS)',
     licenseEnterprise: 'MinIO Enterprise / Enterprise Architecture Doc Storage',
-    notes: 'Long-term electronic customer statement and KYC store.',
+    notes: 'Gudang penyimpanan file dokumen elektronik, e-statement, dan berkas KYC nasabah.',
     contractRef: 'ECM Storage Master',
     moderate: {
       nodeCount: 1,
@@ -381,7 +381,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
     icon: '⏱️',
     licenseFree: 'Kubernetes CronJob (OSS)',
     licenseEnterprise: 'BMC Control-M Workload Automation',
-    notes: 'End-of-day batch settlement and clearing scheduler.',
+    notes: 'Penjadwal otomatis untuk proses tutup buku harian, rekonsiliasi, dan laporan berkala.',
     contractRef: 'TIF.DDL/GH.5510/2025',
     moderate: {
       nodeCount: 1,

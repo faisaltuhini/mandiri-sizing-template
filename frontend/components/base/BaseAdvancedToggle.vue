@@ -3,7 +3,7 @@
     <button
       type="button"
       class="toggle-link-btn"
-      @click="isOpen = !isOpen"
+      @click="toggle"
     >
       <svg
         class="toggle-chevron"
@@ -29,26 +29,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
     showLabel?: string
     hideLabel?: string
     defaultOpen?: boolean
+    modelValue?: boolean
   }>(),
   {
-    defaultOpen: false
+    defaultOpen: false,
+    modelValue: undefined
   }
 )
 
-const isOpen = ref(props.defaultOpen)
+const emit = defineEmits<{
+  (e: 'update:modelValue', val: boolean): void
+}>()
+
+const internalOpen = ref(props.modelValue !== undefined ? props.modelValue : props.defaultOpen)
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val !== undefined) {
+      internalOpen.value = val
+    }
+  }
+)
+
+const isOpen = computed(() => {
+  return props.modelValue !== undefined ? props.modelValue : internalOpen.value
+})
+
+function toggle() {
+  const next = !isOpen.value
+  internalOpen.value = next
+  emit('update:modelValue', next)
+}
 
 const displayLabel = computed(() => {
   const raw = isOpen.value
     ? (props.hideLabel || 'Sembunyikan Pengaturan Detail')
     : (props.showLabel || 'Atur Angka Spesifik Manual (Lanjutan)')
-  // Strip any leading arrow symbols (▸, ▾, ▶, ▼, >, v) and whitespace to prevent duplicate chevrons
   return raw.replace(/^[▸▾▶▼>v\s]+/, '').trim()
 })
 </script>
@@ -68,7 +92,7 @@ const displayLabel = computed(() => {
   align-items: center;
   gap: 6px;
   color: #475569;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
   align-self: flex-start;
@@ -97,7 +121,7 @@ const displayLabel = computed(() => {
 .advanced-slot-wrapper {
   background: #F8FAFC;
   border: 1px dashed #CBD5E1;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 12px 14px;
 }
 </style>

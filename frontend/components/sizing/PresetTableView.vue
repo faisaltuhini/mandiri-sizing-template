@@ -115,65 +115,203 @@
         </div>
       </transition>
 
-      <!-- Toolbar Filter & Search -->
-      <div class="preset-toolbar">
-        <div class="search-input-wrap">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input
-            type="text"
-            v-model="searchQuery"
-            class="preset-search-input"
-            placeholder="Cari berdasarkan nama layer, komponen, atau lisensi..."
-          />
+      <!-- EXECUTIVE GUIDANCE BANNER (MODERAT VS CRITICAL) -->
+      <section class="preset-overview-section">
+        <div class="overview-header-row">
+          <div class="overview-title-group">
+            <span class="overview-eyebrow">PANDUAN EKSEKUTIF</span>
+            <h2 class="overview-heading">Standar Baseline Arsitektur Mandiri</h2>
+          </div>
           <button
-            v-if="searchQuery"
             type="button"
-            class="search-clear-btn"
-            @click="searchQuery = ''"
+            class="btn-toggle-overview"
+            @click="toggleOverviewBanner"
+            :title="isOverviewBannerVisible ? 'Sembunyikan panduan ringkasan' : 'Tampilkan panduan ringkasan'"
           >
-            ✕
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              :class="{ 'rotate-180': !isOverviewBannerVisible }"
+              style="transition: transform 0.2s ease;"
+            >
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            <span>{{ isOverviewBannerVisible ? 'Sembunyikan Panduan' : 'Tampilkan Panduan' }}</span>
           </button>
         </div>
 
-        <div class="tier-view-segmented">
-          <span class="seg-label">Tampilan Preset:</span>
-          <div class="segmented-control">
+        <transition name="overview-collapse">
+          <div v-if="isOverviewBannerVisible" class="overview-cards-row">
+            <!-- MODERATE EXECUTIVE CARD -->
+            <div class="overview-tier-card card-moderat">
+              <div class="card-tier-top">
+                <div class="tier-pill-group">
+                  <span class="overview-tier-badge mod">MODERAT (N+1)</span>
+                  <span class="overview-target-badge">Aplikasi Internal &amp; Operasional Reguler</span>
+                </div>
+              </div>
+              <p class="overview-tier-desc">
+                Dirancang untuk sistem non-kritis dengan efisiensi biaya optimal. Menggunakan klaster <strong>Server Virtual (VM)</strong> hemat daya, ketahanan failover <strong>N+1</strong> (1 server cadangan), dan opsi software <strong>Open Source (Gratis)</strong> tanpa lisensi tahunan berulang.
+              </p>
+              <div class="overview-totals-grid">
+                <div class="overview-total-item">
+                  <span class="tot-label">Total Unit Server</span>
+                  <span class="tot-val text-navy">{{ clusterTotals.modNodes }} Node</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Tenaga Komputasi</span>
+                  <span class="tot-val text-navy">{{ clusterTotals.modVcpu }} vCPU</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Total RAM</span>
+                  <span class="tot-val text-navy">{{ clusterTotals.modRam }} GB</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Kapasitas Disk</span>
+                  <span class="tot-val text-navy">{{ formatDiskSize(clusterTotals.modStorage) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- CRITICAL EXECUTIVE CARD -->
+            <div class="overview-tier-card card-critical">
+              <div class="card-tier-top">
+                <div class="tier-pill-group">
+                  <span class="overview-tier-badge crit">CRITICAL (2N)</span>
+                  <span class="overview-target-badge">Layanan Nasabah 24/7 &amp; Transaksi Finansial (Core)</span>
+                </div>
+              </div>
+              <p class="overview-tier-desc">
+                Dirancang tanpa toleransi downtime (High Availability &amp; zero single point of failure). Kapasitas <strong>digandakan penuh (2N Server Kembar)</strong>, prioritas <strong>Server Fisik Khusus (Baremetal)</strong> untuk performa puncak, serta <strong>Lisensi Resmi Vendor (Enterprise SLA 24/7)</strong>.
+              </p>
+              <div class="overview-totals-grid">
+                <div class="overview-total-item">
+                  <span class="tot-label">Total Unit Server</span>
+                  <span class="tot-val text-amber">{{ clusterTotals.critNodes }} Node</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Tenaga Komputasi</span>
+                  <span class="tot-val text-amber">{{ clusterTotals.critVcpu }} vCPU</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Total RAM</span>
+                  <span class="tot-val text-amber">{{ clusterTotals.critRam }} GB</span>
+                </div>
+                <div class="overview-total-item">
+                  <span class="tot-label">Kapasitas Disk</span>
+                  <span class="tot-val text-amber">{{ formatDiskSize(clusterTotals.critStorage) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </section>
+
+      <!-- SMART TOOLBAR: PENCARIAN + FILTER TIER + VIEW MODE + KATEGORI -->
+      <div class="preset-smart-toolbar">
+        <div class="toolbar-primary-row">
+          <div class="search-input-wrap">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="text"
+              v-model="searchQuery"
+              class="preset-search-input"
+              placeholder="Cari berdasarkan nama layer, fungsi bisnis, komponen, atau lisensi..."
+            />
+            <button
+              v-if="searchQuery"
+              type="button"
+              class="search-clear-btn"
+              @click="searchQuery = ''"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="tier-view-segmented">
+            <span class="seg-label">Filter Tier:</span>
+            <div class="segmented-control">
+              <button
+                type="button"
+                :class="['seg-btn', { active: activeTierTab === 'both' }]"
+                @click="activeTierTab = 'both'"
+              >
+                Kedua Tier (Bandingkan)
+              </button>
+              <button
+                type="button"
+                :class="['seg-btn btn-mod', { active: activeTierTab === 'moderate' }]"
+                @click="activeTierTab = 'moderate'"
+              >
+                Moderat Saja
+              </button>
+              <button
+                type="button"
+                :class="['seg-btn btn-crit', { active: activeTierTab === 'critical' }]"
+                @click="activeTierTab = 'critical'"
+              >
+                Critical Saja
+              </button>
+            </div>
+          </div>
+
+          <!-- View Switcher (Cards vs Table) -->
+          <div class="view-mode-switcher">
             <button
               type="button"
-              :class="['seg-btn', { active: activeTierTab === 'both' }]"
-              @click="activeTierTab = 'both'"
+              :class="['view-switch-btn', { active: viewMode === 'cards' }]"
+              @click="viewMode = 'cards'"
+              title="Tampilan Kartu Visual Interaktif"
             >
-              Kedua Tier (Bandingkan)
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Kartu Detail</span>
             </button>
             <button
               type="button"
-              :class="['seg-btn btn-mod', { active: activeTierTab === 'moderate' }]"
-              @click="activeTierTab = 'moderate'"
+              :class="['view-switch-btn', { active: viewMode === 'table' }]"
+              @click="viewMode = 'table'"
+              title="Tampilan Matriks Tabel 1 Layar"
             >
-              Moderat Saja
-            </button>
-            <button
-              type="button"
-              :class="['seg-btn btn-crit', { active: activeTierTab === 'critical' }]"
-              @click="activeTierTab = 'critical'"
-            >
-              Critical Saja
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <span>Tabel Ringkas</span>
             </button>
           </div>
         </div>
 
-        <div class="preset-stats">
-          <span class="stat-badge">
-            <strong>{{ filteredPresetItems.length }}</strong> Layer Terdaftar
-          </span>
+        <!-- CATEGORY PILL FILTER ROW -->
+        <div class="category-pills-row">
+          <button
+            v-for="cat in availableCategories"
+            :key="cat.id"
+            type="button"
+            :class="['category-pill-btn', { active: activeCategory === cat.id }]"
+            @click="activeCategory = cat.id"
+          >
+            <span class="cat-pill-icon">{{ cat.icon }}</span>
+            <span class="cat-pill-label">{{ cat.label }}</span>
+            <span class="cat-pill-count">{{ categoryCounts[cat.id] || 0 }}</span>
+          </button>
         </div>
       </div>
 
-      <!-- CARDS LIST OF PRESET LAYERS -->
-      <div class="preset-cards-grid">
+      <!-- VIEW MODE 1: CARDS LIST OF PRESET LAYERS -->
+      <div v-if="viewMode === 'cards' && filteredPresetItems.length > 0" class="preset-cards-grid">
         <div
           v-for="item in filteredPresetItems"
           :key="item.id"
@@ -182,10 +320,25 @@
           <!-- Card Header -->
           <div class="preset-card-header">
             <div class="card-header-left">
-              <span class="layer-number-badge">Layer {{ item.no }}</span>
-              <div class="layer-title-wrap">
+              <!-- Component Icon Avatar -->
+              <div class="card-avatar-box">
+                <span class="avatar-emoji">{{ getLayerIcon(item) }}</span>
+              </div>
+
+              <div class="layer-title-meta-wrap">
+                <div class="layer-badges-line">
+                  <span class="layer-number-badge">Layer {{ String(item.no).padStart(2, '0') }}</span>
+                  <span :class="['category-badge-chip', getCategoryBadge(item).theme]">
+                    {{ getCategoryBadge(item).icon }} {{ getCategoryBadge(item).label }}
+                  </span>
+                  <span class="component-code-chip">{{ item.component }}</span>
+                </div>
                 <h3 class="layer-title">{{ item.layer }}</h3>
-                <span class="component-subtitle">{{ item.component }}</span>
+                <!-- Plain-Language Business Function Description -->
+                <div v-if="item.notes" class="layer-business-role">
+                  <span class="role-icon">💡</span>
+                  <span class="role-text">{{ item.notes }}</span>
+                </div>
               </div>
             </div>
 
@@ -204,11 +357,10 @@
               </button>
 
               <button
-                v-if="item.no > 13"
                 type="button"
                 class="btn-delete-layer"
                 @click="confirmDeleteCustomLayer(item)"
-                title="Hapus Layer Kustom Ini"
+                title="Hapus Layer Preset Ini"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6"/>
@@ -226,36 +378,62 @@
               class="spec-box box-mod"
             >
               <div class="spec-box-hdr">
-                <div class="tier-dot mod-dot"></div>
-                <span class="box-tier-title text-navy">Formula Baseline: Moderat (N+1)</span>
-              </div>
-
-              <div class="spec-metrics-grid">
-                <div class="metric-cell">
-                  <span class="cell-lbl">Nodes:</span>
-                  <span class="cell-val">{{ item.moderate.nodeCount }} Node</span>
+                <div class="spec-tier-badge mod-theme">
+                  <div class="tier-dot mod-dot"></div>
+                  <span class="box-tier-title text-navy">Moderat (N+1)</span>
+                  <span class="box-tier-sub">· Operasional Reguler</span>
                 </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">Compute:</span>
-                  <span class="cell-val">{{ item.moderate.vcpuPerNode }} vCPU / node</span>
-                </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">RAM:</span>
-                  <span class="cell-val">{{ item.moderate.ramGBPerNode }} GB / node</span>
-                </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">Storage:</span>
-                  <span class="cell-val">{{ item.moderate.storageGBPerNode }} GB ({{ item.moderate.storageClass }})</span>
-                </div>
-              </div>
-
-              <div class="spec-type-strip">
-                <span class="type-pill font-mono">{{ formatComputeType(item.moderate.computeType) }}</span>
-                <span :class="['backup-badge', item.moderate.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.moderate.backupEnabled ? '✓ NetBackup NBU' : 'Tanpa NBU' }}
+                <span :class="['tshirt-size-badge', getSizeBadge(item.moderate).tagClass]">
+                  {{ getSizeBadge(item.moderate).label }}
                 </span>
-                <span class="license-spec-pill">
-                  Lisensi: <strong>{{ item.moderate.licenseKind === 'enterprise' ? 'Enterprise' : 'Free OSS' }}</strong>
+              </div>
+
+              <!-- Shared Storage Special View vs Standard Compute Nodes -->
+              <div v-if="item.moderate.computeType === 'shared'" class="shared-storage-callout mod-theme">
+                <div class="shared-callout-icon">🗄️</div>
+                <div class="shared-callout-info">
+                  <span class="shared-callout-title">Penyimpanan Bersama Terpusat (SAN LUN Storage Pool)</span>
+                  <span class="shared-callout-desc">Volume disk bersama terpusat tanpa unit server prosesor terpisah.</span>
+                </div>
+                <div class="shared-storage-val">
+                  <span class="storage-num">{{ item.moderate.storageGBPerNode }} GB</span>
+                  <span class="storage-class-tag">{{ item.moderate.storageClass }}</span>
+                </div>
+              </div>
+
+              <div v-else class="spec-metrics-grid">
+                <div class="metric-cell">
+                  <span class="cell-lbl">Unit Server</span>
+                  <span class="cell-val">{{ item.moderate.nodeCount }} Unit</span>
+                  <span class="cell-sub">{{ formatComputeType(item.moderate.computeType) }}</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Tenaga Prosesor</span>
+                  <span class="cell-val">{{ item.moderate.vcpuPerNode }} vCPU / node</span>
+                  <span class="cell-sub">Total {{ item.moderate.nodeCount * item.moderate.vcpuPerNode }} vCPU</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Memori RAM</span>
+                  <span class="cell-val">{{ item.moderate.ramGBPerNode }} GB / node</span>
+                  <span class="cell-sub">Total {{ item.moderate.nodeCount * item.moderate.ramGBPerNode }} GB</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Ruang Disk</span>
+                  <span class="cell-val">{{ item.moderate.storageGBPerNode }} GB</span>
+                  <span class="cell-sub">{{ item.moderate.storageClass }} · Total {{ (item.moderate.nodeCount || 1) * item.moderate.storageGBPerNode }} GB</span>
+                </div>
+              </div>
+
+              <div class="spec-box-tier-footer">
+                <div class="tier-lic-indicator">
+                  <span class="lic-icon">{{ item.moderate.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}</span>
+                  <span class="lic-name">
+                    <strong>{{ item.moderate.licenseKind === 'enterprise' ? 'Lisensi Resmi' : 'Gratis (OSS)' }}:</strong>
+                    {{ item.moderate.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
+                  </span>
+                </div>
+                <span :class="['backup-badge', item.moderate.backupEnabled ? 'active' : 'inactive']">
+                  {{ item.moderate.backupEnabled ? '✓ NetBackup Aktif' : 'Tanpa NetBackup' }}
                 </span>
               </div>
             </div>
@@ -266,36 +444,76 @@
               class="spec-box box-crit"
             >
               <div class="spec-box-hdr">
-                <div class="tier-dot crit-dot"></div>
-                <span class="box-tier-title text-amber">Formula Baseline: Critical (2N)</span>
-              </div>
-
-              <div class="spec-metrics-grid">
-                <div class="metric-cell">
-                  <span class="cell-lbl">Nodes:</span>
-                  <span class="cell-val">{{ item.critical.nodeCount }} Node</span>
+                <div class="spec-tier-badge crit-theme">
+                  <div class="tier-dot crit-dot"></div>
+                  <span class="box-tier-title text-amber">Critical (2N)</span>
+                  <span class="box-tier-sub">· Layanan Inti 24/7</span>
                 </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">Compute:</span>
-                  <span class="cell-val">{{ item.critical.vcpuPerNode }} vCPU / node</span>
-                </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">RAM:</span>
-                  <span class="cell-val">{{ item.critical.ramGBPerNode }} GB / node</span>
-                </div>
-                <div class="metric-cell">
-                  <span class="cell-lbl">Storage:</span>
-                  <span class="cell-val">{{ item.critical.storageGBPerNode }} GB ({{ item.critical.storageClass }})</span>
-                </div>
-              </div>
-
-              <div class="spec-type-strip">
-                <span class="type-pill font-mono">{{ formatComputeType(item.critical.computeType) }}</span>
-                <span :class="['backup-badge', item.critical.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.critical.backupEnabled ? '✓ NetBackup NBU' : 'Tanpa NBU' }}
+                <span :class="['tshirt-size-badge', getSizeBadge(item.critical).tagClass]">
+                  {{ getSizeBadge(item.critical).label }}
                 </span>
-                <span class="license-spec-pill">
-                  Lisensi: <strong>{{ item.critical.licenseKind === 'enterprise' ? 'Enterprise' : 'Free OSS' }}</strong>
+              </div>
+
+              <!-- Delta Highlight Pills: Apa yang Meningkat di Critical? -->
+              <div class="delta-pills-strip">
+                <span class="delta-label">Perbedaan vs Moderat:</span>
+                <div class="delta-chips-wrap">
+                  <span
+                    v-for="(pill, pIdx) in getDeltaPills(item.moderate, item.critical)"
+                    :key="pIdx"
+                    :class="['delta-chip', pill.type]"
+                  >
+                    {{ pill.text }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Shared Storage Special View vs Standard Compute Nodes -->
+              <div v-if="item.critical.computeType === 'shared'" class="shared-storage-callout crit-theme">
+                <div class="shared-callout-icon">🗄️</div>
+                <div class="shared-callout-info">
+                  <span class="shared-callout-title">Penyimpanan Bersama Terpusat (SAN LUN Storage Pool)</span>
+                  <span class="shared-callout-desc">Volume disk berkecepatan tinggi tanpa unit server terpisah.</span>
+                </div>
+                <div class="shared-storage-val">
+                  <span class="storage-num">{{ item.critical.storageGBPerNode }} GB</span>
+                  <span class="storage-class-tag">{{ item.critical.storageClass }}</span>
+                </div>
+              </div>
+
+              <div v-else class="spec-metrics-grid">
+                <div class="metric-cell">
+                  <span class="cell-lbl">Unit Server</span>
+                  <span class="cell-val">{{ item.critical.nodeCount }} Unit</span>
+                  <span class="cell-sub">{{ formatComputeType(item.critical.computeType) }}</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Tenaga Prosesor</span>
+                  <span class="cell-val">{{ item.critical.vcpuPerNode }} vCPU / node</span>
+                  <span class="cell-sub">Total {{ item.critical.nodeCount * item.critical.vcpuPerNode }} vCPU</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Memori RAM</span>
+                  <span class="cell-val">{{ item.critical.ramGBPerNode }} GB / node</span>
+                  <span class="cell-sub">Total {{ item.critical.nodeCount * item.critical.ramGBPerNode }} GB</span>
+                </div>
+                <div class="metric-cell">
+                  <span class="cell-lbl">Ruang Disk</span>
+                  <span class="cell-val">{{ item.critical.storageGBPerNode }} GB</span>
+                  <span class="cell-sub">{{ item.critical.storageClass }} · Total {{ (item.critical.nodeCount || 1) * item.critical.storageGBPerNode }} GB</span>
+                </div>
+              </div>
+
+              <div class="spec-box-tier-footer">
+                <div class="tier-lic-indicator">
+                  <span class="lic-icon">{{ item.critical.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}</span>
+                  <span class="lic-name">
+                    <strong>{{ item.critical.licenseKind === 'enterprise' ? 'Lisensi Resmi' : 'Gratis (OSS)' }}:</strong>
+                    {{ item.critical.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
+                  </span>
+                </div>
+                <span :class="['backup-badge', item.critical.backupEnabled ? 'active' : 'inactive']">
+                  {{ item.critical.backupEnabled ? '✓ NetBackup Aktif' : 'Tanpa NetBackup' }}
                 </span>
               </div>
             </div>
@@ -303,19 +521,185 @@
 
           <!-- License & Meta Footer -->
           <div class="preset-card-ftr">
-            <div class="ftr-lic-pair">
-              <span class="lic-tag free" title="Community Free OSS SKU">
-                OSS: <strong>{{ item.licenseFree }}</strong>
+            <div class="ftr-left-refs">
+              <span class="ftr-sku-item">
+                <span class="sku-label">SKU OSS:</span>
+                <span class="sku-value">{{ item.licenseFree || 'Community OSS' }}</span>
               </span>
-              <span class="lic-tag enterprise" title="Enterprise Official License SKU">
-                Enterprise: <strong>{{ item.licenseEnterprise }}</strong>
+              <span class="ftr-sku-sep">·</span>
+              <span class="ftr-sku-item">
+                <span class="sku-label">SKU Enterprise:</span>
+                <span class="sku-value text-green">{{ item.licenseEnterprise || 'Enterprise Official' }}</span>
               </span>
             </div>
-            <div v-if="item.contractRef" class="ftr-contract-ref">
-              Ref: {{ item.contractRef }}
+            <div v-if="item.contractRef" class="ftr-contract-ref" title="Nomor referensi kontrak pengadaan">
+              <span class="ref-icon">📋</span>
+              <span>Ref: {{ item.contractRef }}</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- VIEW MODE 2: MATRIX TABLE VIEW (1 SCREEN COMPACT COMPARISON) -->
+      <div v-else-if="viewMode === 'table' && filteredPresetItems.length > 0" class="preset-matrix-table-wrap">
+        <table class="preset-matrix-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="th-layer">Layer Arsitektur</th>
+              <th rowspan="2" class="th-cat">Kategori</th>
+              <th colspan="4" class="th-group-mod">STANDAR BASELINE: MODERAT (N+1)</th>
+              <th colspan="5" class="th-group-crit">STANDAR BASELINE: CRITICAL (2N)</th>
+              <th rowspan="2" class="th-action">Aksi</th>
+            </tr>
+            <tr class="sub-headers">
+              <!-- MODERAT SUB -->
+              <th class="th-sub">Node &amp; Tipe</th>
+              <th class="th-sub">vCPU &amp; RAM Total</th>
+              <th class="th-sub">Storage Disk</th>
+              <th class="th-sub">Lisensi &amp; NBU</th>
+              <!-- CRITICAL SUB -->
+              <th class="th-sub">Node &amp; Tipe</th>
+              <th class="th-sub">vCPU &amp; RAM Total</th>
+              <th class="th-sub">Storage Disk</th>
+              <th class="th-sub">Lisensi &amp; NBU</th>
+              <th class="th-sub th-delta">Upgrade Highlight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in filteredPresetItems" :key="item.id" class="matrix-row">
+              <!-- Layer Col -->
+              <td class="td-layer-info">
+                <div class="matrix-layer-cell">
+                  <span class="matrix-emoji">{{ getLayerIcon(item) }}</span>
+                  <div class="matrix-text-wrap">
+                    <div class="matrix-layer-name">
+                      <span class="matrix-no">L{{ String(item.no).padStart(2, '0') }}</span>
+                      <strong>{{ item.layer }}</strong>
+                    </div>
+                    <div class="matrix-comp-sub">{{ item.component }}</div>
+                    <div v-if="item.notes" class="matrix-role-sub" :title="item.notes">{{ item.notes }}</div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Kategori Col -->
+              <td class="td-cat">
+                <span :class="['matrix-cat-tag', getCategoryBadge(item).theme]">
+                  {{ getCategoryBadge(item).icon }} {{ getCategoryBadge(item).label }}
+                </span>
+              </td>
+
+              <!-- MODERAT COLS -->
+              <td class="td-mod-node">
+                <div v-if="item.moderate.computeType === 'shared'" class="matrix-shared-tag">Shared SAN</div>
+                <div v-else>
+                  <strong>{{ item.moderate.nodeCount }} Node</strong>
+                  <div class="matrix-compute-type">{{ item.moderate.computeType === 'baremetal' ? 'Baremetal' : 'VM' }}</div>
+                </div>
+              </td>
+              <td class="td-mod-compute">
+                <div v-if="item.moderate.computeType === 'shared'" class="text-muted">-</div>
+                <div v-else>
+                  <div><strong>{{ item.moderate.nodeCount * item.moderate.vcpuPerNode }}</strong> vCPU</div>
+                  <div class="text-muted">{{ item.moderate.nodeCount * item.moderate.ramGBPerNode }} GB RAM</div>
+                </div>
+              </td>
+              <td class="td-mod-storage">
+                <strong>{{ (item.moderate.nodeCount || 1) * item.moderate.storageGBPerNode }} GB</strong>
+                <div class="text-muted">{{ item.moderate.storageClass }}</div>
+              </td>
+              <td class="td-mod-lic">
+                <div class="matrix-lic-text" :title="item.moderate.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
+                  {{ item.moderate.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
+                </div>
+                <span :class="['matrix-nbu-dot', item.moderate.backupEnabled ? 'active' : 'inactive']" :title="item.moderate.backupEnabled ? 'NetBackup Aktif' : 'Tanpa NetBackup'">
+                  {{ item.moderate.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                </span>
+              </td>
+
+              <!-- CRITICAL COLS -->
+              <td class="td-crit-node">
+                <div v-if="item.critical.computeType === 'shared'" class="matrix-shared-tag">Shared SAN</div>
+                <div v-else>
+                  <strong>{{ item.critical.nodeCount }} Node</strong>
+                  <div class="matrix-compute-type">{{ item.critical.computeType === 'baremetal' ? 'Baremetal' : 'VM' }}</div>
+                </div>
+              </td>
+              <td class="td-crit-compute">
+                <div v-if="item.critical.computeType === 'shared'" class="text-muted">-</div>
+                <div v-else>
+                  <div><strong>{{ item.critical.nodeCount * item.critical.vcpuPerNode }}</strong> vCPU</div>
+                  <div class="text-muted">{{ item.critical.nodeCount * item.critical.ramGBPerNode }} GB RAM</div>
+                </div>
+              </td>
+              <td class="td-crit-storage">
+                <strong>{{ (item.critical.nodeCount || 1) * item.critical.storageGBPerNode }} GB</strong>
+                <div class="text-muted">{{ item.critical.storageClass }}</div>
+              </td>
+              <td class="td-crit-lic">
+                <div class="matrix-lic-text" :title="item.critical.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
+                  {{ item.critical.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
+                </div>
+                <span :class="['matrix-nbu-dot', item.critical.backupEnabled ? 'active' : 'inactive']" :title="item.critical.backupEnabled ? 'NetBackup Aktif' : 'Tanpa NetBackup'">
+                  {{ item.critical.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                </span>
+              </td>
+              <td class="td-crit-delta">
+                <div class="matrix-delta-wrap">
+                  <span
+                    v-for="(pill, pIdx) in getDeltaPills(item.moderate, item.critical).slice(0, 2)"
+                    :key="pIdx"
+                    :class="['delta-chip-mini', pill.type]"
+                  >
+                    {{ pill.text }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- ACTION COL -->
+              <td class="td-actions">
+                <div class="matrix-action-btns">
+                  <button
+                    type="button"
+                    class="btn-matrix-action edit"
+                    @click="openEditLayerModal(item)"
+                    title="Edit Preset Layer"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-matrix-action del"
+                    @click="confirmDeleteCustomLayer(item)"
+                    title="Hapus Layer Preset"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- EMPTY STATE IF SEARCH / CATEGORY FINDS NOTHING -->
+      <div v-if="filteredPresetItems.length === 0" class="preset-empty-state">
+        <div class="empty-icon-box">🔍</div>
+        <h3 class="empty-title">Tidak ada layer preset yang cocok</h3>
+        <p class="empty-desc">Tidak ditemukan layer arsitektur yang sesuai dengan filter atau kata kunci pencarian Anda.</p>
+        <button
+          type="button"
+          class="btn-reset-filter"
+          @click="searchQuery = ''; activeCategory = 'all'"
+        >
+          Reset Filter &amp; Pencarian
+        </button>
       </div>
     </div>
 
@@ -1522,9 +1906,275 @@ function handleComponentSelect(option: AutocompleteOption) {
 
 const searchQuery = ref('')
 const activeTierTab = ref<'both' | 'moderate' | 'critical'>('both')
+const viewMode = ref<'cards' | 'table'>('cards')
+const activeCategory = ref<string>('all')
+const isOverviewBannerVisible = ref(true)
 const showModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref<string | null>(null)
+
+// Restore saved preferences
+if (typeof window !== 'undefined') {
+  const savedMode = localStorage.getItem('mandiri_preset_view_mode')
+  if (savedMode === 'cards' || savedMode === 'table') {
+    viewMode.value = savedMode
+  }
+  const savedBanner = localStorage.getItem('mandiri_preset_overview_visible')
+  if (savedBanner !== null) {
+    isOverviewBannerVisible.value = savedBanner === 'true'
+  }
+}
+
+watch(viewMode, (newVal) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('mandiri_preset_view_mode', newVal)
+  }
+})
+
+function toggleOverviewBanner() {
+  isOverviewBannerVisible.value = !isOverviewBannerVisible.value
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('mandiri_preset_overview_visible', String(isOverviewBannerVisible.value))
+  }
+}
+
+function formatDiskSize(gb: number): string {
+  if (!gb || gb <= 0) return '0 GB'
+  if (gb >= 1000) {
+    const tb = (gb / 1000).toFixed(1)
+    return `${tb.endsWith('.0') ? tb.slice(0, -2) : tb} TB`
+  }
+  return `${gb} GB`
+}
+
+// Cluster Totals (Moderat vs Critical) for Executive Overview
+const clusterTotals = computed(() => {
+  const items = props.presetItems || []
+  let modNodes = 0
+  let modVcpu = 0
+  let modRam = 0
+  let modStorage = 0
+
+  let critNodes = 0
+  let critVcpu = 0
+  let critRam = 0
+  let critStorage = 0
+
+  for (const item of items) {
+    if (item.moderate) {
+      if (item.moderate.computeType !== 'shared') {
+        const nodes = Number(item.moderate.nodeCount) || 0
+        modNodes += nodes
+        modVcpu += nodes * (Number(item.moderate.vcpuPerNode) || 0)
+        modRam += nodes * (Number(item.moderate.ramGBPerNode) || 0)
+      }
+      modStorage += (Number(item.moderate.nodeCount) || 1) * (Number(item.moderate.storageGBPerNode) || 0)
+    }
+    if (item.critical) {
+      if (item.critical.computeType !== 'shared') {
+        const nodes = Number(item.critical.nodeCount) || 0
+        critNodes += nodes
+        critVcpu += nodes * (Number(item.critical.vcpuPerNode) || 0)
+        critRam += nodes * (Number(item.critical.ramGBPerNode) || 0)
+      }
+      critStorage += (Number(item.critical.nodeCount) || 1) * (Number(item.critical.storageGBPerNode) || 0)
+    }
+  }
+
+  return {
+    modNodes,
+    modVcpu,
+    modRam,
+    modStorage,
+    critNodes,
+    critVcpu,
+    critRam,
+    critStorage
+  }
+})
+
+// Architecture Categories & Categorization
+const CATEGORY_DEFINITIONS = [
+  { id: 'all', label: 'Semua Layer', icon: '📑' },
+  { id: 'access_app', label: 'Akses & Aplikasi', icon: '🌐' },
+  { id: 'db_storage', label: 'Database & Penyimpanan', icon: '🗄️' },
+  { id: 'cache_queue', label: 'Memori Cepat & Antrean', icon: '⚡' },
+  { id: 'monitor_batch', label: 'Pemantauan & Penjadwalan', icon: '📊' },
+  { id: 'other', label: 'Layer Tambahan', icon: '🔧' }
+]
+
+function getLayerCategory(item: SizingPresetItem): 'access_app' | 'db_storage' | 'cache_queue' | 'monitor_batch' | 'other' {
+  const no = Number(item.no) || 0
+  if (no === 1 || no === 2 || no === 3) return 'access_app'
+  if (no === 4 || no === 5 || no === 12) return 'db_storage'
+  if (no === 6 || no === 7 || no === 8) return 'cache_queue'
+  if (no === 9 || no === 10 || no === 11 || no === 13) return 'monitor_batch'
+
+  const text = `${item.layer} ${item.component} ${item.notes || ''}`.toLowerCase()
+  if (text.includes('ingress') || text.includes('router') || text.includes('container') || text.includes('web') || text.includes('gateway') || text.includes('api')) {
+    return 'access_app'
+  }
+  if (text.includes('database') || text.includes('storage') || text.includes('oracle') || text.includes('postgres') || text.includes('minio') || text.includes('s3') || text.includes('san')) {
+    return 'db_storage'
+  }
+  if (text.includes('cache') || text.includes('redis') || text.includes('kafka') || text.includes('message') || text.includes('queue') || text.includes('rabbit')) {
+    return 'cache_queue'
+  }
+  if (text.includes('log') || text.includes('monitor') || text.includes('batch') || text.includes('elastic') || text.includes('kibana') || text.includes('cron') || text.includes('audit')) {
+    return 'monitor_batch'
+  }
+  return 'other'
+}
+
+const categoryCounts = computed(() => {
+  const counts: Record<string, number> = {
+    all: props.presetItems.length,
+    access_app: 0,
+    db_storage: 0,
+    cache_queue: 0,
+    monitor_batch: 0,
+    other: 0
+  }
+  for (const item of props.presetItems) {
+    const cat = getLayerCategory(item)
+    counts[cat] = (counts[cat] || 0) + 1
+  }
+  return counts
+})
+
+const availableCategories = computed(() => {
+  return CATEGORY_DEFINITIONS.filter(c => c.id === 'all' || (categoryCounts.value[c.id] || 0) > 0)
+})
+
+function getCategoryBadge(item: SizingPresetItem) {
+  const cat = getLayerCategory(item)
+  switch (cat) {
+    case 'access_app': return { label: 'Akses & Aplikasi', icon: '🌐', theme: 'cat-app' }
+    case 'db_storage': return { label: 'Database & Storage', icon: '🗄️', theme: 'cat-db' }
+    case 'cache_queue': return { label: 'Memori & Antrean', icon: '⚡', theme: 'cat-cache' }
+    case 'monitor_batch': return { label: 'Pemantauan & Batch', icon: '📊', theme: 'cat-monitor' }
+    default: return { label: 'Layer Tambahan', icon: '🔧', theme: 'cat-other' }
+  }
+}
+
+function getLayerIcon(item: SizingPresetItem): string {
+  if (item.icon) return item.icon
+  const defaultIcons: Record<number, string> = {
+    1: '🌐',
+    2: '📦',
+    3: '🔀',
+    4: '🗄️',
+    5: '💾',
+    6: '⚡',
+    7: '🛡️',
+    8: '📨',
+    9: '🔍',
+    10: '📋',
+    11: '📊',
+    12: '📁',
+    13: '⏱️'
+  }
+  if (defaultIcons[item.no]) return defaultIcons[item.no]
+
+  const text = `${item.layer} ${item.component}`.toLowerCase()
+  if (text.includes('ingress') || text.includes('web') || text.includes('gateway')) return '🌐'
+  if (text.includes('database') || text.includes('db') || text.includes('oracle') || text.includes('sql')) return '🗄️'
+  if (text.includes('storage') || text.includes('san') || text.includes('minio') || text.includes('s3')) return '💾'
+  if (text.includes('cache') || text.includes('redis')) return '⚡'
+  if (text.includes('message') || text.includes('kafka') || text.includes('queue')) return '📨'
+  if (text.includes('log') || text.includes('elastic') || text.includes('monitor')) return '📊'
+  if (text.includes('container') || text.includes('app') || text.includes('pod')) return '📦'
+  return '⚙️'
+}
+
+function getSizeBadge(spec?: LayerPresetSpec) {
+  if (!spec) return { label: 'Standar', tagClass: 'badge-size-standard' }
+  if (spec.computeType === 'shared') {
+    return { label: 'Khusus Ruang Disk', tagClass: 'badge-size-storage' }
+  }
+  const vcpu = Number(spec.vcpuPerNode) || 0
+  const ram = Number(spec.ramGBPerNode) || 0
+  if (vcpu <= 2) {
+    return { label: 'Ukuran Kecil', tagClass: 'badge-size-small' }
+  }
+  if (vcpu <= 4) {
+    return { label: 'Ukuran Sedang', tagClass: 'badge-size-medium' }
+  }
+  if (vcpu <= 8 && ram <= 16) {
+    return { label: 'Ukuran Standar', tagClass: 'badge-size-standard' }
+  }
+  if (vcpu <= 8 && ram > 16) {
+    return { label: 'Ukuran Menengah+', tagClass: 'badge-size-plus' }
+  }
+  if (vcpu <= 32) {
+    return { label: 'Ukuran Besar', tagClass: 'badge-size-large' }
+  }
+  return { label: 'Ukuran Raksasa', tagClass: 'badge-size-xlarge' }
+}
+
+function getDeltaPills(mod?: LayerPresetSpec, crit?: LayerPresetSpec): Array<{ text: string; type: 'upgrade' | 'scale' | 'license' | 'info' }> {
+  if (!mod || !crit) return []
+  const pills: Array<{ text: string; type: 'upgrade' | 'scale' | 'license' | 'info' }> = []
+
+  const modNodes = Number(mod.nodeCount) || 0
+  const critNodes = Number(crit.nodeCount) || 0
+  if (critNodes > modNodes) {
+    pills.push({ text: `↑ +${critNodes - modNodes} Unit Server`, type: 'scale' })
+  } else if (critNodes < modNodes) {
+    pills.push({ text: `↓ ${critNodes - modNodes} Unit Server`, type: 'info' })
+  }
+
+  if (mod.computeType !== crit.computeType) {
+    if (crit.computeType === 'baremetal') {
+      pills.push({ text: '↑ Server Fisik Dedicated (Baremetal)', type: 'upgrade' })
+    } else if (crit.computeType === 'vm') {
+      pills.push({ text: 'Virtual Machine (VM)', type: 'info' })
+    }
+  }
+
+  if (mod.computeType !== 'shared' && crit.computeType !== 'shared') {
+    const modTotalVcpu = modNodes * (Number(mod.vcpuPerNode) || 0)
+    const critTotalVcpu = critNodes * (Number(crit.vcpuPerNode) || 0)
+    if (modTotalVcpu > 0 && critTotalVcpu > modTotalVcpu) {
+      const ratio = critTotalVcpu / modTotalVcpu
+      if (ratio === 2) {
+        pills.push({ text: '↑ Kapasitas 2x Lipat (2N)', type: 'scale' })
+      } else if (ratio > 1) {
+        pills.push({ text: `↑ Kapasitas +${Math.round((ratio - 1) * 100)}% vCPU`, type: 'scale' })
+      }
+    }
+
+    const modTotalRam = modNodes * (Number(mod.ramGBPerNode) || 0)
+    const critTotalRam = critNodes * (Number(crit.ramGBPerNode) || 0)
+    if (modTotalRam > 0 && critTotalRam > modTotalRam) {
+      const ramRatio = critTotalRam / modTotalRam
+      const vcpuRatio = modTotalVcpu > 0 ? (critTotalVcpu / modTotalVcpu) : 1
+      if (Math.abs(ramRatio - vcpuRatio) > 0.1) {
+        pills.push({ text: `↑ RAM +${Math.round((ramRatio - 1) * 100)}%`, type: 'scale' })
+      }
+    }
+  }
+
+  const modTotalStorage = (modNodes || 1) * (Number(mod.storageGBPerNode) || 0)
+  const critTotalStorage = (critNodes || 1) * (Number(crit.storageGBPerNode) || 0)
+  if (critTotalStorage > modTotalStorage) {
+    const diff = critTotalStorage - modTotalStorage
+    pills.push({ text: `↑ Ruang Disk +${formatDiskSize(diff)}`, type: 'upgrade' })
+  }
+  if (mod.storageClass !== crit.storageClass) {
+    pills.push({ text: `↑ Kecepatan Disk ${crit.storageClass}`, type: 'upgrade' })
+  }
+
+  if (mod.licenseKind !== crit.licenseKind && crit.licenseKind === 'enterprise') {
+    pills.push({ text: '🛡️ Lisensi Resmi Vendor (SLA 24/7)', type: 'license' })
+  }
+
+  if (pills.length === 0) {
+    pills.push({ text: 'Spesifikasi Hardware & Lisensi Identik', type: 'info' })
+  }
+
+  return pills
+}
 
 const form = reactive({
   id: '',
@@ -1558,11 +2208,15 @@ const form = reactive({
 })
 
 const filteredPresetItems = computed(() => {
+  let list = props.presetItems || []
+  if (activeCategory.value !== 'all') {
+    list = list.filter(item => getLayerCategory(item) === activeCategory.value)
+  }
   if (!searchQuery.value.trim()) {
-    return props.presetItems
+    return list
   }
   const q = searchQuery.value.toLowerCase().trim()
-  return props.presetItems.filter(item => {
+  return list.filter(item => {
     return (
       item.layer.toLowerCase().includes(q) ||
       item.component.toLowerCase().includes(q) ||
@@ -1661,7 +2315,11 @@ function savePresetLayer() {
 }
 
 function confirmDeleteCustomLayer(item: SizingPresetItem) {
-  if (confirm(`Apakah Anda yakin ingin menghapus layer preset "${item.layer} (${item.component})"?`)) {
+  const isBuiltIn = item.no <= 13
+  const msg = isBuiltIn
+    ? `Apakah Anda yakin ingin menghapus layer preset bawaan "${item.layer} (${item.component})"?\n\nCatatan: Anda dapat mengembalikannya kapan saja melalui tombol "Kembalikan Default Pabrik".`
+    : `Apakah Anda yakin ingin menghapus layer preset kustom "${item.layer} (${item.component})"?`
+  if (confirm(msg)) {
     emit('delete-preset-item', item.id)
   }
 }
@@ -2235,16 +2893,206 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   transform: translateY(-6px);
 }
 
-.preset-toolbar {
+/* ─────────────────────────────────────────────
+   Executive Guidance Banner (Moderat vs Critical)
+   ───────────────────────────────────────────── */
+.preset-overview-section {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.overview-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+}
+
+.overview-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.overview-eyebrow {
+  font-size: 10px;
+  font-weight: 800;
+  color: #002060;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.overview-heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+}
+
+.btn-toggle-overview {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-toggle-overview:hover {
+  background: #F1F5F9;
+  color: #002060;
+  border-color: #94A3B8;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.overview-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.overview-tier-card {
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid #E2E8F0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.overview-tier-card.card-moderat {
+  background: linear-gradient(180deg, #F0F7FF 0%, #F8FAFC 100%);
+  border-color: #BAE6FD;
+}
+
+.overview-tier-card.card-critical {
+  background: linear-gradient(180deg, #FFFBEB 0%, #FFFDF7 100%);
+  border-color: #FDE68A;
+}
+
+.card-tier-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tier-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.overview-tier-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.overview-tier-badge.mod {
+  background: #0284C7;
+  color: #FFFFFF;
+}
+
+.overview-tier-badge.crit {
+  background: #D97706;
+  color: #FFFFFF;
+}
+
+.overview-target-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.overview-tier-desc {
+  margin: 0;
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.overview-totals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+.overview-total-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.tot-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tot-val {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.overview-collapse-enter-active,
+.overview-collapse-leave-active {
+  transition: all 0.2s ease;
+}
+
+.overview-collapse-enter-from,
+.overview-collapse-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* ─────────────────────────────────────────────
+   Smart Toolbar & Filters
+   ───────────────────────────────────────────── */
+.preset-smart-toolbar {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  padding: 10px 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toolbar-primary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .search-input-wrap {
@@ -2255,7 +3103,9 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   border-radius: 6px;
   padding: 0 12px;
   gap: 8px;
-  width: 340px;
+  flex: 1;
+  min-width: 280px;
+  max-width: 440px;
   height: 36px;
 }
 
@@ -2263,7 +3113,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   border: none;
   background: transparent;
   outline: none;
-  font-size: 12px;
+  font-size: 12.5px;
   color: #0F172A;
   width: 100%;
 }
@@ -2301,7 +3151,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .seg-btn {
   padding: 5px 12px;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #64748B;
   background: transparent;
@@ -2326,108 +3176,287 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   color: #0284C7;
 }
 
-.stat-badge {
-  font-size: 12px;
-  color: #475569;
+/* View Mode Switcher */
+.view-mode-switcher {
+  display: inline-flex;
+  align-items: center;
   background: #F1F5F9;
-  border: 1px solid #E2E8F0;
-  padding: 4px 10px;
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px solid #CBD5E1;
+  gap: 2px;
+}
+
+.view-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748B;
+  background: transparent;
+  border: none;
   border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.view-switch-btn.active {
+  background: #002060;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 32, 96, 0.25);
+}
+
+/* Category Pills Row */
+.category-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-top: 4px;
+  border-top: 1px solid #F1F5F9;
+}
+
+.category-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.category-pill-btn:hover {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+.category-pill-btn.active {
+  background: #002060;
+  border-color: #002060;
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 32, 96, 0.15);
+}
+
+.cat-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.category-pill-btn.active .cat-pill-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
 }
 
 /* ─────────────────────────────────────────────
-   Cards Grid
+   Visual Cards Grid
    ───────────────────────────────────────────── */
 .preset-cards-grid {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .preset-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  padding: 16px 18px;
+  border-radius: 10px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-  transition: border-color 0.15s ease;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  transition: all 0.2s ease;
 }
 
 .preset-card:hover {
   border-color: #CBD5E1;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 }
 
 .preset-card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   border-bottom: 1px solid #F1F5F9;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+  gap: 16px;
 }
 
 .card-header-left {
   display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+}
+
+.card-avatar-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 22px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.layer-title-meta-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.layer-badges-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .layer-number-badge {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   color: #002060;
   background: #EFF6FF;
   border: 1px solid #DBEAFE;
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.layer-title-wrap {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.category-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.category-badge-chip.cat-app {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+.category-badge-chip.cat-db {
+  background: #F5F3FF;
+  color: #6D28D9;
+  border: 1px solid #DDD6FE;
+}
+
+.category-badge-chip.cat-cache {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.category-badge-chip.cat-monitor {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.category-badge-chip.cat-other {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+.component-code-chip {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748B;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
 .layer-title {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   color: #0F172A;
-  margin: 0;
+  margin: 2px 0 0 0;
+  letter-spacing: -0.01em;
 }
 
-.component-subtitle {
+/* Plain-Language Business Function Description */
+.layer-business-role {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  background: #F8FAFC;
+  border-left: 3px solid #002060;
+  border-radius: 0 4px 4px 0;
+  padding: 6px 10px;
+  margin-top: 3px;
+}
+
+.role-icon {
   font-size: 12px;
-  color: #64748B;
-  font-weight: 600;
+  line-height: 1.4;
+}
+
+.role-text {
+  font-size: 12px;
+  color: #334155;
+  line-height: 1.45;
+  font-weight: 500;
 }
 
 .card-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-edit-layer {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   background: #F8FAFC;
   border: 1px solid #CBD5E1;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #334155;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #002060;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .btn-edit-layer:hover {
-  background: #EFF6FF;
-  color: #002060;
+  background: #002060;
+  color: #FFFFFF;
   border-color: #002060;
 }
 
@@ -2435,12 +3464,13 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 8px;
+  padding: 6px 9px;
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
-  border-radius: 4px;
+  border-radius: 6px;
   color: #DC2626;
   cursor: pointer;
+  transition: all 0.15s ease;
 }
 
 .btn-delete-layer:hover {
@@ -2449,12 +3479,12 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 /* ─────────────────────────────────────────────
-   Specs Comparison Row
+   Specs Comparison Row (Moderat vs Critical)
    ───────────────────────────────────────────── */
 .preset-specs-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .preset-specs-row.single-col {
@@ -2462,12 +3492,12 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .spec-box {
-  border-radius: 6px;
-  padding: 12px 14px;
+  border-radius: 8px;
+  padding: 14px 16px;
   border: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .spec-box.box-mod {
@@ -2481,6 +3511,13 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .spec-box-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.spec-tier-badge {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2497,12 +3534,18 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .crit-dot {
-  background: #D4A017;
+  background: #D97706;
 }
 
 .box-tier-title {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
+}
+
+.box-tier-sub {
+  font-size: 11.5px;
+  color: #64748B;
+  font-weight: 600;
 }
 
 .text-navy {
@@ -2513,14 +3556,189 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   color: #B45309;
 }
 
+/* T-Shirt Size Badges */
+.tshirt-size-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.badge-size-small {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+.badge-size-medium {
+  background: #F0FDFA;
+  color: #0F766E;
+  border: 1px solid #99F6E4;
+}
+
+.badge-size-standard {
+  background: #F0FDF4;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+}
+
+.badge-size-plus {
+  background: #FEF9C3;
+  color: #A16207;
+  border: 1px solid #FDE047;
+}
+
+.badge-size-large {
+  background: #FFF7ED;
+  color: #C2410C;
+  border: 1px solid #FED7AA;
+}
+
+.badge-size-xlarge {
+  background: #FEF2F2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+}
+
+.badge-size-storage {
+  background: #F5F3FF;
+  color: #6D28D9;
+  border: 1px solid #DDD6FE;
+}
+
+/* Delta Pills Strip */
+.delta-pills-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 6px;
+  padding: 6px 10px;
+  flex-wrap: wrap;
+}
+
+.delta-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #92400E;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.delta-chips-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.delta-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.delta-chip.scale {
+  background: #FFFFFF;
+  color: #B45309;
+  border: 1px solid #FCD34D;
+}
+
+.delta-chip.upgrade {
+  background: #FFFFFF;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+.delta-chip.license {
+  background: #FFFFFF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+.delta-chip.info {
+  background: #FFFFFF;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+/* Shared Storage Special Callout */
+.shared-storage-callout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 6px;
+  padding: 12px 14px;
+  border: 1px dashed #CBD5E1;
+}
+
+.shared-storage-callout.mod-theme {
+  background: #FFFFFF;
+  border-color: #BAE6FD;
+}
+
+.shared-storage-callout.crit-theme {
+  background: #FFFFFF;
+  border-color: #FDE68A;
+}
+
+.shared-callout-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.shared-callout-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.shared-callout-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.shared-callout-desc {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.shared-storage-val {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.storage-num {
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.storage-class-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6D28D9;
+  background: #F5F3FF;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* Spec Metrics Grid */
 .spec-metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 4px;
-  padding: 8px 10px;
+  border-radius: 6px;
+  padding: 10px 12px;
 }
 
 .metric-cell {
@@ -2529,88 +3747,439 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .cell-lbl {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #64748B;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .cell-val {
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12.5px;
+  font-weight: 800;
   color: #0F172A;
+  margin-top: 2px;
 }
 
-.spec-type-strip {
+.cell-sub {
+  font-size: 10.5px;
+  color: #64748B;
+  font-weight: 500;
+  margin-top: 1px;
+}
+
+/* Tier Footer inside box */
+.spec-box-tier-footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  font-size: 11.5px;
 }
 
-.type-pill {
-  background: rgba(0, 0, 0, 0.04);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 600;
+.tier-lic-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #334155;
+  min-width: 0;
+  flex: 1;
+}
+
+.lic-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.lic-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .backup-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .backup-badge.active {
   background: #DCFCE7;
   color: #15803D;
+  border: 1px solid #BBF7D0;
 }
 
 .backup-badge.inactive {
   background: #F1F5F9;
   color: #64748B;
+  border: 1px solid #E2E8F0;
 }
 
-.license-spec-pill {
-  font-size: 10px;
-  color: #475569;
-}
-
+/* Card Bottom Footer */
 .preset-card-ftr {
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-top: 1px dashed #E2E8F0;
-  padding-top: 8px;
+  padding-top: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.ftr-lic-pair {
+.ftr-left-refs {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  font-size: 11.5px;
 }
 
-.lic-tag {
-  font-size: 11px;
+.sku-label {
+  color: #64748B;
+  font-weight: 600;
 }
 
-.lic-tag.free {
-  color: #475569;
+.sku-value {
+  color: #1E293B;
+  font-weight: 700;
 }
 
-.lic-tag.enterprise {
+.text-green {
   color: #15803D;
 }
 
+.ftr-sku-sep {
+  color: #CBD5E1;
+}
+
 .ftr-contract-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
   font-weight: 600;
   color: #0369A1;
   background: #E0F2FE;
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 4px;
+}
+
+.ref-icon {
+  font-size: 11px;
+}
+
+/* ─────────────────────────────────────────────
+   Matrix Table View (1 Screen Dense Comparison)
+   ───────────────────────────────────────────── */
+.preset-matrix-table-wrap {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  overflow: hidden;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.preset-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.preset-matrix-table thead tr {
+  background: #F8FAFC;
+  border-bottom: 1px solid #CBD5E1;
+}
+
+.preset-matrix-table thead th {
+  padding: 8px 10px;
+  font-weight: 700;
+  color: #475569;
+  border-right: 1px solid #E2E8F0;
+}
+
+.th-layer {
+  width: 260px;
+  min-width: 240px;
+}
+
+.th-cat {
+  width: 130px;
+}
+
+.th-group-mod {
+  background: #EFF6FF;
+  color: #002060;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #BFDBFE;
+}
+
+.th-group-crit {
+  background: #FEF3C7;
+  color: #92400E;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid #FDE68A;
+}
+
+.th-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748B;
+  background: #F8FAFC;
+  text-transform: uppercase;
+}
+
+.th-action {
+  width: 70px;
+  text-align: center;
+}
+
+.preset-matrix-table tbody tr.matrix-row {
+  border-bottom: 1px solid #F1F5F9;
+  transition: background 0.1s ease;
+}
+
+.preset-matrix-table tbody tr.matrix-row:hover {
+  background: #F8FAFC;
+}
+
+.preset-matrix-table td {
+  padding: 8px 10px;
+  border-right: 1px solid #F1F5F9;
+  vertical-align: middle;
+}
+
+.matrix-layer-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.matrix-emoji {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.matrix-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.matrix-layer-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #0F172A;
+}
+
+.matrix-no {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #002060;
+  background: #EFF6FF;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.matrix-comp-sub {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.matrix-role-sub {
+  font-size: 10.5px;
+  color: #475569;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.matrix-cat-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.matrix-shared-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #6D28D9;
+  background: #F5F3FF;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.matrix-compute-type {
+  font-size: 10px;
+  color: #64748B;
+}
+
+.text-muted {
+  color: #94A3B8;
+  font-size: 11px;
+}
+
+.matrix-lic-text {
+  font-weight: 600;
+  font-size: 11px;
+  color: #334155;
+  white-space: nowrap;
+}
+
+.matrix-nbu-dot {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.matrix-nbu-dot.active {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.matrix-nbu-dot.inactive {
+  background: #F1F5F9;
+  color: #94A3B8;
+}
+
+.matrix-delta-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.delta-chip-mini {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.delta-chip-mini.scale {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.delta-chip-mini.upgrade {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+.delta-chip-mini.license {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.delta-chip-mini.info {
+  background: #F1F5F9;
+  color: #64748B;
+}
+
+.matrix-action-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-matrix-action {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.btn-matrix-action.edit:hover {
+  background: #EFF6FF;
+  color: #002060;
+  border-color: #002060;
+}
+
+.btn-matrix-action.del:hover {
+  background: #FEE2E2;
+  color: #DC2626;
+  border-color: #EF4444;
+}
+
+/* ─────────────────────────────────────────────
+   Empty State
+   ───────────────────────────────────────────── */
+.preset-empty-state {
+  background: #FFFFFF;
+  border: 1px dashed #CBD5E1;
+  border-radius: 10px;
+  padding: 40px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 26px;
+  background: #F8FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.empty-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.empty-desc {
+  margin: 0;
+  font-size: 12.5px;
+  color: #64748B;
+  max-width: 400px;
+}
+
+.btn-reset-filter {
+  margin-top: 6px;
+  padding: 6px 14px;
+  background: #002060;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* ─────────────────────────────────────────────

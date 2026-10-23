@@ -6,44 +6,56 @@
       @click="collapsible && toggleCollapse()"
     >
       <div class="hdr-left">
-        <span class="step-badge">{{ stepNumber }}</span>
+        <span class="step-badge" :class="{ 'badge-modified': hasChanges }">{{ stepNumber }}</span>
         <div class="title-wrap">
           <div class="title-row">
             <h3 class="section-main-title">{{ title }}</h3>
-            <span v-if="technicalLabel" class="technical-pill">{{ technicalLabel }}</span>
-            <span v-if="hasChanges" class="change-indicator" title="Telah disesuaikan dari standar baseline">• Diubah</span>
-            <span v-if="isCollapsed && collapsedSummary" class="collapsed-summary-chip" :title="collapsedSummary">
-              {{ collapsedSummary }}
+            <span v-if="technicalLabel && !isCollapsed" class="technical-pill">{{ technicalLabel }}</span>
+            <span v-if="hasChanges" class="change-indicator" title="Nilai pada bagian ini telah disesuaikan dari standar baseline">
+              • Disesuaikan
             </span>
           </div>
-          <p v-if="!isCollapsed || !collapsedSummary" class="section-guide-question">{{ guideQuestion }}</p>
+          <p class="section-guide-question">{{ guideQuestion }}</p>
         </div>
       </div>
 
-      <div class="hdr-right" @click.stop>
-        <slot name="header-action" />
-        <button
-          v-if="collapsible"
-          type="button"
-          class="collapse-btn"
-          @click="toggleCollapse"
-          :title="isCollapsed ? 'Buka Section (Klik untuk memperluas)' : 'Ciutkan Section (Klik untuk memperkecil)'"
+      <div class="hdr-right">
+        <span
+          v-if="isCollapsed && collapsedSummary"
+          class="collapsed-summary-chip"
+          :class="{ 'summary-modified': hasChanges }"
+          :title="collapsedSummary"
         >
-          <span class="collapse-action-hint">{{ isCollapsed ? 'Buka' : 'Tutup' }}</span>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            :class="{ rotated: !isCollapsed }"
+          <span class="summary-dot"></span>
+          <span class="summary-text">{{ collapsedSummary }}</span>
+        </span>
+
+        <div class="hdr-actions" @click.stop>
+          <slot name="header-action" />
+          <button
+            v-if="collapsible"
+            type="button"
+            class="collapse-btn"
+            :class="{ 'is-open': !isCollapsed }"
+            @click="toggleCollapse"
+            :title="isCollapsed ? 'Buka bagian ini untuk mengubah pengaturan' : 'Ciutkan bagian ini'"
           >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
+            <span class="collapse-action-hint">{{ isCollapsed ? 'Ubah' : 'Tutup' }}</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              :class="{ rotated: !isCollapsed }"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -109,31 +121,31 @@ function toggleCollapse() {
 .base-section-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  /* Removed overflow: hidden so popovers aren't clipped */
+  border-radius: 10px;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   position: relative;
 }
 
 .base-section-card:hover {
   border-color: #CBD5E1;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 .base-section-card.has-changes {
-  border-left: 3px solid #D4A017;
+  border-left: 3.5px solid #D97706;
 }
 
 .section-card-hdr {
-  padding: 12px 16px;
+  padding: 13px 18px;
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
-  border-top-left-radius: 7px;
-  border-top-right-radius: 7px;
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   user-select: none;
   transition: background-color 0.15s ease;
 }
@@ -147,9 +159,14 @@ function toggleCollapse() {
 }
 
 .base-section-card.collapsed .section-card-hdr {
+  background: #FFFFFF;
   border-bottom: none;
-  border-bottom-left-radius: 7px;
-  border-bottom-right-radius: 7px;
+  border-bottom-left-radius: 9px;
+  border-bottom-right-radius: 9px;
+}
+
+.base-section-card.collapsed .section-card-hdr:hover {
+  background: #F8FAFC;
 }
 
 .hdr-left {
@@ -161,23 +178,29 @@ function toggleCollapse() {
 }
 
 .step-badge {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: #002060;
   color: #FFFFFF;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 800;
   flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 32, 96, 0.15);
+}
+
+.step-badge.badge-modified {
+  background: #D97706;
 }
 
 .title-wrap {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  gap: 2px;
 }
 
 .title-row {
@@ -189,20 +212,19 @@ function toggleCollapse() {
 
 .section-main-title {
   margin: 0;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 800;
-  color: #002060;
+  color: #0F172A;
   letter-spacing: -0.01em;
-  white-space: nowrap;
 }
 
 .technical-pill {
   font-size: 10px;
   font-family: 'JetBrains Mono', monospace;
   color: #64748B;
-  background: #F1F5F9;
-  padding: 1px 6px;
-  border-radius: 3px;
+  background: #E2E8F0;
+  padding: 1.5px 6px;
+  border-radius: 4px;
   white-space: nowrap;
 }
 
@@ -211,58 +233,93 @@ function toggleCollapse() {
   font-weight: 700;
   color: #B45309;
   background: #FEF3C7;
-  padding: 1px 6px;
-  border-radius: 3px;
+  border: 1px solid #FDE68A;
+  padding: 1px 7px;
+  border-radius: 12px;
   white-space: nowrap;
-}
-
-.collapsed-summary-chip {
-  font-size: 11px;
-  font-weight: 600;
-  color: #002060;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  padding: 1px 8px;
-  border-radius: 4px;
-  display: inline-flex;
-  align-items: center;
-  max-width: 480px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .section-guide-question {
-  margin: 2px 0 0 0;
-  font-size: 11px;
+  margin: 0;
+  font-size: 11.5px;
   color: #64748B;
+  line-height: 1.35;
 }
 
 .hdr-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
+}
+
+.collapsed-summary-chip {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #002060;
+  background: #F0F6FF;
+  border: 1px solid #BFDBFE;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 380px;
+}
+
+.collapsed-summary-chip.summary-modified {
+  color: #92400E;
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.summary-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2563EB;
+  flex-shrink: 0;
+}
+
+.collapsed-summary-chip.summary-modified .summary-dot {
+  background: #D97706;
+}
+
+.summary-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .collapse-btn {
   background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  color: #475569;
+  border: 1px solid #CBD5E1;
+  color: #334155;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 5px 10px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.15s ease;
 }
 
 .collapse-btn:hover {
-  background: #E2E8F0;
+  background: #EFF6FF;
   color: #002060;
+  border-color: #93C5FD;
+}
+
+.collapse-btn.is-open {
+  background: #F1F5F9;
   border-color: #CBD5E1;
 }
 
@@ -276,14 +333,13 @@ function toggleCollapse() {
 
 .collapse-action-hint {
   font-size: 11px;
-  color: #64748B;
 }
 
 .section-card-body {
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .collapse-enter-active,
@@ -294,5 +350,19 @@ function toggleCollapse() {
 .collapse-enter-from,
 .collapse-leave-to {
   opacity: 0;
+}
+
+@media (max-width: 900px) {
+  .section-card-hdr {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hdr-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .collapsed-summary-chip {
+    max-width: 240px;
+  }
 }
 </style>
