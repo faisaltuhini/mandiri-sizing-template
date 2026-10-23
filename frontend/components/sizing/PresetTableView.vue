@@ -262,7 +262,7 @@
             </div>
           </div>
 
-          <!-- View Switcher (Cards vs Table) -->
+          <!-- View Switcher (Cards vs Table vs Diagram) -->
           <div class="view-mode-switcher">
             <button
               type="button"
@@ -290,6 +290,23 @@
                 <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
               <span>Tabel Ringkas</span>
+            </button>
+            <button
+              type="button"
+              :class="['view-switch-btn', { active: viewMode === 'diagram' }]"
+              @click="viewMode = 'diagram'"
+              title="Tampilan High-Level Architecture Blueprint Diagram"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="2" width="6" height="5" rx="1"></rect>
+                <rect x="2" y="17" width="6" height="5" rx="1"></rect>
+                <rect x="9" y="17" width="6" height="5" rx="1"></rect>
+                <rect x="16" y="17" width="6" height="5" rx="1"></rect>
+                <path d="M12 7v5"></path>
+                <path d="M5 17v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"></path>
+                <line x1="12" y1="12" x2="12" y2="17"></line>
+              </svg>
+              <span>Diagram</span>
             </button>
           </div>
         </div>
@@ -686,6 +703,333 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- VIEW MODE 3: HIGH-LEVEL ARCHITECTURE BLUEPRINT DIAGRAM -->
+      <div v-else-if="viewMode === 'diagram' && filteredPresetItems.length > 0" class="preset-diagram-canvas">
+        <!-- Blueprint Top Header & Visual Legend -->
+        <div class="blueprint-header-bar">
+          <div class="blueprint-title-block">
+            <div class="bp-title-row">
+              <span class="bp-badge-tag">REFERENCE ARCHITECTURE</span>
+              <h3 class="bp-main-title">High-Level Enterprise Architecture Topology</h3>
+              <span :class="['bp-lens-pill', activeTierTab]">
+                {{ activeTierTab === 'both' ? '⚖️ Mode Perbandingan: Moderat (N+1) vs Critical (2N)' : (activeTierTab === 'moderate' ? '🔵 Fokus Blueprint: Tier Moderat (N+1)' : '🟠 Fokus Blueprint: Tier Critical (2N)') }}
+              </span>
+            </div>
+            <p class="bp-subtitle">
+              Visualisasi alur trafik berlapis (North-South Traffic Flow) beserta penempatan klaster compute, storage SAN, dan lisensi per zona arsitektur. Klik node untuk inspeksi detail atau edit formula.
+            </p>
+          </div>
+
+          <div class="blueprint-legend-box">
+            <div class="legend-item" title="Klaster Virtual Machine Standar">
+              <span class="leg-dot vm"></span>
+              <span>VM Cluster</span>
+            </div>
+            <div class="legend-item" title="Server Fisik Khusus Performa Tinggi">
+              <span class="leg-dot bm"></span>
+              <span>Baremetal Dedicated</span>
+            </div>
+            <div class="legend-item" title="Penyimpanan Terpusat SAN LUN">
+              <span class="leg-dot san"></span>
+              <span>Shared SAN LUN</span>
+            </div>
+            <div class="legend-sep"></div>
+            <div class="legend-item" title="Jalur Trafik Sinkron Utama">
+              <span class="leg-line sync"></span>
+              <span>Sync Data Flow</span>
+            </div>
+            <div class="legend-item" title="Jalur Asinkron, Quorum, atau Log Telemetry">
+              <span class="leg-line async"></span>
+              <span>Async / Telemetry</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- External Entry Traffic Node (Shown when viewing All or Access & App) -->
+        <div v-if="activeCategory === 'all' || activeCategory === 'access_app'" class="bp-external-entry-wrap">
+          <div class="bp-external-pill">
+            <div class="ext-icon-pulse">🌍</div>
+            <div class="ext-text-group">
+              <span class="ext-eyebrow">EXTERNAL TRAFFIC &amp; CHANNELS</span>
+              <span class="ext-title">Nasabah Mobile Banking · Web Portal · Partner Open API</span>
+            </div>
+            <div class="ext-protocol-tags">
+              <span class="proto-chip">HTTPS / TLS 1.3</span>
+              <span class="proto-chip">WAF &amp; Rate Limiting</span>
+            </div>
+          </div>
+          <div class="bp-spine-connector entry-spine">
+            <div class="spine-line"></div>
+            <span class="spine-pill">⬇ Masuk ke Zona DMZ &amp; Ingress Layer</span>
+          </div>
+        </div>
+
+        <!-- Architectural Swimlane Zones -->
+        <div class="bp-zones-stack">
+          <template v-for="(zone, zIdx) in diagramZones" :key="zone.id">
+            <section :class="['bp-zone-lane', zone.themeClass]">
+              <!-- Zone Header Bar -->
+              <div class="bp-zone-header">
+                <div class="zone-hdr-left">
+                  <span class="zone-code-badge">{{ zone.code }}</span>
+                  <span class="zone-icon-box">{{ zone.icon }}</span>
+                  <div class="zone-title-wrap">
+                    <div class="zone-title-line">
+                      <h4 class="zone-name">{{ zone.title }}</h4>
+                      <span class="zone-role-pill">{{ zone.architectureTier }}</span>
+                    </div>
+                    <p class="zone-desc">{{ zone.subtitle }}</p>
+                  </div>
+                </div>
+
+                <div class="zone-hdr-metrics">
+                  <div class="zone-stat-chip">
+                    <span class="z-stat-lbl">Komponen</span>
+                    <span class="z-stat-val">{{ zone.items.length }} Layer</span>
+                  </div>
+                  <div v-if="activeTierTab === 'both' || activeTierTab === 'moderate'" class="zone-stat-chip mod">
+                    <span class="z-stat-lbl">Moderat (N+1)</span>
+                    <span class="z-stat-val">{{ zone.modNodes }} Node · {{ zone.modVcpu }} vCPU</span>
+                  </div>
+                  <div v-if="activeTierTab === 'both' || activeTierTab === 'critical'" class="zone-stat-chip crit">
+                    <span class="z-stat-lbl">Critical (2N)</span>
+                    <span class="z-stat-val">{{ zone.critNodes }} Node · {{ zone.critVcpu }} vCPU</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Zone Nodes Flow Grid -->
+              <div :class="['bp-zone-nodes-flow', { 'single-node-hub': zone.items.length === 1 }]">
+                <template v-for="(item, nIdx) in zone.items" :key="item.id">
+                  <!-- Blueprint Node Card -->
+                  <div
+                    :class="[
+                      'bp-node-card',
+                      {
+                        'is-selected': selectedDiagramItem?.id === item.id,
+                        'has-baremetal': (activeTierTab !== 'moderate' && item.critical.computeType === 'baremetal') || (activeTierTab === 'moderate' && item.moderate.computeType === 'baremetal'),
+                        'is-shared-san': item.moderate.computeType === 'shared' || item.critical.computeType === 'shared'
+                      }
+                    ]"
+                    @click="selectDiagramNode(item)"
+                  >
+                    <!-- Node Top Meta Strip -->
+                    <div class="bp-node-topbar">
+                      <div class="bp-node-badges">
+                        <span class="bp-layer-no">L{{ String(item.no).padStart(2, '0') }}</span>
+                        <span class="bp-role-tag">{{ getNodeArchitectureRole(item) }}</span>
+                      </div>
+                      <div class="bp-node-actions" @click.stop>
+                        <button
+                          type="button"
+                          class="bp-btn-edit"
+                          @click="openEditLayerModal(item)"
+                          title="Edit Formula Preset Layer Ini"
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                          </svg>
+                          <span>Edit</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Node Identity (Icon + Layer + Software Component) -->
+                    <div class="bp-node-identity">
+                      <div class="bp-node-avatar">
+                        <span>{{ getLayerIcon(item) }}</span>
+                      </div>
+                      <div class="bp-node-titles">
+                        <h5 class="bp-node-layer-name">{{ item.layer }}</h5>
+                        <div class="bp-node-comp-name">{{ item.component }}</div>
+                      </div>
+                    </div>
+
+                    <p v-if="item.notes" class="bp-node-desc" :title="item.notes">
+                      {{ item.notes }}
+                    </p>
+
+                    <!-- MODE A: BOTH TIERS COMPARISON INSIDE NODE -->
+                    <div v-if="activeTierTab === 'both'" class="bp-node-dual-tiers">
+                      <!-- Moderat Row -->
+                      <div class="bp-tier-strip mod-strip">
+                        <div class="strip-hdr">
+                          <span class="strip-tier-dot mod"></span>
+                          <span class="strip-tier-name">MODERAT (N+1)</span>
+                          <span :class="['strip-compute-pill', item.moderate.computeType]">
+                            {{ item.moderate.computeType === 'shared' ? '🗄️ Shared SAN' : `${item.moderate.nodeCount}x ${item.moderate.computeType === 'baremetal' ? 'Baremetal' : 'VM'}` }}
+                          </span>
+                        </div>
+                        <div class="strip-specs-line">
+                          <span v-if="item.moderate.computeType !== 'shared'">
+                            <strong>{{ item.moderate.nodeCount * item.moderate.vcpuPerNode }}</strong> vCPU ·
+                            <strong>{{ item.moderate.nodeCount * item.moderate.ramGBPerNode }}</strong> GB RAM ·
+                          </span>
+                          <span>
+                            <strong>{{ formatDiskSize((item.moderate.nodeCount || 1) * item.moderate.storageGBPerNode) }}</strong> ({{ item.moderate.storageClass }})
+                          </span>
+                        </div>
+                        <div class="strip-lic-line">
+                          <span class="strip-lic-badge">
+                            {{ item.moderate.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ item.moderate.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Enterprise') : (item.licenseFree || 'Community OSS') }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Critical Row -->
+                      <div class="bp-tier-strip crit-strip">
+                        <div class="strip-hdr">
+                          <span class="strip-tier-dot crit"></span>
+                          <span class="strip-tier-name">CRITICAL (2N)</span>
+                          <span :class="['strip-compute-pill', item.critical.computeType]">
+                            {{ item.critical.computeType === 'shared' ? '🗄️ Shared SAN' : `${item.critical.nodeCount}x ${item.critical.computeType === 'baremetal' ? '🔥 Baremetal' : 'VM'}` }}
+                          </span>
+                        </div>
+                        <div class="strip-specs-line">
+                          <span v-if="item.critical.computeType !== 'shared'">
+                            <strong>{{ item.critical.nodeCount * item.critical.vcpuPerNode }}</strong> vCPU ·
+                            <strong>{{ item.critical.nodeCount * item.critical.ramGBPerNode }}</strong> GB RAM ·
+                          </span>
+                          <span>
+                            <strong>{{ formatDiskSize((item.critical.nodeCount || 1) * item.critical.storageGBPerNode) }}</strong> ({{ item.critical.storageClass }})
+                          </span>
+                        </div>
+                        <div class="strip-lic-line">
+                          <span class="strip-lic-badge crit-lic">
+                            {{ item.critical.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ item.critical.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Enterprise') : (item.licenseFree || 'Community OSS') }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Upgrade Delta Footer -->
+                      <div class="bp-node-delta-bar">
+                        <span
+                          v-for="(pill, pIdx) in getDeltaPills(item.moderate, item.critical).slice(0, 2)"
+                          :key="pIdx"
+                          :class="['bp-delta-tag', pill.type]"
+                        >
+                          {{ pill.text }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- MODE B: SINGLE TIER LENS (MODERATE ONLY OR CRITICAL ONLY) -->
+                    <div v-else :class="['bp-node-single-tier', activeTierTab]">
+                      <template v-for="activeSpec in [activeTierTab === 'moderate' ? item.moderate : item.critical]" :key="activeTierTab">
+                        <div class="single-spec-badges">
+                          <span :class="['single-compute-badge', activeSpec.computeType]">
+                            <template v-if="activeSpec.computeType === 'shared'">
+                              🗄️ Shared SAN LUN Pool
+                            </template>
+                            <template v-else>
+                              {{ activeSpec.computeType === 'baremetal' ? '🔥' : '🖥️' }}
+                              {{ activeSpec.nodeCount }} Node · {{ activeSpec.computeType === 'baremetal' ? 'Baremetal Dedicated' : 'Virtual Machine' }}
+                            </template>
+                          </span>
+                          <span :class="['single-tshirt-pill', getSizeBadge(activeSpec).tagClass]">
+                            {{ getSizeBadge(activeSpec).label }}
+                          </span>
+                        </div>
+
+                        <div class="single-metrics-box">
+                          <div class="s-metric">
+                            <span class="s-lbl">Total vCPU</span>
+                            <span class="s-val">{{ activeSpec.computeType === 'shared' ? '-' : `${activeSpec.nodeCount * activeSpec.vcpuPerNode} Core` }}</span>
+                          </div>
+                          <div class="s-metric">
+                            <span class="s-lbl">Total RAM</span>
+                            <span class="s-val">{{ activeSpec.computeType === 'shared' ? '-' : `${activeSpec.nodeCount * activeSpec.ramGBPerNode} GB` }}</span>
+                          </div>
+                          <div class="s-metric">
+                            <span class="s-lbl">Total Disk ({{ activeSpec.storageClass }})</span>
+                            <span class="s-val">{{ formatDiskSize((activeSpec.nodeCount || 1) * activeSpec.storageGBPerNode) }}</span>
+                          </div>
+                        </div>
+
+                        <div class="single-lic-footer">
+                          <span class="s-lic-text">
+                            {{ activeSpec.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ activeSpec.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
+                          </span>
+                          <span :class="['s-nbu-pill', { on: activeSpec.backupEnabled }]">
+                            {{ activeSpec.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                          </span>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- Intra-Zone Horizontal Flow Connector (If nodes in this zone have a direct relationship) -->
+                  <div
+                    v-if="nIdx < zone.items.length - 1 && getIntraZoneConnector(zone.id, item, zone.items[nIdx + 1])"
+                    class="bp-intra-connector"
+                  >
+                    <span class="intra-label">{{ getIntraZoneConnector(zone.id, item, zone.items[nIdx + 1])?.label }}</span>
+                    <div :class="['intra-arrow-line', getIntraZoneConnector(zone.id, item, zone.items[nIdx + 1])?.style]">
+                      <span class="arrow-head">➔</span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </section>
+
+            <!-- Inter-Zone North-South Spine Connector -->
+            <div v-if="zIdx < diagramZones.length - 1" class="bp-spine-connector">
+              <div :class="['spine-line', zone.spineStyle || 'sync']"></div>
+              <span class="spine-pill">{{ zone.nextFlowLabel }}</span>
+            </div>
+          </template>
+        </div>
+
+        <!-- Selected Node Quick Inspector Bar (Appears when user clicks any node in the diagram) -->
+        <transition name="banner-slide">
+          <div v-if="selectedDiagramItem" class="bp-inspector-panel">
+            <div class="insp-left">
+              <div class="insp-avatar">{{ getLayerIcon(selectedDiagramItem) }}</div>
+              <div class="insp-info">
+                <div class="insp-title-line">
+                  <span class="insp-no">LAYER {{ String(selectedDiagramItem.no).padStart(2, '0') }}</span>
+                  <h4 class="insp-layer">{{ selectedDiagramItem.layer }}</h4>
+                  <span class="insp-comp">{{ selectedDiagramItem.component }}</span>
+                  <span v-if="selectedDiagramItem.contractRef" class="insp-ref">📋 Ref: {{ selectedDiagramItem.contractRef }}</span>
+                </div>
+                <p class="insp-notes">{{ selectedDiagramItem.notes || 'Komponen standar baseline arsitektur.' }}</p>
+                <div class="insp-lic-pair">
+                  <span><strong>SKU OSS:</strong> {{ selectedDiagramItem.licenseFree || 'Community OSS' }}</span>
+                  <span class="insp-sep">·</span>
+                  <span><strong>SKU Enterprise:</strong> <em class="text-green">{{ selectedDiagramItem.licenseEnterprise || 'Official Enterprise' }}</em></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="insp-actions">
+              <button
+                type="button"
+                class="btn-insp-edit"
+                @click="openEditLayerModal(selectedDiagramItem)"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span>Edit Formula Layer</span>
+              </button>
+              <button
+                type="button"
+                class="btn-insp-close"
+                @click="selectedDiagramId = null"
+                title="Tutup panel inspeksi"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </transition>
       </div>
 
       <!-- EMPTY STATE IF SEARCH / CATEGORY FINDS NOTHING -->
@@ -1906,7 +2250,8 @@ function handleComponentSelect(option: AutocompleteOption) {
 
 const searchQuery = ref('')
 const activeTierTab = ref<'both' | 'moderate' | 'critical'>('both')
-const viewMode = ref<'cards' | 'table'>('cards')
+const viewMode = ref<'cards' | 'table' | 'diagram'>('cards')
+const selectedDiagramId = ref<string | null>(null)
 const activeCategory = ref<string>('all')
 const isOverviewBannerVisible = ref(true)
 const showModal = ref(false)
@@ -1916,7 +2261,7 @@ const editingId = ref<string | null>(null)
 // Restore saved preferences
 if (typeof window !== 'undefined') {
   const savedMode = localStorage.getItem('mandiri_preset_view_mode')
-  if (savedMode === 'cards' || savedMode === 'table') {
+  if (savedMode === 'cards' || savedMode === 'table' || savedMode === 'diagram') {
     viewMode.value = savedMode
   }
   const savedBanner = localStorage.getItem('mandiri_preset_overview_visible')
@@ -2225,6 +2570,249 @@ const filteredPresetItems = computed(() => {
       (item.notes || '').toLowerCase().includes(q)
     )
   })
+})
+
+// ==========================================
+// HIGH-LEVEL ARCHITECTURE DIAGRAM HELPERS
+// ==========================================
+const selectedDiagramItem = computed<SizingPresetItem | null>(() => {
+  if (!selectedDiagramId.value) return null
+  return (props.presetItems || []).find(item => item.id === selectedDiagramId.value) || null
+})
+
+function selectDiagramNode(item: SizingPresetItem) {
+  if (selectedDiagramId.value === item.id) {
+    selectedDiagramId.value = null
+  } else {
+    selectedDiagramId.value = item.id
+  }
+}
+
+function getNodeArchitectureRole(item: SizingPresetItem): string {
+  const no = Number(item.no) || 0
+  switch (no) {
+    case 1: return 'DMZ Reverse Proxy'
+    case 2: return 'Microservices Worker'
+    case 3: return 'Ingress & Service Mesh'
+    case 4: return 'Core OLTP Engine'
+    case 5: return 'High-IOPS SAN LUN'
+    case 6: return 'In-Memory Speed Layer'
+    case 7: return 'HA Failover Quorum'
+    case 8: return 'Event Streaming Bus'
+    case 9: return 'Search & Log Indexer'
+    case 10: return 'Log Ingest Pipeline'
+    case 11: return 'Observability Portal'
+    case 12: return 'Object & ECM Archive'
+    case 13: return 'Workload Automation'
+  }
+  const cat = getLayerCategory(item)
+  if (cat === 'access_app') return 'App & Access Tier'
+  if (cat === 'db_storage') return 'Data Persistence'
+  if (cat === 'cache_queue') return 'Middleware & Queue'
+  if (cat === 'monitor_batch') return 'Telemetry & Ops'
+  return 'Custom Extension'
+}
+
+function getIntraZoneConnector(
+  zoneId: string,
+  currentItem: SizingPresetItem,
+  nextItem?: SizingPresetItem
+): { label: string; style: 'sync' | 'async' | 'san' } | null {
+  if (!nextItem) return null
+  const curNo = Number(currentItem.no) || 0
+  const nextNo = Number(nextItem.no) || 0
+
+  if (zoneId === 'edge_ingress') {
+    if (curNo === 1 && nextNo === 3) {
+      return { label: 'HTTPS / Route Proxy', style: 'sync' }
+    }
+    return { label: 'Traffic Forward', style: 'sync' }
+  }
+
+  if (zoneId === 'middleware_mesh') {
+    if (curNo === 6 && nextNo === 7) {
+      return { label: 'HA Quorum Watch', style: 'async' }
+    }
+    if ((curNo === 6 || curNo === 7) && nextNo === 8) {
+      return { label: 'Pub/Sub Stream', style: 'async' }
+    }
+  }
+
+  if (zoneId === 'data_persistence') {
+    if (curNo === 4 && nextNo === 5) {
+      return { label: 'Fibre Channel ASM LUN', style: 'san' }
+    }
+  }
+
+  if (zoneId === 'ops_observability') {
+    if (curNo === 10 && nextNo === 9) {
+      return { label: 'Parse & Index Stream', style: 'async' }
+    }
+    if (curNo === 9 && nextNo === 11) {
+      return { label: 'Visual Query API', style: 'sync' }
+    }
+  }
+
+  return null
+}
+
+interface DiagramZoneGroup {
+  id: string
+  code: string
+  icon: string
+  title: string
+  architectureTier: string
+  subtitle: string
+  themeClass: string
+  nextFlowLabel: string
+  spineStyle: 'sync' | 'async'
+  items: SizingPresetItem[]
+  modNodes: number
+  modVcpu: number
+  critNodes: number
+  critVcpu: number
+}
+
+const diagramZones = computed<DiagramZoneGroup[]>(() => {
+  const items = filteredPresetItems.value || []
+
+  const isEdgeIngress = (item: SizingPresetItem) => {
+    const no = Number(item.no) || 0
+    if (no === 1 || no === 3) return true
+    if (no === 2) return false
+    if (getLayerCategory(item) !== 'access_app') return false
+    const text = `${item.layer} ${item.component}`.toLowerCase()
+    return text.includes('ingress') || text.includes('router') || text.includes('gateway') || text.includes('waf') || text.includes('proxy') || text.includes('load balancer')
+  }
+
+  const isCoreCompute = (item: SizingPresetItem) => {
+    const no = Number(item.no) || 0
+    if (no === 2) return true
+    if (no === 1 || no === 3) return false
+    return getLayerCategory(item) === 'access_app' && !isEdgeIngress(item)
+  }
+
+  const edgeItems = items.filter(isEdgeIngress).sort((a, b) => a.no - b.no)
+  const computeItems = items.filter(isCoreCompute).sort((a, b) => a.no - b.no)
+  const middlewareItems = items.filter(i => getLayerCategory(i) === 'cache_queue').sort((a, b) => a.no - b.no)
+  const dataItems = items.filter(i => getLayerCategory(i) === 'db_storage').sort((a, b) => a.no - b.no)
+
+  // Order Observability logically: L10 (Log Shipper) -> L09 (Log Analytics) -> L11 (Log Dashboard) -> L13 (Batch Engine) -> others
+  const opsOrderWeight = (no: number) => {
+    if (no === 10) return 1
+    if (no === 9) return 2
+    if (no === 11) return 3
+    if (no === 13) return 4
+    return 10 + no
+  }
+  const opsItems = items
+    .filter(i => getLayerCategory(i) === 'monitor_batch')
+    .sort((a, b) => opsOrderWeight(a.no) - opsOrderWeight(b.no))
+
+  const customOtherItems = items.filter(i => getLayerCategory(i) === 'other').sort((a, b) => a.no - b.no)
+
+  const rawZones = [
+    {
+      id: 'edge_ingress',
+      code: 'ZONE 01',
+      icon: '🌐',
+      title: 'Edge, DMZ & Traffic Ingress Layer',
+      architectureTier: 'Network Entry & Routing',
+      subtitle: 'Pintu gerbang utama lalu lintas nasabah, terminasi SSL/TLS, proteksi WAF, dan internal mesh router.',
+      themeClass: 'zone-theme-edge',
+      nextFlowLabel: '⬇ Routed HTTP/gRPC Request ke Klaster Aplikasi Inti',
+      spineStyle: 'sync' as const,
+      items: edgeItems
+    },
+    {
+      id: 'core_compute',
+      code: 'ZONE 02',
+      icon: '📦',
+      title: 'Core Application & Microservices Runtime',
+      architectureTier: 'Compute Orchestration Hub',
+      subtitle: 'Klaster eksekusi utama tempat seluruh container microservices dan logika bisnis transaksi berjalan.',
+      themeClass: 'zone-theme-compute',
+      nextFlowLabel: '⬇ Akses Sub-ms In-Memory Cache & Event Streaming Asinkron',
+      spineStyle: 'sync' as const,
+      items: computeItems
+    },
+    {
+      id: 'middleware_mesh',
+      code: 'ZONE 03',
+      icon: '⚡',
+      title: 'In-Memory Speed & Event Streaming Mesh',
+      architectureTier: 'High-Speed Middleware',
+      subtitle: 'Akselerasi baca/tulis instan (Redis Cluster + Sentinel Quorum) dan antrean transaksi berkapasitas tinggi (Kafka).',
+      themeClass: 'zone-theme-middleware',
+      nextFlowLabel: '⬇ Transaksi Finansial OLTP Read/Write & Penyimpanan Persisten',
+      spineStyle: 'sync' as const,
+      items: middlewareItems
+    },
+    {
+      id: 'data_persistence',
+      code: 'ZONE 04',
+      icon: '🗄️',
+      title: 'Core Database & High-IOPS Persistent Storage',
+      architectureTier: 'Enterprise Data Persistence',
+      subtitle: 'Penyimpanan transaksi inti berketahanan tinggi (Oracle RAC + ASM SAN LUN Tier 3) serta arsip dokumen objek.',
+      themeClass: 'zone-theme-data',
+      nextFlowLabel: '⇣ Pengiriman Log Telemetry, Audit Trail & Eksekusi Batch EOD',
+      spineStyle: 'async' as const,
+      items: dataItems
+    },
+    {
+      id: 'ops_observability',
+      code: 'ZONE 05',
+      icon: '📊',
+      title: 'Observability Pipeline & Batch Automation',
+      architectureTier: 'Telemetry, Audit & Operations',
+      subtitle: 'Pipa pengumpulan log (Logstash ➔ Elasticsearch ➔ Kibana) serta otomasi penjadwalan tutup buku harian (Control-M).',
+      themeClass: 'zone-theme-ops',
+      nextFlowLabel: '⇣ Integrasi Ekstensi Tambahan',
+      spineStyle: 'async' as const,
+      items: opsItems
+    },
+    {
+      id: 'custom_other',
+      code: 'ZONE 06',
+      icon: '🔧',
+      title: 'Extended & Custom Architecture Layers',
+      architectureTier: 'Custom Extensions',
+      subtitle: 'Komponen arsitektur tambahan sesuai kebutuhan spesifik proyek.',
+      themeClass: 'zone-theme-other',
+      nextFlowLabel: '',
+      spineStyle: 'async' as const,
+      items: customOtherItems
+    }
+  ]
+
+  return rawZones
+    .filter(z => z.items.length > 0)
+    .map(z => {
+      let modNodes = 0
+      let modVcpu = 0
+      let critNodes = 0
+      let critVcpu = 0
+      for (const it of z.items) {
+        if (it.moderate && it.moderate.computeType !== 'shared') {
+          const n = Number(it.moderate.nodeCount) || 0
+          modNodes += n
+          modVcpu += n * (Number(it.moderate.vcpuPerNode) || 0)
+        }
+        if (it.critical && it.critical.computeType !== 'shared') {
+          const n = Number(it.critical.nodeCount) || 0
+          critNodes += n
+          critVcpu += n * (Number(it.critical.vcpuPerNode) || 0)
+        }
+      }
+      return {
+        ...z,
+        modNodes,
+        modVcpu,
+        critNodes,
+        critVcpu
+      }
+    })
 })
 
 function formatComputeType(type: string): string {
@@ -4737,5 +5325,1063 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .clean-btn-submit:hover {
   background: #003399;
   box-shadow: 0 4px 8px rgba(0, 32, 96, 0.25);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VIEW MODE 3: HIGH-LEVEL ARCHITECTURE BLUEPRINT DIAGRAM
+   ───────────────────────────────────────────────────────────── */
+.preset-diagram-canvas {
+  background-color: #F8FAFC;
+  background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+  background-size: 20px 20px;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: inset 0 2px 6px rgba(15, 23, 42, 0.03);
+  position: relative;
+}
+
+/* Blueprint Header & Legend */
+.blueprint-header-bar {
+  background: linear-gradient(135deg, #002060 0%, #0F296B 60%, #1E3A8A 100%);
+  color: #FFFFFF;
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 4px 12px rgba(0, 32, 96, 0.15);
+}
+
+.blueprint-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 300px;
+}
+
+.bp-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bp-badge-tag {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #FDE68A;
+}
+
+.bp-main-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+
+.bp-lens-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #E2E8F0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.bp-lens-pill.moderate {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: #7DD3FC;
+  color: #E0F2FE;
+}
+
+.bp-lens-pill.critical {
+  background: rgba(245, 158, 11, 0.28);
+  border-color: #FCD34D;
+  color: #FEF3C7;
+}
+
+.bp-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #CBD5E1;
+  line-height: 1.45;
+}
+
+.blueprint-legend-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 14px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #F1F5F9;
+  white-space: nowrap;
+}
+
+.leg-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.leg-dot.vm {
+  background: #38BDF8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+}
+
+.leg-dot.bm {
+  background: #F59E0B;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+}
+
+.leg-dot.san {
+  background: #A855F7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35);
+}
+
+.legend-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.leg-line {
+  width: 18px;
+  height: 0;
+  display: inline-block;
+}
+
+.leg-line.sync {
+  border-top: 2px solid #38BDF8;
+}
+
+.leg-line.async {
+  border-top: 2px dashed #FCD34D;
+}
+
+/* External Entry Pill */
+.bp-external-entry-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.bp-external-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: #FFFFFF;
+  border: 2px solid #002060;
+  border-radius: 40px;
+  padding: 10px 22px;
+  box-shadow: 0 4px 12px rgba(0, 32, 96, 0.08);
+  flex-wrap: wrap;
+}
+
+.ext-icon-pulse {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.ext-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.ext-eyebrow {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #0284C7;
+  letter-spacing: 0.06em;
+}
+
+.ext-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.ext-protocol-tags {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.proto-chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #002060;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  padding: 3px 9px;
+  border-radius: 12px;
+}
+
+/* North-South Spine Connector */
+.bp-spine-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 6px 0;
+}
+
+.bp-spine-connector .spine-line {
+  width: 2px;
+  height: 16px;
+  background: #0284C7;
+}
+
+.bp-spine-connector .spine-line.async {
+  background: transparent;
+  border-left: 2px dashed #D97706;
+}
+
+.bp-spine-connector .spine-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #002060;
+  background: #EFF6FF;
+  border: 1px solid #93C5FD;
+  padding: 3px 12px;
+  border-radius: 14px;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+  z-index: 1;
+}
+
+/* Zones Stack & Swimlane Cards */
+.bp-zones-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.bp-zone-lane {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: 1px solid #CBD5E1;
+  border-left-width: 5px;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease;
+}
+
+.bp-zone-lane.zone-theme-edge {
+  border-left-color: #0284C7;
+}
+
+.bp-zone-lane.zone-theme-compute {
+  border-left-color: #002060;
+  background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%);
+}
+
+.bp-zone-lane.zone-theme-middleware {
+  border-left-color: #D97706;
+}
+
+.bp-zone-lane.zone-theme-data {
+  border-left-color: #7C3AED;
+}
+
+.bp-zone-lane.zone-theme-ops {
+  border-left-color: #059669;
+}
+
+.bp-zone-lane.zone-theme-other {
+  border-left-color: #475569;
+}
+
+.bp-zone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #E2E8F0;
+  flex-wrap: wrap;
+}
+
+.zone-hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 260px;
+}
+
+.zone-code-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: #0F172A;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.zone-theme-edge .zone-code-badge { background: #0284C7; }
+.zone-theme-compute .zone-code-badge { background: #002060; }
+.zone-theme-middleware .zone-code-badge { background: #D97706; }
+.zone-theme-data .zone-code-badge { background: #6D28D9; }
+.zone-theme-ops .zone-code-badge { background: #047857; }
+
+.zone-icon-box {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.zone-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zone-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zone-name {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.zone-role-pill {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.zone-desc {
+  margin: 0;
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+.zone-hdr-metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zone-stat-chip {
+  display: flex;
+  flex-direction: column;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 4px 10px;
+}
+
+.zone-stat-chip.mod {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+}
+
+.zone-stat-chip.crit {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.z-stat-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.z-stat-val {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.zone-stat-chip.mod .z-stat-val { color: #0369A1; }
+.zone-stat-chip.crit .z-stat-val { color: #B45309; }
+
+/* Zone Nodes Flow Layout */
+.bp-zone-nodes-flow {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bp-zone-nodes-flow.single-node-hub {
+  justify-content: center;
+}
+
+.bp-zone-nodes-flow.single-node-hub .bp-node-card {
+  max-width: 640px;
+  flex: 1 1 480px;
+}
+
+/* Blueprint Node Card */
+.bp-node-card {
+  flex: 1 1 280px;
+  min-width: 265px;
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  position: relative;
+}
+
+.bp-node-card:hover {
+  border-color: #002060;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -4px rgba(0, 32, 96, 0.12);
+}
+
+.bp-node-card.is-selected {
+  border-color: #002060;
+  box-shadow: 0 0 0 3px rgba(0, 32, 96, 0.16), 0 8px 20px -4px rgba(0, 32, 96, 0.15);
+}
+
+.bp-node-card.has-baremetal {
+  border-top: 3px solid #D97706;
+}
+
+.bp-node-card.is-shared-san {
+  border-top: 3px solid #7C3AED;
+}
+
+.bp-node-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bp-node-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.bp-layer-no {
+  font-size: 10px;
+  font-weight: 800;
+  color: #002060;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.bp-role-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.bp-btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #002060;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bp-btn-edit:hover {
+  background: #002060;
+  color: #FFFFFF;
+  border-color: #002060;
+}
+
+.bp-node-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bp-node-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.bp-node-titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bp-node-layer-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+}
+
+.bp-node-comp-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0284C7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bp-node-desc {
+  margin: 0;
+  font-size: 11.5px;
+  color: #64748B;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Dual Tiers Comparison inside Node */
+.bp-node-dual-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.bp-tier-strip {
+  border-radius: 7px;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid #E2E8F0;
+}
+
+.bp-tier-strip.mod-strip {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+}
+
+.bp-tier-strip.crit-strip {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.strip-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.strip-tier-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.strip-tier-dot.mod { background: #0284C7; }
+.strip-tier-dot.crit { background: #D97706; }
+
+.strip-tier-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: #0F172A;
+  margin-right: auto;
+}
+
+.strip-compute-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+}
+
+.strip-compute-pill.baremetal {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #92400E;
+}
+
+.strip-compute-pill.shared {
+  background: #F3E8FF;
+  border-color: #C084FC;
+  color: #6B21A8;
+}
+
+.strip-specs-line {
+  font-size: 11px;
+  color: #334155;
+}
+
+.strip-specs-line strong {
+  color: #0F172A;
+  font-weight: 800;
+}
+
+.strip-lic-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.strip-lic-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.strip-lic-badge.crit-lic {
+  color: #92400E;
+  font-weight: 700;
+}
+
+.bp-node-delta-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.bp-delta-tag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+}
+
+.bp-delta-tag.upgrade {
+  background: #FEF3C7;
+  color: #B45309;
+  border-color: #FDE68A;
+}
+
+.bp-delta-tag.scale {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border-color: #BFDBFE;
+}
+
+.bp-delta-tag.license {
+  background: #ECFDF5;
+  color: #047857;
+  border-color: #A7F3D0;
+}
+
+/* Single Tier Lens inside Node */
+.bp-node-single-tier {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  margin-top: auto;
+}
+
+.bp-node-single-tier.moderate {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+}
+
+.bp-node-single-tier.critical {
+  background: #FFFBEB;
+  border-color: #FDE68A;
+}
+
+.single-spec-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.single-compute-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0F172A;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.single-compute-badge.baremetal {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+  color: #92400E;
+}
+
+.single-compute-badge.shared {
+  background: #F3E8FF;
+  border-color: #C084FC;
+  color: #6B21A8;
+}
+
+.single-tshirt-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.single-metrics-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.s-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.s-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+}
+
+.s-val {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.single-lic-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.s-lic-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.s-nbu-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #F1F5F9;
+  color: #64748B;
+  flex-shrink: 0;
+}
+
+.s-nbu-pill.on {
+  background: #DCFCE7;
+  color: #15803D;
+}
+
+/* Intra-Zone Horizontal Connector */
+.bp-intra-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0 2px;
+  min-width: 84px;
+  flex-shrink: 0;
+}
+
+.intra-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  padding: 2px 7px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.intra-arrow-line {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.intra-arrow-line::before {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-top: 2px solid #0284C7;
+}
+
+.intra-arrow-line.async::before {
+  border-top: 2px dashed #D97706;
+}
+
+.intra-arrow-line.san::before {
+  border-top: 3px double #7C3AED;
+}
+
+.arrow-head {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0284C7;
+  margin-left: 2px;
+}
+
+.intra-arrow-line.async .arrow-head { color: #D97706; }
+.intra-arrow-line.san .arrow-head { color: #7C3AED; }
+
+/* Selected Node Inspector Panel */
+.bp-inspector-panel {
+  position: sticky;
+  bottom: 12px;
+  background: #FFFFFF;
+  border: 2px solid #002060;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 12px 28px -6px rgba(0, 32, 96, 0.25);
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.insp-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.insp-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.insp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.insp-title-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.insp-no {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #FFFFFF;
+  background: #002060;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.insp-layer {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+.insp-comp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #0284C7;
+  background: #F0F9FF;
+  border: 1px solid #BAE6FD;
+  padding: 1px 7px;
+  border-radius: 4px;
+}
+
+.insp-ref {
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 1px 7px;
+  border-radius: 4px;
+}
+
+.insp-notes {
+  margin: 0;
+  font-size: 12px;
+  color: #334155;
+}
+
+.insp-lic-pair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.insp-sep {
+  color: #CBD5E1;
+}
+
+.insp-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-insp-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #002060;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-insp-edit:hover {
+  background: #003399;
+}
+
+.btn-insp-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #CBD5E1;
+  background: #F8FAFC;
+  color: #475569;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-insp-close:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+@media (max-width: 960px) {
+  .bp-intra-connector {
+    display: none;
+  }
 }
 </style>
