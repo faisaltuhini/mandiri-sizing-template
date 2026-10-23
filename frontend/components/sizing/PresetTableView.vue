@@ -2329,7 +2329,9 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .preset-view-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
   background: #F8FAFC;
 }
@@ -2483,11 +2485,33 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
    ───────────────────────────────────────────── */
 .preset-workspace {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 20px 24px;
+  padding: 20px 24px 80px 24px;
   overflow-y: auto;
-  gap: 12px;
+  overflow-x: hidden;
+  gap: 14px;
+}
+
+/* Clear visible scrollbars for workspace */
+.preset-workspace::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.preset-workspace::-webkit-scrollbar-track {
+  background: #F1F5F9;
+  border-radius: 4px;
+}
+
+.preset-workspace::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+.preset-workspace::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
 }
 
 /* ─────────────────────────────────────────────
@@ -3878,9 +3902,10 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 10px;
-  overflow: hidden;
   overflow-x: auto;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  flex-shrink: 0;
+  margin-bottom: 24px;
 }
 
 .preset-matrix-table {
