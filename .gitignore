@@ -5,6 +5,7 @@
 dist
 backend/bin/
 backend/bin
+backend/api
 sw.*
 manifest.*
 

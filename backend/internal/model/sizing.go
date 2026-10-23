@@ -126,17 +126,22 @@ type ScenarioItem struct {
 // --- QUOTE ENGINE DTOs ---
 
 type QuoteItemRequest struct {
-	ComponentID      string `json:"component_id"`
-	Tier             string `json:"tier"`         // moderate, critical
-	ComputeType      string `json:"compute_type"` // vm, baremetal
-	NodeCount        int    `json:"node_count"`
-	VCPUPerNode      int    `json:"vcpu_per_node"`
-	RAMGBPerNode     int    `json:"ram_gb_per_node"`
-	StorageGBPerNode int    `json:"storage_gb_per_node"`
-	StorageClass     string `json:"storage_class"` // Tier 2, Tier 3, Tier 1
-	BackupEnabled    bool   `json:"backup_enabled"`
-	LicenseKind      string `json:"license_kind"` // free, enterprise
-	LicenseOptionID  string `json:"license_option_id"`
+	ComponentID        string `json:"component_id"`
+	ComponentName      string `json:"component_name,omitempty"`
+	LayerName          string `json:"layer_name,omitempty"`
+	PricingSKU         string `json:"pricing_sku,omitempty"`
+	LicenseProductName string `json:"license_product_name,omitempty"`
+	LicenseMetric      string `json:"license_metric,omitempty"`
+	Tier               string `json:"tier"`         // moderate, critical
+	ComputeType        string `json:"compute_type"` // vm, baremetal, shared, none
+	NodeCount          int    `json:"node_count"`
+	VCPUPerNode        int    `json:"vcpu_per_node"`
+	RAMGBPerNode       int    `json:"ram_gb_per_node"`
+	StorageGBPerNode   int    `json:"storage_gb_per_node"`
+	StorageClass       string `json:"storage_class"` // Tier 2, Tier 3, Tier 1
+	BackupEnabled      bool   `json:"backup_enabled"`
+	LicenseKind        string `json:"license_kind"` // free, enterprise
+	LicenseOptionID    string `json:"license_option_id"`
 }
 
 type QuoteRequest struct {
@@ -161,6 +166,7 @@ type QuoteItemCost struct {
 	TotalCostAnnual    int64    `json:"total_cost_annual"`
 	LicenseProductName string   `json:"license_product_name"`
 	LicenseKind        string   `json:"license_kind"`
+	PricingSKU         string   `json:"pricing_sku,omitempty"`
 	UnconfirmedPrices  []string `json:"unconfirmed_prices,omitempty"`
 }
 

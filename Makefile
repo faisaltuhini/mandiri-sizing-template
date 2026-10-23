@@ -8,7 +8,7 @@ dev:
 	@echo "📡 Backend (Go):     http://localhost:$(PORT)"
 	@echo "💻 Frontend (Nuxt):  http://localhost:5454"
 	@echo "=================================================="
-	@(trap 'kill 0' SIGINT; cd backend && PORT=$(PORT) go run ./cmd/api & cd frontend && pnpm dev & wait)
+	@(trap 'kill 0' SIGINT; cd backend && PORT=$(PORT) go run ./cmd/api & cd frontend && NUXT_PUBLIC_API_BASE=http://localhost:$(PORT) pnpm dev & wait)
 
 run-backend: dev-backend
 
@@ -20,7 +20,7 @@ run-frontend: dev-frontend
 
 dev-frontend:
 	@echo "💻 Running Nuxt Sizing Frontend on :5454..."
-	@cd frontend && pnpm dev
+	@cd frontend && NUXT_PUBLIC_API_BASE=http://localhost:$(PORT) pnpm dev
 
 build:
 	@echo "📦 Building Golang backend..."

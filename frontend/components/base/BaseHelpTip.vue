@@ -5,7 +5,7 @@
       class="help-tip-btn"
       :class="{ active: show }"
       @click.stop="show = !show"
-      :title="title"
+      aria-label="Bantuan informasi parameter"
     >
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
@@ -15,7 +15,12 @@
     </button>
 
     <transition name="tip-fade">
-      <div v-if="show" class="help-popover" @click.stop>
+      <div
+        v-if="show"
+        class="help-popover"
+        :class="placement === 'top' ? 'pos-top' : 'pos-bottom'"
+        @click.stop
+      >
         <div class="popover-hdr">
           <span class="popover-title">{{ title }}</span>
           <span v-if="subtitle" class="popover-sub">{{ subtitle }}</span>
@@ -33,12 +38,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-defineProps<{
-  title: string
-  subtitle?: string
-  content: string
-  businessImpact?: string
-}>()
+withDefaults(
+  defineProps<{
+    title: string
+    subtitle?: string
+    content: string
+    businessImpact?: string
+    placement?: 'bottom' | 'top'
+  }>(),
+  {
+    placement: 'bottom'
+  }
+)
 
 const show = ref(false)
 </script>
@@ -71,27 +82,43 @@ const show = ref(false)
 
 .help-popover {
   position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 280px;
+  width: 290px;
   background: #0F172A;
   color: #FFFFFF;
   border-radius: 8px;
   padding: 12px 14px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-  z-index: 100;
+  z-index: 1000;
   pointer-events: auto;
   font-size: 11px;
   line-height: 1.45;
 }
 
-.help-popover::after {
+.help-popover.pos-bottom {
+  top: calc(100% + 8px);
+  left: 0;
+}
+
+.help-popover.pos-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 12px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #0F172A transparent;
+}
+
+.help-popover.pos-top {
+  bottom: calc(100% + 8px);
+  left: 0;
+}
+
+.help-popover.pos-top::after {
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 12px;
   border-width: 5px;
   border-style: solid;
   border-color: #0F172A transparent transparent transparent;
@@ -148,9 +175,15 @@ const show = ref(false)
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.tip-fade-enter-from,
-.tip-fade-leave-to {
+.help-popover.pos-bottom.tip-fade-enter-from,
+.help-popover.pos-bottom.tip-fade-leave-to {
   opacity: 0;
-  transform: translate(-50%, 4px);
+  transform: translateY(-4px);
+}
+
+.help-popover.pos-top.tip-fade-enter-from,
+.help-popover.pos-top.tip-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
 }
 </style>

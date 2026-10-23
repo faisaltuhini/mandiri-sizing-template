@@ -1,6 +1,10 @@
 <template>
   <div class="base-section-card" :class="{ 'has-changes': hasChanges, collapsed: isCollapsed }">
-    <div class="section-card-hdr" @click="collapsible && (isCollapsed = !isCollapsed)">
+    <div
+      class="section-card-hdr"
+      :class="{ 'is-clickable': collapsible }"
+      @click="collapsible && toggleCollapse()"
+    >
       <div class="hdr-left">
         <span class="step-badge">{{ stepNumber }}</span>
         <div class="title-wrap">
@@ -8,8 +12,11 @@
             <h3 class="section-main-title">{{ title }}</h3>
             <span v-if="technicalLabel" class="technical-pill">{{ technicalLabel }}</span>
             <span v-if="hasChanges" class="change-indicator" title="Telah disesuaikan dari standar baseline">• Diubah</span>
+            <span v-if="isCollapsed && collapsedSummary" class="collapsed-summary-chip" :title="collapsedSummary">
+              {{ collapsedSummary }}
+            </span>
           </div>
-          <p class="section-guide-question">{{ guideQuestion }}</p>
+          <p v-if="!isCollapsed || !collapsedSummary" class="section-guide-question">{{ guideQuestion }}</p>
         </div>
       </div>
 
@@ -19,9 +26,10 @@
           v-if="collapsible"
           type="button"
           class="collapse-btn"
-          @click="isCollapsed = !isCollapsed"
-          :title="isCollapsed ? 'Buka Section' : 'Tutup Section'"
+          @click="toggleCollapse"
+          :title="isCollapsed ? 'Buka Section (Klik untuk memperluas)' : 'Ciutkan Section (Klik untuk memperkecil)'"
         >
+          <span class="collapse-action-hint">{{ isCollapsed ? 'Buka' : 'Tutup' }}</span>
           <svg
             width="14"
             height="14"
@@ -48,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const props = withDefaults(
   defineProps<{
@@ -58,16 +66,43 @@ const props = withDefaults(
     technicalLabel?: string
     hasChanges?: boolean
     collapsible?: boolean
+    collapsed?: boolean
     defaultCollapsed?: boolean
+    collapsedSummary?: string
   }>(),
   {
     collapsible: false,
+    collapsed: undefined,
     defaultCollapsed: false,
     hasChanges: false
   }
 )
 
-const isCollapsed = ref(props.defaultCollapsed)
+const emit = defineEmits<{
+  (e: 'update:collapsed', value: boolean): void
+}>()
+
+const internalCollapsed = ref(props.collapsed !== undefined ? props.collapsed : props.defaultCollapsed)
+
+watch(
+  () => props.collapsed,
+  (val) => {
+    if (val !== undefined) {
+      internalCollapsed.value = val
+    }
+  }
+)
+
+const isCollapsed = computed(() => {
+  return props.collapsed !== undefined ? props.collapsed : internalCollapsed.value
+})
+
+function toggleCollapse() {
+  if (!props.collapsible) return
+  const nextVal = !isCollapsed.value
+  internalCollapsed.value = nextVal
+  emit('update:collapsed', nextVal)
+}
 </script>
 
 <style scoped>
@@ -75,9 +110,10 @@ const isCollapsed = ref(props.defaultCollapsed)
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 8px;
-  overflow: hidden;
+  /* Removed overflow: hidden so popovers aren't clipped */
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  position: relative;
 }
 
 .base-section-card:hover {
@@ -92,15 +128,28 @@ const isCollapsed = ref(props.defaultCollapsed)
   padding: 12px 16px;
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  cursor: default;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.section-card-hdr.is-clickable {
+  cursor: pointer;
+}
+
+.section-card-hdr.is-clickable:hover {
+  background: #F1F5F9;
 }
 
 .base-section-card.collapsed .section-card-hdr {
   border-bottom: none;
+  border-bottom-left-radius: 7px;
+  border-bottom-right-radius: 7px;
 }
 
 .hdr-left {
@@ -108,6 +157,7 @@ const isCollapsed = ref(props.defaultCollapsed)
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .step-badge {
@@ -127,12 +177,14 @@ const isCollapsed = ref(props.defaultCollapsed)
 .title-wrap {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .title-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .section-main-title {
@@ -141,6 +193,7 @@ const isCollapsed = ref(props.defaultCollapsed)
   font-weight: 800;
   color: #002060;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .technical-pill {
@@ -150,6 +203,7 @@ const isCollapsed = ref(props.defaultCollapsed)
   background: #F1F5F9;
   padding: 1px 6px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 .change-indicator {
@@ -159,6 +213,23 @@ const isCollapsed = ref(props.defaultCollapsed)
   background: #FEF3C7;
   padding: 1px 6px;
   border-radius: 3px;
+  white-space: nowrap;
+}
+
+.collapsed-summary-chip {
+  font-size: 11px;
+  font-weight: 600;
+  color: #002060;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  padding: 1px 8px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 480px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .section-guide-question {
@@ -171,28 +242,41 @@ const isCollapsed = ref(props.defaultCollapsed)
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .collapse-btn {
-  background: none;
-  border: none;
-  color: #64748B;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  color: #475569;
   cursor: pointer;
-  padding: 4px;
+  padding: 4px 8px;
   border-radius: 4px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
   transition: all 0.15s ease;
 }
 
 .collapse-btn:hover {
   background: #E2E8F0;
   color: #002060;
+  border-color: #CBD5E1;
+}
+
+.collapse-btn svg {
+  transition: transform 0.2s ease;
 }
 
 .collapse-btn svg.rotated {
   transform: rotate(180deg);
+}
+
+.collapse-action-hint {
+  font-size: 11px;
+  color: #64748B;
 }
 
 .section-card-body {
@@ -204,7 +288,11 @@ const isCollapsed = ref(props.defaultCollapsed)
 
 .collapse-enter-active,
 .collapse-leave-active {
-  transition: max-height 0.25s ease, opacity 0.2s ease;
-  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
 }
 </style>

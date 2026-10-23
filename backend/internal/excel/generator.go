@@ -649,6 +649,7 @@ func buildSizingSheet(
 		// Raw spec check from request
 		isBaremetal := false
 		isShared := false
+		isNone := false
 		stgClass := "Tier 2"
 		backupEnabled := true
 
@@ -658,6 +659,8 @@ func buildSizingSheet(
 				isBaremetal = true
 			} else if strings.ToLower(raw.ComputeType) == "shared" {
 				isShared = true
+			} else if strings.ToLower(raw.ComputeType) == "none" {
+				isNone = true
 			}
 			if raw.StorageClass != "" {
 				stgClass = raw.StorageClass
@@ -665,12 +668,20 @@ func buildSizingSheet(
 			backupEnabled = raw.BackupEnabled
 		}
 
+		vmCount := nodeCount
+		if isNone {
+			vmCount = 0
+			vcpuPerNode = 0
+			ramPerNode = 0
+			stgPerNode = 0
+		}
+
 		_ = f.SetCellValue(sh, fmt.Sprintf("B%d", r), idx+1)
 		_ = f.SetCellValue(sh, fmt.Sprintf("C%d", r), item.LayerName)
 		_ = f.SetCellValue(sh, fmt.Sprintf("D%d", r), item.ComponentName)
 		_ = f.SetCellValue(sh, fmt.Sprintf("E%d", r), edition)
 		_ = f.SetCellValue(sh, fmt.Sprintf("F%d", r), env)
-		_ = f.SetCellValue(sh, fmt.Sprintf("G%d", r), nodeCount)
+		_ = f.SetCellValue(sh, fmt.Sprintf("G%d", r), vmCount)
 		_ = f.SetCellValue(sh, fmt.Sprintf("H%d", r), vcpuPerNode)
 		_ = f.SetCellValue(sh, fmt.Sprintf("I%d", r), ramPerNode)
 		_ = f.SetCellValue(sh, fmt.Sprintf("J%d", r), stgPerNode)
@@ -683,7 +694,7 @@ func buildSizingSheet(
 		if isBaremetal {
 			_ = f.SetCellValue(sh, fmt.Sprintf("N%d", r), 0)
 			_ = f.SetCellFormula(sh, fmt.Sprintf("Q%d", r), fmt.Sprintf("G%d*Pricing!$E$%d", r, bmRow))
-		} else if isShared {
+		} else if isShared || isNone {
 			_ = f.SetCellValue(sh, fmt.Sprintf("N%d", r), 0)
 			_ = f.SetCellValue(sh, fmt.Sprintf("Q%d", r), 0)
 		} else {
@@ -691,16 +702,21 @@ func buildSizingSheet(
 			_ = f.SetCellValue(sh, fmt.Sprintf("Q%d", r), 0)
 		}
 
-		targetStgRow := stgT2Row
-		if strings.ToLower(stgClass) == "tier 3" {
-			targetStgRow = stgT3Row
-		}
-		_ = f.SetCellFormula(sh, fmt.Sprintf("O%d", r), fmt.Sprintf("M%d*Pricing!$E$%d", r, targetStgRow))
-
-		if backupEnabled && item.BackupCostAnnual > 0 {
-			_ = f.SetCellFormula(sh, fmt.Sprintf("P%d", r), fmt.Sprintf("M%d*0.5*0.8*Pricing!$E$%d", r, nbuRow))
-		} else {
+		if isNone {
+			_ = f.SetCellValue(sh, fmt.Sprintf("O%d", r), 0)
 			_ = f.SetCellValue(sh, fmt.Sprintf("P%d", r), 0)
+		} else {
+			targetStgRow := stgT2Row
+			if strings.ToLower(stgClass) == "tier 3" {
+				targetStgRow = stgT3Row
+			}
+			_ = f.SetCellFormula(sh, fmt.Sprintf("O%d", r), fmt.Sprintf("M%d*Pricing!$E$%d", r, targetStgRow))
+
+			if backupEnabled && item.BackupCostAnnual > 0 {
+				_ = f.SetCellFormula(sh, fmt.Sprintf("P%d", r), fmt.Sprintf("M%d*0.5*0.8*Pricing!$E$%d", r, nbuRow))
+			} else {
+				_ = f.SetCellValue(sh, fmt.Sprintf("P%d", r), 0)
+			}
 		}
 
 		_ = f.SetCellFormula(sh, fmt.Sprintf("R%d", r), fmt.Sprintf("SUM(N%d:Q%d)", r, r))
@@ -824,19 +840,35 @@ func buildSizingSheet(
 	}
 	var activeLic []entLicRow
 
-	for _, it := range quote.Items {
+	for idx, it := range quote.Items {
 		if strings.ToLower(it.LicenseKind) == "enterprise" {
 			// Find pricing SKU for this component
 			var matchedSKU string
 			var remarks string
-			if comp, ok := compMap[it.ComponentID]; ok {
-				for _, lic := range comp.Licenses {
-					if strings.ToLower(lic.Kind) == "enterprise" {
-						matchedSKU = lic.PricingSKU
-						remarks = fmt.Sprintf("Per %s", lic.Metric)
-						break
+
+			if idx < len(rawReq.Items) && rawReq.Items[idx].PricingSKU != "" {
+				matchedSKU = rawReq.Items[idx].PricingSKU
+				if rawReq.Items[idx].LicenseMetric != "" {
+					remarks = fmt.Sprintf("Per %s", rawReq.Items[idx].LicenseMetric)
+				}
+			}
+			if matchedSKU == "" && it.PricingSKU != "" {
+				matchedSKU = it.PricingSKU
+			}
+
+			if matchedSKU == "" {
+				if comp, ok := compMap[it.ComponentID]; ok {
+					for _, lic := range comp.Licenses {
+						if strings.ToLower(lic.Kind) == "enterprise" {
+							matchedSKU = lic.PricingSKU
+							remarks = fmt.Sprintf("Per %s", lic.Metric)
+							break
+						}
 					}
 				}
+			}
+			if remarks == "" {
+				remarks = "Katalog SKU"
 			}
 
 			priceFormula := "0"

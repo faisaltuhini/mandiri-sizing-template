@@ -10,7 +10,10 @@ export interface LayerAdjusterConfig {
   storageClass: 'Tier 2' | 'Tier 3'
   backupEnabled: boolean
   licenseKind: 'free' | 'enterprise'
-  computeType: 'vm' | 'baremetal' | 'shared'
+  computeType: 'vm' | 'baremetal' | 'shared' | 'none'
+  pricingSku?: string
+  licenseProductName?: string
+  licenseMetric?: string
 }
 
 export interface QuoteItemCost {
@@ -28,6 +31,7 @@ export interface QuoteItemCost {
   total_cost_annual: number
   license_product_name: string
   license_kind: string
+  pricing_sku?: string
   unconfirmed_prices?: string[]
 }
 
@@ -83,7 +87,7 @@ export interface LayerPresetSpec {
   ramGBPerNode: number
   storageGBPerNode: number
   storageClass: 'Tier 2' | 'Tier 3'
-  computeType: 'vm' | 'baremetal' | 'shared'
+  computeType: 'vm' | 'baremetal' | 'shared' | 'none'
   backupEnabled: boolean
   licenseKind: 'free' | 'enterprise'
 }
@@ -96,6 +100,8 @@ export interface SizingPresetItem {
   icon?: string
   licenseFree: string
   licenseEnterprise: string
+  pricingSku?: string
+  licenseMetric?: string
   notes?: string
   contractRef?: string
   moderate: LayerPresetSpec

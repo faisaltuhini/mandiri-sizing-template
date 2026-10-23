@@ -87,6 +87,12 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 			compName = comp.ComponentName
 			layerName = comp.LayerName
 		}
+		if item.ComponentName != "" {
+			compName = item.ComponentName
+		}
+		if item.LayerName != "" {
+			layerName = item.LayerName
+		}
 
 		itemNodes := item.NodeCount
 		if itemNodes <= 0 {
@@ -96,11 +102,18 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 		itemRAM := itemNodes * item.RAMGBPerNode
 		itemStorage := itemNodes * item.StorageGBPerNode
 
+		isNoneCompute := strings.ToLower(item.ComputeType) == "none"
+		if isNoneCompute {
+			itemVCPU = 0
+			itemRAM = 0
+			itemStorage = 0
+		}
+
 		// 1. Compute Cost
 		var computeCost int64
 		if strings.ToLower(item.ComputeType) == "baremetal" {
 			computeCost = int64(itemNodes) * bmPrice
-		} else if strings.ToLower(item.ComputeType) == "shared" {
+		} else if strings.ToLower(item.ComputeType) == "shared" || isNoneCompute {
 			computeCost = 0
 		} else {
 			// VM
@@ -109,15 +122,17 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 
 		// 2. Storage Cost
 		var storageCost int64
-		if strings.ToLower(item.StorageClass) == "tier 3" {
-			storageCost = int64(itemStorage) * stgT3Price
-		} else {
-			storageCost = int64(itemStorage) * stgT2Price
+		if !isNoneCompute {
+			if strings.ToLower(item.StorageClass) == "tier 3" {
+				storageCost = int64(itemStorage) * stgT3Price
+			} else {
+				storageCost = int64(itemStorage) * stgT2Price
+			}
 		}
 
 		// 3. Backup Cost
 		var backupCost int64
-		if item.BackupEnabled {
+		if !isNoneCompute && item.BackupEnabled {
 			backupCost = int64(itemStorage) * nbuPrice
 		}
 
@@ -127,26 +142,46 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 		licenseProductName := "Community (Free OSS)"
 		licenseKind := strings.ToLower(item.LicenseKind)
 		if licenseKind == "" {
-			licenseKind = "free"
+			if item.PricingSKU != "" {
+				licenseKind = "enterprise"
+			} else {
+				licenseKind = "free"
+			}
+		}
+
+		entSKU := item.PricingSKU
+		entProductName := item.LicenseProductName
+		entMetric := item.LicenseMetric
+
+		if hasComp {
+			for _, lic := range comp.Licenses {
+				if strings.ToLower(lic.Kind) == "enterprise" {
+					if entSKU == "" {
+						entSKU = lic.PricingSKU
+					}
+					if entProductName == "" {
+						entProductName = lic.ProductName
+					}
+					if entMetric == "" {
+						entMetric = lic.Metric
+					}
+					break
+				}
+			}
+		}
+
+		if entSKU != "" {
+			if pItem, exists := e.pricingMap[entSKU]; exists {
+				if entProductName == "" {
+					entProductName = pItem.Name
+				}
+				if entMetric == "" && pItem.Unit != "" {
+					entMetric = pItem.Unit
+				}
+			}
 		}
 
 		if licenseKind == "enterprise" {
-			// Find enterprise license option from component or lookup SKU
-			var entSKU string
-			var entProductName string
-			var entMetric string
-
-			if hasComp {
-				for _, lic := range comp.Licenses {
-					if strings.ToLower(lic.Kind) == "enterprise" {
-						entSKU = lic.PricingSKU
-						entProductName = lic.ProductName
-						entMetric = lic.Metric
-						break
-					}
-				}
-			}
-
 			if entProductName != "" {
 				licenseProductName = entProductName
 			} else {
@@ -158,7 +193,7 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 				if exists {
 					if pItem.UnitPriceIDR != nil && *pItem.UnitPriceIDR > 0 {
 						unitRate := *pItem.UnitPriceIDR
-						switch entMetric {
+						switch strings.ToLower(entMetric) {
 						case "per_shard":
 							licenseCost = int64(itemNodes) * unitRate
 							if itemNodes < 3 {
@@ -169,15 +204,15 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 									warningSet[warnMsg] = true
 								}
 							}
-						case "per_node", "per_worker", "per_instance", "per_node_db":
+						case "per_node", "per_worker", "per_instance", "per_node_db", "unit", "per_unit", "node / thn", "shard / thn", "instance / thn", "broker / thn", "db node / thn":
 							licenseCost = int64(itemNodes) * unitRate
-						case "per_5_pods":
+						case "per_5_pods", "5 pods / thn":
 							factor := (itemNodes + 4) / 5
 							if factor < 1 {
 								factor = 1
 							}
 							licenseCost = int64(factor) * unitRate
-						case "per_core":
+						case "per_core", "core / thn":
 							licenseCost = int64(itemVCPU) * unitRate
 						case "per_4vcpu":
 							factor := (itemVCPU + 3) / 4
@@ -201,7 +236,9 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 		// Item Total
 		itemTotal := computeCost + storageCost + backupCost + licenseCost
 
-		totalNodes += itemNodes
+		if !isNoneCompute {
+			totalNodes += itemNodes
+		}
 		totalVCPU += itemVCPU
 		totalRAM += itemRAM
 		totalStorage += itemStorage
@@ -226,6 +263,7 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 			TotalCostAnnual:    itemTotal,
 			LicenseProductName: licenseProductName,
 			LicenseKind:        licenseKind,
+			PricingSKU:         entSKU,
 			UnconfirmedPrices:  itemWarnings,
 		})
 	}

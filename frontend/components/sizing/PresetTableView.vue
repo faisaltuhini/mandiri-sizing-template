@@ -22,6 +22,18 @@
 
       <div class="topbar-actions">
         <button
+          v-if="(unregisteredCatalogItems?.length || 0) > 0 && isBannerDismissed"
+          type="button"
+          class="btn-unmapped-trigger"
+          @click="openCatalogPickerModal"
+          title="Lihat daftar komponen katalog yang belum memiliki preset arsitektur"
+        >
+          <span class="unmapped-dot"></span>
+          <span>Katalog Belum Dipetakan</span>
+          <span class="unmapped-count">{{ unregisteredCatalogItems.length }}</span>
+        </button>
+
+        <button
           type="button"
           class="btn-reset-defaults"
           @click="$emit('reset-to-official-defaults')"
@@ -50,72 +62,54 @@
 
     <!-- CONTENT WORKSPACE -->
     <div class="preset-workspace">
-      <!-- ALERT BANNER: INFO KATALOG BARU TERDETEKSI -->
+      <!-- COMPACT SINGLE-LINE CATALOG SYNC BAR -->
       <transition name="banner-slide">
         <div
           v-if="(unregisteredCatalogItems?.length || 0) > 0 && !isBannerDismissed"
-          class="new-catalog-alert-banner"
+          class="catalog-sync-strip"
         >
-          <div class="banner-content-left">
-            <div class="alert-icon-circle">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          <div class="sync-strip-left">
+            <div class="sync-status-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
               </svg>
             </div>
-            <div class="alert-texts">
-              <div class="alert-title-row">
-                <span class="alert-badge">Info Katalog Baru</span>
-                <h4 class="alert-title">
-                  Ada {{ unregisteredCatalogItems?.length || 0 }} komponen katalog baru yang belum dimasukkan ke preset arsitektur
-                </h4>
-              </div>
-              <p class="alert-sub">
-                Komponen di bawah ini telah terdaftar di master data katalog. Apakah Anda ingin menginputkannya sebagai layer baru?
-              </p>
-              
-              <!-- Chips of unregistered catalog items -->
-              <div class="new-items-chips">
-                <button
-                  type="button"
-                  v-for="(catItem, idx) in (unregisteredCatalogItems || []).slice(0, 4)"
-                  :key="idx"
-                  class="new-item-chip"
-                  @click="openAddLayerModalWithCatalogItem(catItem)"
-                  :title="'Klik untuk input layer baru: ' + catItem.name"
-                >
-                  <span class="chip-icon">📦</span>
-                  <span class="chip-name">{{ catItem.name }}</span>
-                  <span class="chip-cat">{{ catItem.category }}</span>
-                  <span class="chip-action">+ Input</span>
-                </button>
-                <span v-if="(unregisteredCatalogItems?.length || 0) > 4" class="more-chips-pill">
-                  +{{ (unregisteredCatalogItems?.length || 0) - 4 }} katalog lainnya
-                </span>
-              </div>
+            <div class="sync-strip-copy">
+              <span class="sync-strip-title">
+                <strong>{{ unregisteredCatalogItems.length }} komponen katalog</strong> belum dipetakan ke layer preset
+              </span>
+              <span class="sync-strip-sep">·</span>
+              <span class="sync-strip-preview">
+                {{ unregisteredPreviewText }}
+              </span>
             </div>
           </div>
 
-          <div class="banner-actions-right">
+          <div class="sync-strip-actions">
             <button
               type="button"
-              class="btn-input-new-layer"
-              @click="unregisteredCatalogItems?.[0] && openAddLayerModalWithCatalogItem(unregisteredCatalogItems[0])"
+              class="btn-sync-review"
+              @click="openCatalogPickerModal"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
+              <span>Tinjau &amp; Pilih Katalog</span>
+              <span class="review-count-pill">{{ unregisteredCatalogItems.length }}</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-              <span>Inputkan Layer Baru</span>
             </button>
             <button
               type="button"
-              class="btn-dismiss-alert"
+              class="btn-sync-close"
               @click="dismissNewCatalogBanner"
-              title="Abaikan peringatan ini untuk sementara"
+              title="Sembunyikan bar notifikasi ini"
+              aria-label="Tutup notifikasi"
             >
-              Nanti Saja
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
         </div>
@@ -802,6 +796,138 @@
         </form>
       </div>
     </div>
+
+    <!-- MODAL: KATALOG BELUM DIPETAKAN (CLEAN PICKER FOR MANY ITEMS) -->
+    <div v-if="showCatalogPickerModal" class="sketch-modal-backdrop" @click.self="showCatalogPickerModal = false">
+      <div class="catalog-picker-modal">
+        <div class="picker-modal-hdr">
+          <div class="picker-hdr-left">
+            <h2 class="picker-title">Komponen Katalog Belum Dipetakan</h2>
+            <p class="picker-subtitle">
+              Pilih komponen dari master katalog untuk dijadikan layer arsitektur baru, atau abaikan jika hanya berupa lisensi/tarif dasar.
+            </p>
+          </div>
+          <button type="button" class="modal-close" @click="showCatalogPickerModal = false" title="Tutup">✕</button>
+        </div>
+
+        <!-- Search & Filter Bar inside Modal -->
+        <div class="picker-toolbar">
+          <div class="picker-search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              type="text"
+              v-model="catalogPickerSearch"
+              class="picker-search-input"
+              placeholder="Cari nama komponen, kategori, atau kode SKU..."
+            />
+            <button
+              v-if="catalogPickerSearch"
+              type="button"
+              class="picker-search-clear"
+              @click="catalogPickerSearch = ''"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="picker-filter-tabs">
+            <button
+              type="button"
+              :class="['picker-tab-btn', { active: catalogPickerFilter === 'all' }]"
+              @click="catalogPickerFilter = 'all'"
+            >
+              Semua ({{ unregisteredCatalogItems.length }})
+            </button>
+            <button
+              type="button"
+              :class="['picker-tab-btn', { active: catalogPickerFilter === 'component' }]"
+              @click="catalogPickerFilter = 'component'"
+            >
+              Komponen
+            </button>
+            <button
+              type="button"
+              :class="['picker-tab-btn', { active: catalogPickerFilter === 'pricing' }]"
+              @click="catalogPickerFilter = 'pricing'"
+            >
+              SKU &amp; Lisensi
+            </button>
+          </div>
+        </div>
+
+        <!-- Clean Scrollable Table / List -->
+        <div class="picker-list-body">
+          <div v-if="filteredPickerCatalogItems.length === 0" class="picker-empty-state">
+            <span>Tidak ada komponen katalog yang cocok dengan pencarian Anda.</span>
+          </div>
+
+          <div
+            v-for="catItem in filteredPickerCatalogItems"
+            :key="catItem.id + '_' + catItem.name"
+            class="picker-row-item"
+          >
+            <div class="picker-row-main">
+              <div class="picker-row-top">
+                <span class="picker-item-name">{{ catItem.name }}</span>
+                <span class="picker-item-cat">{{ catItem.category }}</span>
+                <span v-if="catItem.sku" class="picker-item-sku">{{ catItem.sku }}</span>
+              </div>
+              <p v-if="catItem.description" class="picker-item-desc">{{ catItem.description }}</p>
+            </div>
+
+            <div class="picker-row-actions">
+              <button
+                type="button"
+                class="btn-picker-ignore"
+                @click="ignoreCatalogItem(catItem)"
+                title="Sembunyikan item ini dari daftar rekomendasi layer"
+              >
+                Abaikan
+              </button>
+              <button
+                type="button"
+                class="btn-picker-select"
+                @click="selectCatalogItemFromPicker(catItem)"
+              >
+                <span>Buat Layer</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="picker-modal-ftr">
+          <div class="picker-ftr-left">
+            <button
+              v-if="ignoredCatalogKeys.size > 0"
+              type="button"
+              class="btn-restore-ignored"
+              @click="restoreIgnoredCatalogItems"
+            >
+              Tampilkan kembali {{ ignoredCatalogKeys.size }} item yang diabaikan
+            </button>
+            <span v-else class="picker-ftr-hint">
+              Menampilkan {{ filteredPickerCatalogItems.length }} dari {{ unregisteredCatalogItems.length }} komponen belum terpetakan
+            </span>
+          </div>
+          <div class="picker-ftr-right">
+            <button
+              type="button"
+              class="clean-btn-cancel"
+              @click="showCatalogPickerModal = false"
+            >
+              Tutup
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -892,19 +1018,96 @@ export interface UnregisteredCatalogItem {
 }
 
 const isBannerDismissed = ref(false)
+const showCatalogPickerModal = ref(false)
+const catalogPickerSearch = ref('')
+const catalogPickerFilter = ref<'all' | 'component' | 'pricing'>('all')
+const ignoredCatalogKeys = ref<Set<string>>(new Set())
 
 function dismissNewCatalogBanner() {
   isBannerDismissed.value = true
 }
 
+function openCatalogPickerModal() {
+  catalogPickerSearch.value = ''
+  catalogPickerFilter.value = 'all'
+  showCatalogPickerModal.value = true
+}
+
+function ignoreCatalogItem(catItem: UnregisteredCatalogItem) {
+  const next = new Set(ignoredCatalogKeys.value)
+  next.add((catItem.name || '').trim().toLowerCase())
+  ignoredCatalogKeys.value = next
+}
+
+function restoreIgnoredCatalogItems() {
+  ignoredCatalogKeys.value = new Set()
+}
+
+function selectCatalogItemFromPicker(catItem: UnregisteredCatalogItem) {
+  showCatalogPickerModal.value = false
+  openAddLayerModalWithCatalogItem(catItem)
+}
+
 const unregisteredCatalogItems = computed<UnregisteredCatalogItem[]>(() => {
   const items = props.presetItems || []
   const existingComponents = new Set(
-    items.map(p => (p?.component || '').trim().toLowerCase())
+    items.map(p => (p?.component || '').trim().toLowerCase()).filter(Boolean)
   )
   const existingLayers = new Set(
-    items.map(p => (p?.layer || '').trim().toLowerCase())
+    items.map(p => (p?.layer || '').trim().toLowerCase()).filter(Boolean)
   )
+  const existingLicenses = new Set([
+    ...items.map(p => (p?.licenseEnterprise || '').trim().toLowerCase()).filter(Boolean),
+    ...items.map(p => (p?.licenseFree || '').trim().toLowerCase()).filter(Boolean)
+  ])
+
+  const allExistingText = items
+    .map(p => `${p?.layer || ''} ${p?.component || ''} ${p?.licenseEnterprise || ''} ${p?.licenseFree || ''}`.toLowerCase())
+    .join(' | ')
+
+  const productKeywordFamilies = [
+    ['openshift', 'ocp'],
+    ['confluent', 'kafka'],
+    ['oracle database', 'oracle rac', 'oracle asm'],
+    ['redis enterprise', 'redis caching', 'redis sentinel'],
+    ['elasticsearch', 'elastic platinum', 'logstash', 'kibana'],
+    ['nginx'],
+    ['minio'],
+    ['control-m']
+  ]
+
+  const isAlreadyCoveredByPreset = (nameLower: string, layerLower?: string) => {
+    if (existingComponents.has(nameLower) || existingLayers.has(nameLower) || existingLicenses.has(nameLower)) {
+      return true
+    }
+    if (layerLower && (existingLayers.has(layerLower) || existingComponents.has(layerLower))) {
+      return true
+    }
+    for (const lic of existingLicenses) {
+      if (lic.length > 5 && (lic.includes(nameLower) || nameLower.includes(lic))) {
+        return true
+      }
+    }
+    for (const family of productKeywordFamilies) {
+      const itemMatchesFamily = family.some(kw => nameLower.includes(kw))
+      const presetHasFamily = family.some(kw => allExistingText.includes(kw))
+      if (itemMatchesFamily && presetHasFamily) {
+        return true
+      }
+    }
+    return false
+  }
+
+  // Raw infrastructure unit rate names that are not software/architectural layers
+  const rawInfraKeywords = [
+    'compute vcpu',
+    'memory ram',
+    'san storage',
+    'netbackup',
+    'baremetal server',
+    'vcpu',
+    'ram gb'
+  ]
 
   const unreg: UnregisteredCatalogItem[] = []
   const seenNames = new Set<string>()
@@ -913,9 +1116,10 @@ const unregisteredCatalogItems = computed<UnregisteredCatalogItem[]>(() => {
   for (const bc of backendComponents.value) {
     const compName = (bc.component_name || '').trim()
     const compLower = compName.toLowerCase()
-    if (!compName || seenNames.has(compLower)) continue
+    const layerLower = (bc.layer_name || '').trim().toLowerCase()
+    if (!compName || seenNames.has(compLower) || ignoredCatalogKeys.value.has(compLower)) continue
 
-    if (!existingComponents.has(compLower)) {
+    if (!isAlreadyCoveredByPreset(compLower, layerLower)) {
       seenNames.add(compLower)
       const freeLic = bc.licenses?.find(l => l.license_kind === 'free')?.product_name || ''
       const entLic = bc.licenses?.find(l => l.license_kind === 'enterprise')?.product_name || ''
@@ -926,7 +1130,7 @@ const unregisteredCatalogItems = computed<UnregisteredCatalogItem[]>(() => {
       unreg.push({
         id: bc.id,
         name: compName,
-        category: bc.layer_name || 'Software Katalog',
+        category: bc.layer_name || 'Komponen Arsitektur',
         description: bc.description || bc.notes,
         source: 'component',
         meta: {
@@ -947,22 +1151,27 @@ const unregisteredCatalogItems = computed<UnregisteredCatalogItem[]>(() => {
     for (const item of props.catalogItems) {
       const name = (item.name || '').trim()
       const nameLower = name.toLowerCase()
-      if (!name || seenNames.has(nameLower)) continue
+      if (!name || seenNames.has(nameLower) || ignoredCatalogKeys.value.has(nameLower)) continue
 
-      const isRelevant = ['LICENSE', 'SOFTWARE', 'COMPUTE', 'DATABASE', 'MIDDLEWARE', 'SECURITY', 'STORAGE'].includes(
-        item.category?.toUpperCase() || ''
-      )
-      if (isRelevant && !existingComponents.has(nameLower) && !existingLayers.has(nameLower)) {
+      const catUpper = (item.category || '').toUpperCase()
+      // Exclude raw compute/storage/backup unit rates from layer suggestions
+      const isRawInfraUnit =
+        ['COMPUTE', 'STORAGE', 'BACKUP'].includes(catUpper) ||
+        rawInfraKeywords.some(k => nameLower === k || nameLower.startsWith(k))
+      if (isRawInfraUnit) continue
+
+      const isRelevant = ['LICENSE', 'SOFTWARE', 'DATABASE', 'MIDDLEWARE', 'SECURITY'].includes(catUpper)
+      if (isRelevant && !isAlreadyCoveredByPreset(nameLower)) {
         seenNames.add(nameLower)
         unreg.push({
           id: item.id || item.sku,
           name: item.name,
           category: item.category,
           sku: item.sku,
-          description: `Katalog SKU: ${item.sku} (${item.environment})`,
+          description: `Katalog SKU: ${item.sku} · ${item.environment}`,
           source: 'pricing',
           meta: {
-            layer: item.category === 'DATABASE' ? 'Database Core OLTP' : (item.category === 'SECURITY' ? 'Security WAF & API Gateway' : item.name),
+            layer: catUpper === 'DATABASE' ? 'Database Core OLTP' : (catUpper === 'SECURITY' ? 'Security WAF & API Gateway' : item.name),
             licenseEnterprise: item.name,
             contractRef: item.sku
           }
@@ -972,6 +1181,32 @@ const unregisteredCatalogItems = computed<UnregisteredCatalogItem[]>(() => {
   }
 
   return unreg
+})
+
+const unregisteredPreviewText = computed(() => {
+  const list = unregisteredCatalogItems.value || []
+  if (list.length === 0) return ''
+  const firstTwo = list.slice(0, 2).map(i => i.name)
+  if (list.length <= 2) {
+    return firstTwo.join(', ')
+  }
+  return `${firstTwo.join(', ')}, dan ${list.length - 2} lainnya`
+})
+
+const filteredPickerCatalogItems = computed(() => {
+  let list = unregisteredCatalogItems.value || []
+  if (catalogPickerFilter.value !== 'all') {
+    list = list.filter(item => item.source === catalogPickerFilter.value)
+  }
+  const q = catalogPickerSearch.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter(
+    item =>
+      item.name.toLowerCase().includes(q) ||
+      (item.category || '').toLowerCase().includes(q) ||
+      (item.sku || '').toLowerCase().includes(q) ||
+      (item.description || '').toLowerCase().includes(q)
+  )
 })
 
 function openAddLayerModalWithCatalogItem(catItem: UnregisteredCatalogItem) {
@@ -1499,7 +1734,50 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.btn-unmapped-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-unmapped-trigger:hover {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+  color: #0F172A;
+}
+
+.unmapped-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #D97706;
+  flex-shrink: 0;
+}
+
+.unmapped-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: #E2E8F0;
+  color: #0F172A;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .btn-reset-defaults {
@@ -1551,202 +1829,410 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
   flex-direction: column;
   padding: 20px 24px;
   overflow-y: auto;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* ─────────────────────────────────────────────
-   New Catalog Alert Banner
+   Compact Single-Line Catalog Sync Bar
    ───────────────────────────────────────────── */
-.new-catalog-alert-banner {
-  background: linear-gradient(135deg, #FFFDF5 0%, #FEF3C7 100%);
-  border: 1px solid #FCD34D;
-  border-left: 5px solid #D97706;
-  border-radius: 10px;
-  padding: 14px 18px;
+.catalog-sync-strip {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-left: 3px solid #002060;
+  border-radius: 8px;
+  padding: 9px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.12);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
   flex-shrink: 0;
 }
 
-.banner-content-left {
+.sync-strip-left {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  flex: 1;
+  align-items: center;
+  gap: 10px;
   min-width: 0;
+  flex: 1;
 }
 
-.alert-icon-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #FEF3C7;
-  border: 1.5px solid #FDE68A;
+.sync-status-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  color: #002060;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
-.alert-texts {
+.sync-strip-copy {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
+  align-items: center;
+  gap: 8px;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.alert-title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.alert-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #FDE68A;
-  color: #92400E;
-  font-size: 11px;
-  font-weight: 800;
-  border-radius: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.alert-title {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 800;
-  color: #78350F;
-  letter-spacing: -0.01em;
-}
-
-.alert-sub {
-  margin: 0;
-  font-size: 12px;
-  color: #92400E;
-  line-height: 1.4;
-}
-
-.new-items-chips {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
-
-.new-item-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: #FFFFFF;
-  border: 1px solid #FCD34D;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.new-item-chip:hover {
-  background: #FEF3C7;
-  border-color: #D97706;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.15);
-}
-
-.chip-icon {
-  font-size: 13px;
-}
-
-.chip-name {
-  font-size: 12px;
-  font-weight: 700;
+.sync-strip-title {
+  font-size: 12.5px;
   color: #1E293B;
-}
-
-.chip-cat {
-  font-size: 10px;
-  color: #64748B;
-  background: #F1F5F9;
-  padding: 1px 5px;
-  border-radius: 3px;
-}
-
-.chip-action {
-  font-size: 11px;
-  font-weight: 700;
-  color: #D97706;
-}
-
-.more-chips-pill {
-  font-size: 11px;
-  color: #92400E;
-  font-weight: 600;
-}
-
-.banner-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   flex-shrink: 0;
 }
 
-.btn-input-new-layer {
+.sync-strip-title strong {
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.sync-strip-sep {
+  color: #CBD5E1;
+  flex-shrink: 0;
+}
+
+.sync-strip-preview {
+  font-size: 12px;
+  color: #64748B;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sync-strip-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-sync-review {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  background: #002060;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 4px rgba(0, 32, 96, 0.2);
-}
-
-.btn-input-new-layer:hover {
-  background: #003399;
-  transform: translateY(-1px);
-}
-
-.btn-dismiss-alert {
-  padding: 8px 12px;
-  background: transparent;
-  border: 1px solid #FCD34D;
+  padding: 5px 11px;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
-  color: #92400E;
+  color: #0F172A;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-.btn-dismiss-alert:hover {
-  background: #FEF3C7;
-  color: #78350F;
+.btn-sync-review:hover {
+  background: #002060;
+  border-color: #002060;
+  color: #FFFFFF;
+}
+
+.btn-sync-review:hover .review-count-pill {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.review-count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #E2E8F0;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.btn-sync-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94A3B8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-sync-close:hover {
+  background: #F1F5F9;
+  color: #475569;
+}
+
+/* ─────────────────────────────────────────────
+   Clean Catalog Picker Modal
+   ───────────────────────────────────────────── */
+.catalog-picker-modal {
+  background: #FFFFFF;
+  width: 680px;
+  max-width: 94vw;
+  max-height: 82vh;
+  border-radius: 10px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.picker-modal-hdr {
+  padding: 16px 20px;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.picker-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+}
+
+.picker-subtitle {
+  margin: 3px 0 0 0;
+  font-size: 12px;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+.picker-toolbar {
+  padding: 10px 20px;
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.picker-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  padding: 0 10px;
+  height: 32px;
+  flex: 1;
+}
+
+.picker-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  color: #0F172A;
+  width: 100%;
+}
+
+.picker-search-clear {
+  border: none;
+  background: transparent;
+  color: #94A3B8;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.picker-filter-tabs {
+  display: inline-flex;
+  background: #E2E8F0;
+  padding: 2px;
+  border-radius: 6px;
+  gap: 2px;
+}
+
+.picker-tab-btn {
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.picker-tab-btn.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.picker-list-body {
+  flex: 1;
+  overflow-y: auto;
+  divide-y: 1px solid #F1F5F9;
+  max-height: 420px;
+}
+
+.picker-empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  font-size: 12.5px;
+  color: #64748B;
+}
+
+.picker-row-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #F1F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: background 0.12s ease;
+}
+
+.picker-row-item:hover {
+  background: #F8FAFC;
+}
+
+.picker-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.picker-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.picker-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0F172A;
+}
+
+.picker-item-cat {
+  font-size: 11px;
+  font-weight: 500;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.picker-item-sku {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10.5px;
+  color: #64748B;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.picker-item-desc {
+  margin: 0;
+  font-size: 11.5px;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.picker-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-picker-ignore {
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-picker-ignore:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.btn-picker-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #002060;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-picker-select:hover {
+  background: #002060;
+  border-color: #002060;
+  color: #FFFFFF;
+}
+
+.picker-modal-ftr {
+  padding: 12px 20px;
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picker-ftr-hint {
+  font-size: 11.5px;
+  color: #64748B;
+}
+
+.btn-restore-ignored {
+  border: none;
+  background: transparent;
+  color: #002060;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
 }
 
 /* Banner Slide Transition */
 .banner-slide-enter-active,
 .banner-slide-leave-active {
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 
 .banner-slide-enter-from,
 .banner-slide-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(-6px);
 }
 
 .preset-toolbar {

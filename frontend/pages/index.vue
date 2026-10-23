@@ -35,8 +35,11 @@
           :tier-filter="tierFilter"
           :license-filter="licenseFilter"
           :is-layer-customized="isLayerCustomized"
+          :pricing-list="pricingList"
           @select-layer="activeItemId = $event"
           @reset-active-layer="resetActiveLayerToBaseline"
+          @add-catalog-to-sizing="handleAddCatalogToSizing"
+          @remove-custom-layer="handleDeletePresetItem"
         />
 
         <!-- STICKY ARCHITECTURE COST SUMMARY BAR (BOTTOM) -->
@@ -275,7 +278,10 @@ function parseBaselineSpec(item: TechStackItem | { id: string; no: number }, tie
       storageClass: spec.storageClass,
       backupEnabled: spec.backupEnabled,
       licenseKind: spec.licenseKind,
-      computeType: spec.computeType
+      computeType: spec.computeType,
+      pricingSku: preset.pricingSku,
+      licenseProductName: isCrit ? preset.licenseEnterprise : preset.licenseFree,
+      licenseMetric: preset.licenseMetric,
     }
   }
 
@@ -329,7 +335,8 @@ function isLayerCustomized(id: string): boolean {
     current.storageClass !== baseline.storageClass ||
     current.licenseKind !== baseline.licenseKind ||
     current.computeType !== baseline.computeType ||
-    current.backupEnabled !== baseline.backupEnabled
+    current.backupEnabled !== baseline.backupEnabled ||
+    current.pricingSku !== baseline.pricingSku
   )
 }
 
@@ -338,6 +345,81 @@ function resetActiveLayerToBaseline() {
   layerConfigs[activeItemId.value] = parseBaselineSpec(activeItem.value, targetTier)
   layerConfigs[activeItemId.value].licenseKind = licenseFilter.value === 'license' ? 'enterprise' : 'free'
   showToast(`Konfigurasi Layer ${activeItem.value.no} dikembalikan ke baseline ${targetTier.toUpperCase()}`, 'info')
+}
+
+async function handleAddCatalogToSizing(catalogItem: PricingItemRecord) {
+  const nextNo = presetItems.value.length > 0 ? Math.max(...presetItems.value.map(i => i.no)) + 1 : 1
+  const newId = `layer_custom_${Date.now()}`
+  
+  const isLicenseOnly = catalogItem.category === 'license'
+  let suggestedLayer = 'Komponen Katalog'
+  if (isLicenseOnly) {
+    suggestedLayer = 'Software License / Add-on'
+  } else if (catalogItem.category === 'storage') {
+    suggestedLayer = 'Storage SAN'
+  } else if (catalogItem.category === 'backup') {
+    suggestedLayer = 'Enterprise Backup'
+  } else if (catalogItem.category === 'baremetal') {
+    suggestedLayer = 'Baremetal Server'
+  } else {
+    suggestedLayer = 'Komputasi Server'
+  }
+
+  const newItem: SizingPresetItem = {
+    id: newId,
+    no: nextNo,
+    layer: suggestedLayer,
+    component: catalogItem.name,
+    icon: isLicenseOnly ? '📜' : (catalogItem.category === 'storage' ? '💾' : (catalogItem.category === 'backup' ? '🛡️' : '📦')),
+    licenseFree: 'Community OSS',
+    licenseEnterprise: catalogItem.name,
+    pricingSku: catalogItem.sku,
+    licenseMetric: catalogItem.unit,
+    notes: `Ditambahkan langsung dari Katalog SKU ${catalogItem.sku} (${catalogItem.name}). Tarif resmi: Rp ${formatSimpleIDR(catalogItem.unit_price_idr)} / ${catalogItem.unit}.`,
+    contractRef: `Master SKU: ${catalogItem.sku}`,
+    moderate: {
+      nodeCount: isLicenseOnly ? 1 : 2,
+      vcpuPerNode: isLicenseOnly ? 0 : 4,
+      ramGBPerNode: isLicenseOnly ? 0 : 8,
+      storageGBPerNode: isLicenseOnly ? 0 : 100,
+      storageClass: 'Tier 2',
+      computeType: isLicenseOnly ? 'none' : 'vm',
+      backupEnabled: !isLicenseOnly,
+      licenseKind: isLicenseOnly ? 'enterprise' : 'free',
+    },
+    critical: {
+      nodeCount: isLicenseOnly ? 2 : 2,
+      vcpuPerNode: isLicenseOnly ? 0 : 8,
+      ramGBPerNode: isLicenseOnly ? 0 : 16,
+      storageGBPerNode: isLicenseOnly ? 0 : 200,
+      storageClass: 'Tier 2',
+      computeType: isLicenseOnly ? 'none' : 'vm',
+      backupEnabled: !isLicenseOnly,
+      licenseKind: 'enterprise',
+    }
+  }
+
+  presetItems.value.push(newItem)
+
+  const activeSpec = tierFilter.value === 'critical' ? newItem.critical : newItem.moderate
+  layerConfigs[newId] = {
+    nodeCount: activeSpec.nodeCount,
+    vcpuPerNode: activeSpec.vcpuPerNode,
+    ramGBPerNode: activeSpec.ramGBPerNode,
+    storageGBPerNode: activeSpec.storageGBPerNode,
+    storageClass: activeSpec.storageClass,
+    backupEnabled: activeSpec.backupEnabled,
+    licenseKind: activeSpec.licenseKind,
+    computeType: activeSpec.computeType,
+    pricingSku: newItem.pricingSku,
+    licenseProductName: activeSpec.licenseKind === 'enterprise' ? newItem.licenseEnterprise : newItem.licenseFree,
+    licenseMetric: newItem.licenseMetric,
+  }
+
+  activeItemId.value = newId
+  await setDbItem('sizing_presets', JSON.parse(JSON.stringify(presetItems.value)))
+  triggerQuoteCalculation()
+  showToast(`Item katalog "${catalogItem.name}" berhasil dimasukkan ke Sizing Configurator!`, 'success')
 }
 
 function setTierFilter(tier: 'critical' | 'moderate') {
@@ -418,8 +500,14 @@ const activeLayerCost = computed<QuoteItemCost | undefined>(() => {
 function buildQuoteRequest() {
   const items = layerItems.value.map(l => {
     const cfg = layerConfigs[l.id] || parseBaselineSpec(l, 'moderate')
+    const preset = presetItems.value.find(p => p.id === l.id)
     return {
-      component_id: `layer-${l.no}`,
+      component_id: l.id.startsWith('layer_') ? l.id : `layer-${l.no}`,
+      component_name: l.component,
+      layer_name: l.layer,
+      pricing_sku: cfg.pricingSku || preset?.pricingSku || '',
+      license_product_name: cfg.licenseProductName || (cfg.licenseKind === 'enterprise' ? l.license.enterprise : l.license.free),
+      license_metric: cfg.licenseMetric || preset?.licenseMetric || '',
       tier: tierFilter.value === 'critical' ? 'critical' : 'moderate',
       compute_type: cfg.computeType,
       node_count: cfg.nodeCount,
@@ -480,10 +568,12 @@ function runOptimisticQuoteCalculation() {
 
   for (const l of layerItems.value) {
     const cfg = layerConfigs[l.id] || parseBaselineSpec(l, 'moderate')
-    const itemNodes = cfg.nodeCount
-    const itemVcpu = itemNodes * cfg.vcpuPerNode
-    const itemRam = itemNodes * cfg.ramGBPerNode
-    const itemStorage = itemNodes * cfg.storageGBPerNode
+    const preset = presetItems.value.find(p => p.id === l.id)
+    const isNoneCompute = cfg.computeType === 'none'
+    const itemNodes = cfg.nodeCount <= 0 ? 1 : cfg.nodeCount
+    const itemVcpu = isNoneCompute ? 0 : itemNodes * cfg.vcpuPerNode
+    const itemRam = isNoneCompute ? 0 : itemNodes * cfg.ramGBPerNode
+    const itemStorage = isNoneCompute ? 0 : itemNodes * cfg.storageGBPerNode
 
     let computeCost = 0
     if (cfg.computeType === 'baremetal') {
@@ -493,30 +583,51 @@ function runOptimisticQuoteCalculation() {
     }
 
     const stgRate = cfg.storageClass === 'Tier 3' ? stgT3Rate : stgT2Rate
-    const storageCost = itemStorage * stgRate
-    const backupCost = cfg.backupEnabled ? itemStorage * nbuRate : 0
+    const storageCost = isNoneCompute ? 0 : itemStorage * stgRate
+    const backupCost = (!isNoneCompute && cfg.backupEnabled) ? itemStorage * nbuRate : 0
 
     let licenseCost = 0
     const unconfirmedPrices: string[] = []
     let licProductName = l.license.free
+    const activeSku = cfg.pricingSku || preset?.pricingSku
 
     if (cfg.licenseKind === 'enterprise') {
-      licProductName = l.license.enterprise
-      if (l.no === 2) {
-        licenseCost = itemNodes * (isDev ? 134000000 : 240000000)
-      } else if (l.no === 6) {
-        licenseCost = itemNodes * (isDev ? 75000000 : 125000000)
-      } else if (l.no === 1 || l.no === 4 || l.no === 8) {
-        licenseCost = 0
-        const msg = `${licProductName} (${l.component}): Harga belum dikonfirmasi STA`
-        unconfirmedPrices.push(msg)
-        if (!warnings.includes(msg)) warnings.push(msg)
+      licProductName = cfg.licenseProductName || l.license.enterprise
+
+      // Look up in pricingList if SKU is available
+      if (activeSku) {
+        const foundPrice = pricingList.value.find(p => p.sku === activeSku)
+        if (foundPrice) {
+          licProductName = foundPrice.name || licProductName
+          if (foundPrice.unit_price_idr !== null && foundPrice.unit_price_idr > 0) {
+            licenseCost = itemNodes * foundPrice.unit_price_idr
+          } else {
+            const msg = `${licProductName} (${l.component}): Estimasi harga belum dikonfirmasi STA`
+            unconfirmedPrices.push(msg)
+            if (!warnings.includes(msg)) warnings.push(msg)
+          }
+        }
+      }
+
+      if (licenseCost === 0 && unconfirmedPrices.length === 0) {
+        if (l.no === 2) {
+          licenseCost = itemNodes * (isDev ? 134000000 : 240000000)
+        } else if (l.no === 6) {
+          licenseCost = itemNodes * (isDev ? 75000000 : 125000000)
+        } else if (l.no === 1 || l.no === 4 || l.no === 8) {
+          licenseCost = 0
+          const msg = `${licProductName} (${l.component}): Harga belum dikonfirmasi STA`
+          unconfirmedPrices.push(msg)
+          if (!warnings.includes(msg)) warnings.push(msg)
+        }
       }
     }
 
     const itemTotal = computeCost + storageCost + backupCost + licenseCost
 
-    totalNodes += itemNodes
+    if (!isNoneCompute) {
+      totalNodes += itemNodes
+    }
     totalVCPU += itemVcpu
     totalRAM += itemRam
     totalStorage += itemStorage
@@ -527,7 +638,7 @@ function runOptimisticQuoteCalculation() {
     subLicense += licenseCost
 
     items.push({
-      component_id: l.id,
+      component_id: l.id.startsWith('layer_') ? l.id : `layer-${l.no}`,
       component_name: l.component,
       layer_name: l.layer,
       node_count: itemNodes,
@@ -541,6 +652,7 @@ function runOptimisticQuoteCalculation() {
       total_cost_annual: itemTotal,
       license_product_name: licProductName,
       license_kind: cfg.licenseKind,
+      pricing_sku: activeSku,
       unconfirmed_prices: unconfirmedPrices,
     })
   }
