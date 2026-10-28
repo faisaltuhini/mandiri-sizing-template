@@ -20,8 +20,11 @@ RUN go mod download
 # Copy backend source
 COPY . .
 
+ARG TARGETOS=linux
+ARG TARGETARCH
+
 # Compile static binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} ${TARGETARCH:+GOARCH=${TARGETARCH}} go build \
     -ldflags="-w -s" \
     -o sizing-backend ./cmd/api
 
