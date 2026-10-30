@@ -83,10 +83,10 @@ defineEmits<{
 
 <style scoped>
 .sticky-cost-bar {
-  background: #FFFFFF;
-  border-top: 1px solid #CBD5E1;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px 24px;
+  background: var(--surface, #ffffff);
+  border-top: 1px solid var(--rule, #edf1f4);
+  box-shadow: none;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -104,13 +104,13 @@ defineEmits<{
 .env-selector-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .env-lbl {
-  font-size: 11px;
-  font-weight: 700;
-  color: #475569;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted, #5d6165);
 }
 
 .drc-toggle-label {
@@ -122,22 +122,22 @@ defineEmits<{
 }
 
 .custom-chk {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
-  accent-color: #002060;
+  accent-color: var(--accent, #003b73);
 }
 
 .drc-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text, #131416);
 }
 
 .cost-bar-center {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 
 .metric-pill {
@@ -149,10 +149,8 @@ defineEmits<{
 
 .pill-lbl {
   font-size: 11px;
-  font-weight: 700;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-weight: 500;
+  color: var(--muted, #5d6165);
 }
 
 .cost-bar-right {
@@ -169,33 +167,34 @@ defineEmits<{
 
 .grand-total-lbl {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: #475569;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--muted, #5d6165);
 }
 
 .grand-total-val {
-  font-size: 18px;
-  font-weight: 800;
-  color: #002060;
+  font-size: var(--fs-title, 20px);
+  font-weight: 600;
+  color: var(--accent, #003b73);
+  font-variant-numeric: tabular-nums;
 }
 
 .bar-generate-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  background: #002060;
+  padding: 7px 14px;
+  background: var(--accent, #003b73);
   color: #FFFFFF;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-control, 6px);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: opacity 0.15s ease;
 }
 
 .bar-generate-btn:hover {
-  background: #003399;
+  opacity: 0.9;
 }
 </style>

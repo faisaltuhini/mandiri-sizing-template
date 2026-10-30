@@ -231,9 +231,7 @@
               type="button"
               class="search-clear-btn"
               @click="searchQuery = ''"
-            >
-              ✕
-            </button>
+            ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
           </div>
 
           <div class="tier-view-segmented">
@@ -354,7 +352,7 @@
                 <h3 class="layer-title">{{ item.layer }}</h3>
                 <!-- Plain-Language Business Function Description -->
                 <div v-if="item.notes" class="layer-business-role">
-                  <span class="role-icon">💡</span>
+                  <span class="role-icon">Role</span>
                   <span class="role-text">{{ item.notes }}</span>
                 </div>
               </div>
@@ -408,7 +406,7 @@
 
               <!-- Shared Storage Special View vs Standard Compute Nodes -->
               <div v-if="item.moderate.computeType === 'shared'" class="shared-storage-callout mod-theme">
-                <div class="shared-callout-icon">🗄️</div>
+                <div class="shared-callout-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
                 <div class="shared-callout-info">
                   <span class="shared-callout-title">Penyimpanan Bersama Terpusat (SAN LUN Storage Pool)</span>
                   <span class="shared-callout-desc">Volume disk bersama terpusat tanpa unit server prosesor terpisah.</span>
@@ -444,14 +442,14 @@
 
               <div class="spec-box-tier-footer">
                 <div class="tier-lic-indicator">
-                  <span class="lic-icon">{{ item.moderate.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}</span>
+                  <span class="lic-icon">{{ item.moderate.licenseKind === 'enterprise' ? 'Ent' : 'OSS' }}</span>
                   <span class="lic-name">
                     <strong>{{ item.moderate.licenseKind === 'enterprise' ? 'Lisensi Resmi' : 'Gratis (OSS)' }}:</strong>
                     {{ item.moderate.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
                   </span>
                 </div>
                 <span :class="['backup-badge', item.moderate.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik Backup' : '✓ NetBackup Aktif') : 'Tanpa Backup' }}
+                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup' : 'NetBackup Aktif') : 'Tanpa Backup' }}
                 </span>
               </div>
             </div>
@@ -488,7 +486,7 @@
 
               <!-- Shared Storage Special View vs Standard Compute Nodes -->
               <div v-if="item.critical.computeType === 'shared'" class="shared-storage-callout crit-theme">
-                <div class="shared-callout-icon">🗄️</div>
+                <div class="shared-callout-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
                 <div class="shared-callout-info">
                   <span class="shared-callout-title">Penyimpanan Bersama Terpusat (SAN LUN Storage Pool)</span>
                   <span class="shared-callout-desc">Volume disk berkecepatan tinggi tanpa unit server terpisah.</span>
@@ -524,14 +522,14 @@
 
               <div class="spec-box-tier-footer">
                 <div class="tier-lic-indicator">
-                  <span class="lic-icon">{{ item.critical.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}</span>
+                  <span class="lic-icon">{{ item.critical.licenseKind === 'enterprise' ? 'Ent' : 'OSS' }}</span>
                   <span class="lic-name">
                     <strong>{{ item.critical.licenseKind === 'enterprise' ? 'Lisensi Resmi' : 'Gratis (OSS)' }}:</strong>
                     {{ item.critical.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
                   </span>
                 </div>
                 <span :class="['backup-badge', item.critical.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik Backup' : '✓ NetBackup Aktif') : 'Tanpa Backup' }}
+                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup' : 'NetBackup Aktif') : 'Tanpa Backup' }}
                 </span>
               </div>
             </div>
@@ -551,7 +549,7 @@
               </span>
             </div>
             <div v-if="item.contractRef" class="ftr-contract-ref" title="Nomor referensi kontrak pengadaan">
-              <span class="ref-icon">📋</span>
+              <span class="ref-icon">Ref</span>
               <span>Ref: {{ item.contractRef }}</span>
             </div>
           </div>
@@ -628,10 +626,10 @@
               </td>
               <td class="td-mod-lic">
                 <div class="matrix-lic-text" :title="item.moderate.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
-                  {{ item.moderate.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
+                  {{ item.moderate.licenseKind === 'enterprise' ? 'Enterprise' : 'Free OSS' }}
                 </div>
                 <span :class="['matrix-nbu-dot', item.moderate.backupEnabled ? 'active' : 'inactive']" :title="item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup Aktif' : 'NetBackup Aktif') : 'Tanpa Backup'">
-                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
+                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik' : 'NBU') : 'No Backup' }}
                 </span>
               </td>
 
@@ -656,10 +654,10 @@
               </td>
               <td class="td-crit-lic">
                 <div class="matrix-lic-text" :title="item.critical.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
-                  {{ item.critical.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
+                  {{ item.critical.licenseKind === 'enterprise' ? 'Enterprise' : 'Free OSS' }}
                 </div>
                 <span :class="['matrix-nbu-dot', item.critical.backupEnabled ? 'active' : 'inactive']" :title="item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup Aktif' : 'NetBackup Aktif') : 'Tanpa Backup'">
-                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
+                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik' : 'NBU') : 'No Backup' }}
                 </span>
               </td>
               <td class="td-crit-delta">
@@ -715,7 +713,7 @@
               <span class="bp-badge-tag">REFERENCE ARCHITECTURE</span>
               <h3 class="bp-main-title">High-Level Enterprise Architecture Topology</h3>
               <span :class="['bp-lens-pill', activeTierTab]">
-                {{ activeTierTab === 'both' ? '⚖️ Mode Perbandingan: Moderat (N+1) vs Critical (2N)' : (activeTierTab === 'moderate' ? '🔵 Fokus Blueprint: Tier Moderat (N+1)' : '🟠 Fokus Blueprint: Tier Critical (2N)') }}
+                {{ activeTierTab === 'both' ? 'Mode Perbandingan: Moderat (N+1) vs Critical (2N)' : (activeTierTab === 'moderate' ? 'Fokus Blueprint: Tier Moderat (N+1)' : 'Fokus Blueprint: Tier Critical (2N)') }}
               </span>
             </div>
             <p class="bp-subtitle">
@@ -751,7 +749,7 @@
         <!-- External Entry Traffic Node (Shown when viewing All or Access & App) -->
         <div v-if="activeCategory === 'all' || activeCategory === 'access_app'" class="bp-external-entry-wrap">
           <div class="bp-external-pill">
-            <div class="ext-icon-pulse">🌍</div>
+            <div class="ext-icon-pulse"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
             <div class="ext-text-group">
               <span class="ext-eyebrow">EXTERNAL TRAFFIC &amp; CHANNELS</span>
               <span class="ext-title">Nasabah Mobile Banking · Web Portal · Partner Open API</span>
@@ -861,7 +859,7 @@
                           <span class="strip-tier-dot mod"></span>
                           <span class="strip-tier-name">MODERAT (N+1)</span>
                           <span :class="['strip-compute-pill', item.moderate.computeType]">
-                            {{ item.moderate.computeType === 'shared' ? '🗄️ Shared SAN' : `${item.moderate.nodeCount}x ${item.moderate.computeType === 'baremetal' ? 'Baremetal' : 'VM'}` }}
+                            {{ item.moderate.computeType === 'shared' ? 'Shared SAN' : `${item.moderate.nodeCount}x ${item.moderate.computeType === 'baremetal' ? 'Baremetal' : 'VM'}` }}
                           </span>
                         </div>
                         <div class="strip-specs-line">
@@ -875,7 +873,7 @@
                         </div>
                         <div class="strip-lic-line">
                           <span class="strip-lic-badge">
-                            {{ item.moderate.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ item.moderate.licenseKind === 'enterprise' ? 'Ent' : 'OSS' }}
                             {{ item.moderate.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Enterprise') : (item.licenseFree || 'Community OSS') }}
                           </span>
                         </div>
@@ -887,7 +885,7 @@
                           <span class="strip-tier-dot crit"></span>
                           <span class="strip-tier-name">CRITICAL (2N)</span>
                           <span :class="['strip-compute-pill', item.critical.computeType]">
-                            {{ item.critical.computeType === 'shared' ? '🗄️ Shared SAN' : `${item.critical.nodeCount}x ${item.critical.computeType === 'baremetal' ? '🔥 Baremetal' : 'VM'}` }}
+                            {{ item.critical.computeType === 'shared' ? 'Shared SAN' : `${item.critical.nodeCount}x ${item.critical.computeType === 'baremetal' ? 'Baremetal Dedicated' : 'VM'}` }}
                           </span>
                         </div>
                         <div class="strip-specs-line">
@@ -901,7 +899,7 @@
                         </div>
                         <div class="strip-lic-line">
                           <span class="strip-lic-badge crit-lic">
-                            {{ item.critical.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ item.critical.licenseKind === 'enterprise' ? 'Ent' : 'OSS' }}
                             {{ item.critical.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Enterprise') : (item.licenseFree || 'Community OSS') }}
                           </span>
                         </div>
@@ -925,10 +923,10 @@
                         <div class="single-spec-badges">
                           <span :class="['single-compute-badge', activeSpec.computeType]">
                             <template v-if="activeSpec.computeType === 'shared'">
-                              🗄️ Shared SAN LUN Pool
+                              Shared SAN LUN Pool
                             </template>
                             <template v-else>
-                              {{ activeSpec.computeType === 'baremetal' ? '🔥' : '🖥️' }}
+                              {{ activeSpec.computeType === 'baremetal' ? 'Dedicated' : 'VM' }}
                               {{ activeSpec.nodeCount }} Node · {{ activeSpec.computeType === 'baremetal' ? 'Baremetal Dedicated' : 'Virtual Machine' }}
                             </template>
                           </span>
@@ -954,11 +952,11 @@
 
                         <div class="single-lic-footer">
                           <span class="s-lic-text">
-                            {{ activeSpec.licenseKind === 'enterprise' ? '🛡️' : '🆓' }}
+                            {{ activeSpec.licenseKind === 'enterprise' ? 'Ent' : 'OSS' }}
                             {{ activeSpec.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
                           </span>
                           <span :class="['s-nbu-pill', { on: activeSpec.backupEnabled }]">
-                            {{ activeSpec.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
+                            {{ activeSpec.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik' : 'NBU') : 'No Backup' }}
                           </span>
                         </div>
                       </template>
@@ -972,7 +970,7 @@
                   >
                     <span class="intra-label">{{ getIntraZoneConnector(zone.id, item, zone.items[nIdx + 1])?.label }}</span>
                     <div :class="['intra-arrow-line', getIntraZoneConnector(zone.id, item, zone.items[nIdx + 1])?.style]">
-                      <span class="arrow-head">➔</span>
+                      <span class="arrow-head">&rarr;</span>
                     </div>
                   </div>
                 </template>
@@ -997,7 +995,7 @@
                   <span class="insp-no">LAYER {{ String(selectedDiagramItem.no).padStart(2, '0') }}</span>
                   <h4 class="insp-layer">{{ selectedDiagramItem.layer }}</h4>
                   <span class="insp-comp">{{ selectedDiagramItem.component }}</span>
-                  <span v-if="selectedDiagramItem.contractRef" class="insp-ref">📋 Ref: {{ selectedDiagramItem.contractRef }}</span>
+                  <span v-if="selectedDiagramItem.contractRef" class="insp-ref">Ref: {{ selectedDiagramItem.contractRef }}</span>
                 </div>
                 <p class="insp-notes">{{ selectedDiagramItem.notes || 'Komponen standar baseline arsitektur.' }}</p>
                 <div class="insp-lic-pair">
@@ -1025,9 +1023,7 @@
                 class="btn-insp-close"
                 @click="selectedDiagramId = null"
                 title="Tutup panel inspeksi"
-              >
-                ✕
-              </button>
+              ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
           </div>
         </transition>
@@ -1035,7 +1031,7 @@
 
       <!-- EMPTY STATE IF SEARCH / CATEGORY FINDS NOTHING -->
       <div v-if="filteredPresetItems.length === 0" class="preset-empty-state">
-        <div class="empty-icon-box">🔍</div>
+        <div class="empty-icon-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
         <h3 class="empty-title">Tidak ada layer preset yang cocok</h3>
         <p class="empty-desc">Tidak ditemukan layer arsitektur yang sesuai dengan filter atau kata kunci pencarian Anda.</p>
         <button
@@ -1068,7 +1064,7 @@
               <p class="modal-hdr-sub">Tetapkan formula baseline hardware &amp; lisensi resmi untuk Moderat dan Critical</p>
             </div>
           </div>
-          <button type="button" class="modal-close" @click="showModal = false" title="Tutup">✕</button>
+          <button type="button" class="modal-close" @click="showModal = false" title="Tutup"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
 
         <!-- Wizard / Section Tabs Navigation -->
@@ -1108,7 +1104,7 @@
           <!-- ========================================== -->
           <div v-show="modalActiveTab === 'general'" class="tab-pane-content">
             <div class="field-instruction-box">
-              <span class="inst-icon">💡</span>
+              <span class="inst-icon">Hint</span>
               <p class="inst-text">
                 Tentukan nama layer arsitektur dan software yang digunakan. Nama lisensi free dan enterprise akan dijadikan acuan otomatis saat tim memilih model lisensi.
               </p>
@@ -1273,14 +1269,14 @@
                     title: 'Virtual Machine (VM)',
                     technicalLabel: 'Server Virtual Fleksibel',
                     description: 'Efisien & hemat biaya untuk aplikasi umum.',
-                    icon: '🖥️'
+                    icon: 'server'
                   },
                   {
                     value: 'baremetal',
                     title: 'Server Fisik Khusus',
                     technicalLabel: 'Baremetal Dedicated',
                     description: 'Mesin fisik dedicated tanpa lapisan virtual.',
-                    icon: '🏢',
+                    icon: 'baremetal',
                     badge: 'Dedicated'
                   }
                 ]"
@@ -1300,14 +1296,14 @@
                       title: 'Standar Andal (Tier 2)',
                       technicalLabel: 'SAN Tier 2 Standard',
                       description: 'Kecepatan standar untuk web & worker (Rp 33.000/GB).',
-                      icon: '💾'
+                      icon: 'storage'
                     },
                     {
                       value: 'Tier 3',
                       title: 'Ultra Cepat (Tier 3)',
                       technicalLabel: 'High-Perf ASM',
                       description: 'IOPS tinggi khusus Oracle ASM (Rp 48.000/GB).',
-                      icon: '⚡'
+                      icon: 'cache'
                     }
                   ]"
                 />
@@ -1341,7 +1337,7 @@
                     @click="copyModerateToCritical"
                     title="Salin parameter dari Moderat sebagai titik awal"
                   >
-                    Salin dari Moderat 📋
+                    Salin dari Moderat
                   </button>
                 </div>
                 <span class="banner-sub">Layanan Core Banking, transaksi nasabah intensif, SuperApp Livin' (2N Redundancy, HA 99.99%).</span>
@@ -1423,14 +1419,14 @@
                     title: 'Virtual Machine (VM)',
                     technicalLabel: 'Server Virtual Fleksibel',
                     description: 'Efisien & mudah di-scale up.',
-                    icon: '🖥️'
+                    icon: 'server'
                   },
                   {
                     value: 'baremetal',
                     title: 'Server Fisik Khusus',
                     technicalLabel: 'Baremetal Dedicated',
                     description: 'Dedicated tanpa sharing daya untuk performa TPS maksimal.',
-                    icon: '🏢',
+                    icon: 'baremetal',
                     badge: 'Direkomendasikan',
                     badgeType: 'warning'
                   }
@@ -1451,14 +1447,14 @@
                       title: 'Standar Andal (Tier 2)',
                       technicalLabel: 'SAN Tier 2 Standard',
                       description: 'Kecepatan standar untuk web & worker (Rp 33.000/GB).',
-                      icon: '💾'
+                      icon: 'storage'
                     },
                     {
                       value: 'Tier 3',
                       title: 'Ultra Cepat (Tier 3)',
                       technicalLabel: 'High-Perf ASM',
                       description: 'IOPS tinggi khusus Oracle ASM (Rp 48.000/GB).',
-                      icon: '⚡',
+                      icon: 'cache',
                       badge: 'High-IOPS',
                       badgeType: 'warning'
                     }
@@ -1524,7 +1520,7 @@
               Pilih komponen dari master katalog untuk dijadikan layer arsitektur baru, atau abaikan jika hanya berupa lisensi/tarif dasar.
             </p>
           </div>
-          <button type="button" class="modal-close" @click="showCatalogPickerModal = false" title="Tutup">✕</button>
+          <button type="button" class="modal-close" @click="showCatalogPickerModal = false" title="Tutup"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
 
         <!-- Search & Filter Bar inside Modal -->
@@ -1545,9 +1541,7 @@
               type="button"
               class="picker-search-clear"
               @click="catalogPickerSearch = ''"
-            >
-              ✕
-            </button>
+            ><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
           </div>
 
           <div class="picker-filter-tabs">
@@ -2005,19 +1999,19 @@ const layerOptions = computed<AutocompleteOption[]>(() => {
 
   // Standard architectural layers at Enterprise Architecture
   const standardLayers = [
-    { label: 'Web Ingress', icon: '🌐', desc: 'Reverse proxy, SSL termination, and rate limiting entry layer.' },
-    { label: 'App Container', icon: '📦', desc: 'Microservices orchestration cluster on OpenShift / Kubernetes.' },
-    { label: 'Message Broker & Event Streaming', icon: '📨', desc: 'Enterprise event streaming (Apache Kafka / RabbitMQ).' },
-    { label: 'Database Core OLTP', icon: '🗄️', desc: 'Core transaction relational database (Oracle RAC / PostgreSQL).' },
-    { label: 'Database Read Replica', icon: '📖', desc: 'Read-only replica for reporting and query scalability.' },
-    { label: 'Caching / In-Memory Store', icon: '⚡', desc: 'Low-latency in-memory data store (Redis Enterprise / KeyDB).' },
-    { label: 'Search Engine & Analytics', icon: '🔍', desc: 'High-speed distributed text search (OpenSearch / Elasticsearch).' },
-    { label: 'Log Shipper & Ingest', icon: '📋', desc: 'Log pipeline, parsing, and normalization (Logstash / Fluentbit).' },
-    { label: 'Security WAF & API Gateway', icon: '🛡️', desc: 'API gateway, WAF security, authentication, and traffic throttling.' },
-    { label: 'Object Storage & File Archive', icon: '🪣', desc: 'S3-compatible scalable unstructured storage (MinIO / Ceph).' },
-    { label: 'CI/CD & Worker Runner', icon: '⚙️', desc: 'Automated CI/CD build agents and batch workers.' },
-    { label: 'Batch Processing / ETL', icon: '🔄', desc: 'Scheduled ETL processing and large-scale data transformation.' },
-    { label: 'Observability & Monitoring', icon: '📊', desc: 'Telemetry, metrics, trace collection, and alerting.' }
+    { label: 'Web Ingress', icon: 'web', desc: 'Reverse proxy, SSL termination, and rate limiting entry layer.' },
+    { label: 'App Container', icon: 'container', desc: 'Microservices orchestration cluster on OpenShift / Kubernetes.' },
+    { label: 'Message Broker & Event Streaming', icon: 'messaging', desc: 'Enterprise event streaming (Apache Kafka / RabbitMQ).' },
+    { label: 'Database Core OLTP', icon: 'database', desc: 'Core transaction relational database (Oracle RAC / PostgreSQL).' },
+    { label: 'Database Read Replica', icon: 'replica', desc: 'Read-only replica for reporting and query scalability.' },
+    { label: 'Caching / In-Memory Store', icon: 'cache', desc: 'Low-latency in-memory data store (Redis Enterprise / KeyDB).' },
+    { label: 'Search Engine & Analytics', icon: 'search', desc: 'High-speed distributed text search (OpenSearch / Elasticsearch).' },
+    { label: 'Log Shipper & Ingest', icon: 'logs', desc: 'Log pipeline, parsing, and normalization (Logstash / Fluentbit).' },
+    { label: 'Security WAF & API Gateway', icon: 'security', desc: 'API gateway, WAF security, authentication, and traffic throttling.' },
+    { label: 'Object Storage & File Archive', icon: 'archive', desc: 'S3-compatible scalable unstructured storage (MinIO / Ceph).' },
+    { label: 'CI/CD & Worker Runner', icon: 'scheduler', desc: 'Automated CI/CD build agents and batch workers.' },
+    { label: 'Batch Processing / ETL', icon: 'etl', desc: 'Scheduled ETL processing and large-scale data transformation.' },
+    { label: 'Observability & Monitoring', icon: 'telemetry', desc: 'Telemetry, metrics, trace collection, and alerting.' }
   ]
 
   for (const sl of standardLayers) {
@@ -2042,7 +2036,7 @@ const layerOptions = computed<AutocompleteOption[]>(() => {
       list.push({
         label: p.layer,
         value: p.layer,
-        icon: p.icon || '🏷️',
+        icon: p.icon || 'tag',
         category: 'Preset Aktif',
         badge: 'Katalog',
         description: p.notes || `Komponen: ${p.component}`
@@ -2070,7 +2064,7 @@ const componentOptions = computed<AutocompleteOption[]>(() => {
       list.push({
         label: bc.component_name,
         value: bc.component_name,
-        icon: '📦',
+        icon: 'container',
         category: bc.layer_name,
         badge: 'Katalog Resmi',
         badgeType: 'primary',
@@ -2095,7 +2089,7 @@ const componentOptions = computed<AutocompleteOption[]>(() => {
       list.push({
         label: p.component,
         value: p.component,
-        icon: p.icon || '⚙️',
+        icon: p.icon || 'system',
         category: p.layer,
         badge: 'Preset Enterprise Architecture',
         description: p.notes || `Layer: ${p.layer}`,
@@ -2120,7 +2114,7 @@ const componentOptions = computed<AutocompleteOption[]>(() => {
         list.push({
           label: pi.name,
           value: pi.name,
-          icon: '🏷️',
+          icon: 'tag',
           category: pi.category,
           badge: pi.sku || 'SKU',
           description: `Katalog SKU: ${pi.sku} (${pi.environment})`
@@ -2150,12 +2144,12 @@ const licenseFreeOptions = computed<AutocompleteOption[]>(() => {
   ]
   for (const d of defaults) {
     set.add(d)
-    list.push({ label: d, value: d, icon: '🆓', badge: 'Rp 0 (OSS)', badgeType: 'success' })
+    list.push({ label: d, value: d, icon: 'free', badge: 'Rp 0 (OSS)', badgeType: 'success' })
   }
   for (const p of props.presetItems) {
     if (p.licenseFree && !set.has(p.licenseFree)) {
       set.add(p.licenseFree)
-      list.push({ label: p.licenseFree, value: p.licenseFree, icon: '🆓', badge: 'Preset Free' })
+      list.push({ label: p.licenseFree, value: p.licenseFree, icon: 'free', badge: 'Preset Free' })
     }
   }
   return list
@@ -2170,7 +2164,7 @@ const licenseEnterpriseOptions = computed<AutocompleteOption[]>(() => {
       list.push({
         label: p.licenseEnterprise,
         value: p.licenseEnterprise,
-        icon: '💼',
+        icon: 'license',
         category: 'Preset Enterprise',
         badge: 'Official',
         badgeType: 'warning'
@@ -2184,7 +2178,7 @@ const licenseEnterpriseOptions = computed<AutocompleteOption[]>(() => {
         list.push({
           label: pi.name,
           value: pi.name,
-          icon: '💼',
+          icon: 'license',
           category: 'Katalog SKU',
           badge: pi.sku,
           badgeType: 'primary',
@@ -2329,12 +2323,12 @@ const clusterTotals = computed(() => {
 
 // Architecture Categories & Categorization
 const CATEGORY_DEFINITIONS = [
-  { id: 'all', label: 'Semua Layer', icon: '📑' },
-  { id: 'access_app', label: 'Akses & Aplikasi', icon: '🌐' },
-  { id: 'db_storage', label: 'Database & Penyimpanan', icon: '🗄️' },
-  { id: 'cache_queue', label: 'Memori Cepat & Antrean', icon: '⚡' },
-  { id: 'monitor_batch', label: 'Pemantauan & Penjadwalan', icon: '📊' },
-  { id: 'other', label: 'Layer Tambahan', icon: '🔧' }
+  { id: 'all', label: 'Semua Layer', icon: 'layer' },
+  { id: 'access_app', label: 'Akses & Aplikasi', icon: 'web' },
+  { id: 'db_storage', label: 'Database & Penyimpanan', icon: 'database' },
+  { id: 'cache_queue', label: 'Memori Cepat & Antrean', icon: 'cache' },
+  { id: 'monitor_batch', label: 'Pemantauan & Penjadwalan', icon: 'telemetry' },
+  { id: 'other', label: 'Layer Tambahan', icon: 'tools' }
 ]
 
 function getLayerCategory(item: SizingPresetItem): 'access_app' | 'db_storage' | 'cache_queue' | 'monitor_batch' | 'other' {
@@ -2383,42 +2377,42 @@ const availableCategories = computed(() => {
 function getCategoryBadge(item: SizingPresetItem) {
   const cat = getLayerCategory(item)
   switch (cat) {
-    case 'access_app': return { label: 'Akses & Aplikasi', icon: '🌐', theme: 'cat-app' }
-    case 'db_storage': return { label: 'Database & Storage', icon: '🗄️', theme: 'cat-db' }
-    case 'cache_queue': return { label: 'Memori & Antrean', icon: '⚡', theme: 'cat-cache' }
-    case 'monitor_batch': return { label: 'Pemantauan & Batch', icon: '📊', theme: 'cat-monitor' }
-    default: return { label: 'Layer Tambahan', icon: '🔧', theme: 'cat-other' }
+    case 'access_app': return { label: 'Akses & Aplikasi', icon: 'web', theme: 'cat-app' }
+    case 'db_storage': return { label: 'Database & Storage', icon: 'database', theme: 'cat-db' }
+    case 'cache_queue': return { label: 'Memori & Antrean', icon: 'cache', theme: 'cat-cache' }
+    case 'monitor_batch': return { label: 'Pemantauan & Batch', icon: 'telemetry', theme: 'cat-monitor' }
+    default: return { label: 'Layer Tambahan', icon: 'tools', theme: 'cat-other' }
   }
 }
 
 function getLayerIcon(item: SizingPresetItem): string {
   if (item.icon) return item.icon
   const defaultIcons: Record<number, string> = {
-    1: '🌐',
-    2: '📦',
-    3: '🔀',
-    4: '🗄️',
-    5: '💾',
-    6: '⚡',
-    7: '🛡️',
-    8: '📨',
-    9: '🔍',
-    10: '📋',
-    11: '📊',
-    12: '📁',
-    13: '⏱️'
+    1: 'web',
+    2: 'container',
+    3: 'loadbalancer',
+    4: 'database',
+    5: 'storage',
+    6: 'cache',
+    7: 'security',
+    8: 'messaging',
+    9: 'search',
+    10: 'logs',
+    11: 'telemetry',
+    12: 'filestore',
+    13: 'scheduler'
   }
   if (defaultIcons[item.no]) return defaultIcons[item.no]
 
   const text = `${item.layer} ${item.component}`.toLowerCase()
-  if (text.includes('ingress') || text.includes('web') || text.includes('gateway')) return '🌐'
-  if (text.includes('database') || text.includes('db') || text.includes('oracle') || text.includes('sql')) return '🗄️'
-  if (text.includes('storage') || text.includes('san') || text.includes('minio') || text.includes('s3')) return '💾'
-  if (text.includes('cache') || text.includes('redis')) return '⚡'
-  if (text.includes('message') || text.includes('kafka') || text.includes('queue')) return '📨'
-  if (text.includes('log') || text.includes('elastic') || text.includes('monitor')) return '📊'
-  if (text.includes('container') || text.includes('app') || text.includes('pod')) return '📦'
-  return '⚙️'
+  if (text.includes('ingress') || text.includes('web') || text.includes('gateway')) return 'web'
+  if (text.includes('database') || text.includes('db') || text.includes('oracle') || text.includes('sql')) return 'database'
+  if (text.includes('storage') || text.includes('san') || text.includes('minio') || text.includes('s3')) return 'storage'
+  if (text.includes('cache') || text.includes('redis')) return 'cache'
+  if (text.includes('message') || text.includes('kafka') || text.includes('queue')) return 'messaging'
+  if (text.includes('log') || text.includes('elastic') || text.includes('monitor')) return 'telemetry'
+  if (text.includes('container') || text.includes('app') || text.includes('pod')) return 'container'
+  return 'system'
 }
 
 function getSizeBadge(spec?: LayerPresetSpec) {
@@ -2500,7 +2494,7 @@ function getDeltaPills(mod?: LayerPresetSpec, crit?: LayerPresetSpec): Array<{ t
   }
 
   if (mod.licenseKind !== crit.licenseKind && crit.licenseKind === 'enterprise') {
-    pills.push({ text: '🛡️ Lisensi Resmi Vendor (SLA 24/7)', type: 'license' })
+    pills.push({ text: 'Lisensi Resmi Vendor (SLA 24/7)', type: 'license' })
   }
 
   if (pills.length === 0) {
@@ -2704,7 +2698,7 @@ const diagramZones = computed<DiagramZoneGroup[]>(() => {
     {
       id: 'edge_ingress',
       code: 'ZONE 01',
-      icon: '🌐',
+      icon: 'web',
       title: 'Edge, DMZ & Traffic Ingress Layer',
       architectureTier: 'Network Entry & Routing',
       subtitle: 'Pintu gerbang utama lalu lintas nasabah, terminasi SSL/TLS, proteksi WAF, dan internal mesh router.',
@@ -2716,7 +2710,7 @@ const diagramZones = computed<DiagramZoneGroup[]>(() => {
     {
       id: 'core_compute',
       code: 'ZONE 02',
-      icon: '📦',
+      icon: 'container',
       title: 'Core Application & Microservices Runtime',
       architectureTier: 'Compute Orchestration Hub',
       subtitle: 'Klaster eksekusi utama tempat seluruh container microservices dan logika bisnis transaksi berjalan.',
@@ -2728,7 +2722,7 @@ const diagramZones = computed<DiagramZoneGroup[]>(() => {
     {
       id: 'middleware_mesh',
       code: 'ZONE 03',
-      icon: '⚡',
+      icon: 'cache',
       title: 'In-Memory Speed & Event Streaming Mesh',
       architectureTier: 'High-Speed Middleware',
       subtitle: 'Akselerasi baca/tulis instan (Redis Cluster + Sentinel Quorum) dan antrean transaksi berkapasitas tinggi (Kafka).',
@@ -2740,7 +2734,7 @@ const diagramZones = computed<DiagramZoneGroup[]>(() => {
     {
       id: 'data_persistence',
       code: 'ZONE 04',
-      icon: '🗄️',
+      icon: 'database',
       title: 'Core Database & High-IOPS Persistent Storage',
       architectureTier: 'Enterprise Data Persistence',
       subtitle: 'Penyimpanan transaksi inti berketahanan tinggi (Oracle RAC + ASM SAN LUN Tier 3) serta arsip dokumen objek.',
@@ -2752,19 +2746,19 @@ const diagramZones = computed<DiagramZoneGroup[]>(() => {
     {
       id: 'ops_observability',
       code: 'ZONE 05',
-      icon: '📊',
+      icon: 'telemetry',
       title: 'Observability Pipeline & Batch Automation',
       architectureTier: 'Telemetry, Audit & Operations',
-      subtitle: 'Pipa pengumpulan log (Logstash ➔ Elasticsearch ➔ Kibana) serta otomasi penjadwalan tutup buku harian (Control-M).',
+      subtitle: 'Pipa pengumpulan log (Logstash -> Elasticsearch -> Kibana) serta otomasi penjadwalan tutup buku harian (Control-M).',
       themeClass: 'zone-theme-ops',
-      nextFlowLabel: '⇣ Integrasi Ekstensi Tambahan',
+      nextFlowLabel: 'Integrasi Ekstensi Tambahan',
       spineStyle: 'async' as const,
       items: opsItems
     },
     {
       id: 'custom_other',
       code: 'ZONE 06',
-      icon: '🔧',
+      icon: 'tools',
       title: 'Extended & Custom Architecture Layers',
       architectureTier: 'Custom Extensions',
       subtitle: 'Komponen arsitektur tambahan sesuai kebutuhan spesifik proyek.',
@@ -3583,12 +3577,12 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .overview-tier-card.card-moderat {
-  background: linear-gradient(180deg, #F0F7FF 0%, #F8FAFC 100%);
+  background: var(--surface, #ffffff);
   border-color: #BAE6FD;
 }
 
 .overview-tier-card.card-critical {
-  background: linear-gradient(180deg, #FFFBEB 0%, #FFFDF7 100%);
+  background: var(--surface, #ffffff);
   border-color: #FDE68A;
 }
 
@@ -3969,7 +3963,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .category-badge-chip.cat-db {
   background: #F5F3FF;
-  color: #6D28D9;
+  color: #003b73;
   border: 1px solid #DDD6FE;
 }
 
@@ -4205,7 +4199,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .badge-size-storage {
   background: #F5F3FF;
-  color: #6D28D9;
+  color: #003b73;
   border: 1px solid #DDD6FE;
 }
 
@@ -4326,7 +4320,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .storage-class-tag {
   font-size: 10px;
   font-weight: 700;
-  color: #6D28D9;
+  color: #003b73;
   background: #F5F3FF;
   padding: 1px 6px;
   border-radius: 3px;
@@ -4623,7 +4617,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .matrix-shared-tag {
   font-size: 10.5px;
   font-weight: 700;
-  color: #6D28D9;
+  color: #003b73;
   background: #F5F3FF;
   padding: 2px 6px;
   border-radius: 4px;
@@ -5069,12 +5063,12 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .banner-mod {
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  background: var(--pill-neutral-bg, #ebedee);
   border-color: #BAE6FD;
 }
 
 .banner-crit {
-  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  background: var(--pill-warning-bg, #fffbeb);
   border-color: #FDE68A;
 }
 
@@ -5322,7 +5316,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
    ───────────────────────────────────────────────────────────── */
 .preset-diagram-canvas {
   background-color: #F8FAFC;
-  background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+  /* clean flat canvas */
   background-size: 20px 20px;
   border: 1px solid #CBD5E1;
   border-radius: 12px;
@@ -5336,7 +5330,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 /* Blueprint Header & Legend */
 .blueprint-header-bar {
-  background: linear-gradient(135deg, #002060 0%, #0F296B 60%, #1E3A8A 100%);
+  background: var(--accent, #003b73);
   color: #FFFFFF;
   border-radius: 10px;
   padding: 16px 20px;
@@ -5450,7 +5444,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .leg-dot.san {
-  background: #A855F7;
+  background: #1b6c80;
   box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.35);
 }
 
@@ -5599,7 +5593,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .bp-zone-lane.zone-theme-compute {
   border-left-color: #002060;
-  background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%);
+  background: var(--surface, #ffffff);
 }
 
 .bp-zone-lane.zone-theme-middleware {
@@ -5607,7 +5601,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .bp-zone-lane.zone-theme-data {
-  border-left-color: #7C3AED;
+  border-left-color: #2f70bb;
 }
 
 .bp-zone-lane.zone-theme-ops {
@@ -5650,7 +5644,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 .zone-theme-edge .zone-code-badge { background: #0284C7; }
 .zone-theme-compute .zone-code-badge { background: #002060; }
 .zone-theme-middleware .zone-code-badge { background: #D97706; }
-.zone-theme-data .zone-code-badge { background: #6D28D9; }
+.zone-theme-data .zone-code-badge { background: #003b73; }
 .zone-theme-ops .zone-code-badge { background: #047857; }
 
 .zone-icon-box {
@@ -5794,7 +5788,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .bp-node-card.is-shared-san {
-  border-top: 3px solid #7C3AED;
+  border-top: 3px solid #2f70bb;
 }
 
 .bp-node-topbar {
@@ -5975,7 +5969,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .strip-compute-pill.shared {
   background: #F3E8FF;
-  border-color: #C084FC;
+  border-color: #e2e7eb;
   color: #6B21A8;
 }
 
@@ -6092,7 +6086,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 
 .single-compute-badge.shared {
   background: #F3E8FF;
-  border-color: #C084FC;
+  border-color: #e2e7eb;
   color: #6B21A8;
 }
 
@@ -6205,7 +6199,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .intra-arrow-line.san::before {
-  border-top: 3px double #7C3AED;
+  border-top: 3px double #2f70bb;
 }
 
 .arrow-head {
@@ -6216,7 +6210,7 @@ function confirmDeleteCustomLayer(item: SizingPresetItem) {
 }
 
 .intra-arrow-line.async .arrow-head { color: #D97706; }
-.intra-arrow-line.san .arrow-head { color: #7C3AED; }
+.intra-arrow-line.san .arrow-head { color: #2f70bb; }
 
 /* Selected Node Inspector Panel */
 .bp-inspector-panel {

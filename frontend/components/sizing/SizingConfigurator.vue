@@ -50,7 +50,7 @@
           :class="['bullet-row', { active: activeItemId === item.id, customized: isLayerCustomized(item.id) }]"
           @click="$emit('select-layer', item.id)"
         >
-          <span class="layer-num-badge">{{ String(item.no).padStart(2, '0') }}</span>
+          <span class="layer-num-badge">{{ item.no }}</span>
 
           <div class="bullet-content">
             <div class="bullet-title-row">
@@ -98,7 +98,7 @@
                 ● Disesuaikan dari Standar EA
               </span>
               <span v-else class="standard-status-tag">
-                ✓ Sesuai Standar EA
+                Standar EA
               </span>
             </div>
             <div class="component-title-row">
@@ -214,7 +214,11 @@
         >
           <!-- License-only banner notice -->
           <div v-if="activeConfig.computeType === 'none'" class="license-only-notice">
-            <span class="notice-icon">📦</span>
+            <span class="notice-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </span>
             <div class="notice-text">
               <span class="notice-title">Mode Lisensi / Add-on Saja (Tanpa Server Baru)</span>
               <span class="notice-desc">Komponen ini dihitung dari jumlah unit/node lisensi tanpa tambahan biaya server vCPU, RAM, atau Storage baru.</span>
@@ -300,7 +304,7 @@
                   @click="activeConfig.nodeCount = cnt"
                 >
                   <span>{{ cnt }} {{ activeConfig.computeType === 'none' ? 'Unit' : 'Server' }}</span>
-                  <span v-if="recommendedNodeCount === cnt" class="chip-star" title="Standar EA">★</span>
+                  <span v-if="recommendedNodeCount === cnt" class="chip-star" title="Standar EA">Std</span>
                 </button>
               </div>
               <div class="stepper-wrap-contained">
@@ -331,7 +335,11 @@
         >
           <!-- Notice if computeType === 'none' -->
           <div v-if="activeConfig.computeType === 'none'" class="license-only-notice">
-            <span class="notice-icon">💾</span>
+            <span class="notice-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+              </svg>
+            </span>
             <div class="notice-text">
               <span class="notice-title">Tidak Memerlukan Disk Storage / Backup Tambahan</span>
               <span class="notice-desc">Komponen berjenis lisensi / add-on menumpang pada server yang sudah ada, sehingga kapasitas disk diatur 0 GB (Biaya Storage &amp; Backup: Rp 0).</span>
@@ -365,7 +373,7 @@
                     @click="activeConfig.storageGBPerNode = gb"
                   >
                     <span>{{ gb >= 1000 ? `${gb / 1000} TB` : `${gb} GB` }}</span>
-                    <span v-if="recommendedStorageGB === gb" class="chip-star" title="Standar EA">★</span>
+                    <span v-if="recommendedStorageGB === gb" class="chip-star" title="Standar EA">Std</span>
                   </button>
                 </div>
                 <div class="stepper-wrap-contained">
@@ -402,7 +410,7 @@
                       title: 'Standar Andal',
                       technicalLabel: 'SAN Tier 2 (Rp 33rb/GB)',
                       description: 'Kecepatan standar enterprise untuk web server, container worker, cache, dan log.',
-                      icon: '💾',
+                      icon: 'storage',
                       recommended: recommendedStorageClass === 'Tier 2'
                     },
                     {
@@ -410,7 +418,7 @@
                       title: 'Ultra Cepat (Database)',
                       technicalLabel: 'SAN Tier 3 ASM (Rp 48rb/GB)',
                       description: 'Penyimpanan performa tinggi khusus database transaksi utama (Oracle ASM).',
-                      icon: '⚡',
+                      icon: 'database',
                       badge: 'High IOPS',
                       badgeType: 'warning',
                       recommended: recommendedStorageClass === 'Tier 3'
@@ -444,7 +452,7 @@
                       </span>
                     </div>
                     <span :class="['backup-status-pill', activeConfig.backupEnabled ? 'on' : 'off']">
-                      {{ activeConfig.backupEnabled ? '✓ Aktif' : 'Nonaktif' }}
+                      {{ activeConfig.backupEnabled ? 'Aktif' : 'Nonaktif' }}
                     </span>
                   </div>
                   <span class="backup-desc">
@@ -479,7 +487,7 @@
                 title: 'Virtual Machine (VM)',
                 technicalLabel: 'Server Virtual Fleksibel',
                 description: 'Server virtual yang hemat biaya dan mudah diatur ukurannya. Cocok untuk sebagian besar aplikasi.',
-                icon: '🖥️',
+                icon: 'server',
                 recommended: recommendedComputeType === 'vm'
               },
               {
@@ -487,7 +495,7 @@
                 title: 'Server Fisik Khusus',
                 technicalLabel: 'Baremetal Dedicated',
                 description: 'Satu mesin server fisik penuh tanpa dibagi dengan aplikasi lain. Performa paling tinggi.',
-                icon: '🏢',
+                icon: 'baremetal',
                 badge: 'Dedicated',
                 badgeType: 'warning',
                 recommended: recommendedComputeType === 'baremetal'
@@ -519,7 +527,12 @@
             >
               <div class="lic-card-hdr">
                 <div class="lic-card-hdr-left">
-                  <span class="lic-icon">🌱</span>
+                  <span class="lic-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="16 18 22 12 16 6"></polyline>
+                      <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                  </span>
                   <div class="lic-hdr-titles">
                     <span class="lic-name">Community / Open Source (Gratis)</span>
                     <span class="lic-price-tag">Biaya Lisensi: Rp 0 / tahun</span>
@@ -543,10 +556,16 @@
             >
               <div class="lic-card-hdr">
                 <div class="lic-card-hdr-left">
-                  <span class="lic-icon">🏢</span>
+                  <span class="lic-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                      <line x1="9" y1="22" x2="9" y2="22.01"></line>
+                      <line x1="15" y1="22" x2="15" y2="22.01"></line>
+                    </svg>
+                  </span>
                   <div class="lic-hdr-titles">
                     <span class="lic-name">Enterprise / Berlisensi Resmi</span>
-                    <span class="lic-price-tag font-emerald">✓ Garansi Support Vendor 24/7</span>
+                    <span class="lic-price-tag font-emerald">Garansi Support Vendor 24/7</span>
                   </div>
                 </div>
                 <span class="lic-radio-indicator emerald" :class="{ checked: activeConfig.licenseKind === 'enterprise' }">
@@ -733,7 +752,12 @@
               <p class="modal-subtitle">Pilih produk software, agent monitoring, atau add-on dari master katalog untuk dimasukkan ke lembar Sizing</p>
             </div>
           </div>
-          <button type="button" class="modal-btn-close" @click="showCatalogModal = false" title="Tutup">✕</button>
+          <button type="button" class="modal-btn-close" @click="showCatalogModal = false" title="Tutup">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <!-- Search & Filter Controls -->
@@ -755,7 +779,10 @@
               class="modal-search-clear"
               @click="catalogModalSearch = ''"
             >
-              ✕
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -799,7 +826,12 @@
         <!-- Catalog List Container -->
         <div class="modal-items-scroll">
           <div v-if="filteredModalCatalogItems.length === 0" class="empty-catalog-state">
-            <span class="empty-icon">{{ catalogModalFilter === 'unmapped' ? '🎉' : '🔍' }}</span>
+            <span class="empty-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </span>
             <p class="empty-text">
               <template v-if="catalogModalFilter === 'unmapped'">
                 <strong>Semua komponen katalog sudah terpetakan di Sizing.</strong><br>
@@ -851,13 +883,13 @@
                 <span class="category-pill" :class="cat.category">{{ getCategoryLabel(cat) }}</span>
                 <span class="env-pill" :class="cat.environment === 'Production' ? 'env-prod' : 'env-dev'">{{ cat.environment }}</span>
                 <span v-if="getCatalogItemSizingInfo(cat).isAlreadyInSizing" class="status-pill installed">
-                  ✓ Terpasang di {{ getCatalogItemSizingInfo(cat).matchedLayerText }}
+                  Terpasang di {{ getCatalogItemSizingInfo(cat).matchedLayerText }}
                 </span>
                 <span v-else-if="getCatalogItemSizingInfo(cat).isRawInfra" class="status-pill infra">
-                  ⚙️ Tarif Dasar Mesin &amp; Storage
+                  Tarif Dasar Mesin &amp; Storage
                 </span>
                 <span v-else class="status-pill ready">
-                  ⚡ Siap Dimasukkan
+                  Siap Dimasukkan
                 </span>
               </div>
 
@@ -3075,39 +3107,39 @@ const step4Summary = computed(() => {
 }
 
 .card-icon-avatar.theme-apm {
-  background: #EEF2FF;
-  color: #4F46E5;
-  border: 1px solid #C7D2FE;
+  background: var(--pill-neutral-bg, #ebedee);
+  color: var(--accent-teal, #1b6c80);
+  border: 1px solid var(--border, #e2e7eb);
 }
 
 .card-icon-avatar.theme-database {
-  background: #ECFDF5;
-  color: #059669;
-  border: 1px solid #A7F3D0;
+  background: var(--pill-positive-bg, #dcfae5);
+  color: var(--positive, #1e7b4f);
+  border: 1px solid rgba(30, 123, 79, 0.2);
 }
 
 .card-icon-avatar.theme-security {
-  background: #FEF2F2;
-  color: #DC2626;
-  border: 1px solid #FECACA;
+  background: var(--pill-negative-bg, #ffedea);
+  color: var(--negative, #c4242a);
+  border: 1px solid rgba(196, 36, 42, 0.2);
 }
 
 .card-icon-avatar.theme-backup {
-  background: #FAF5FF;
-  color: #7C3AED;
-  border: 1px solid #E9D5FF;
+  background: var(--pill-warning-bg, #fffbeb);
+  color: var(--warning, #92400e);
+  border: 1px solid rgba(146, 64, 14, 0.2);
 }
 
 .card-icon-avatar.theme-license {
-  background: #F0FDF4;
-  color: #16A34A;
-  border: 1px solid #BBF7D0;
+  background: var(--pill-positive-bg, #dcfae5);
+  color: var(--positive, #1e7b4f);
+  border: 1px solid rgba(30, 123, 79, 0.2);
 }
 
 .card-icon-avatar.theme-infra {
-  background: #F1F5F9;
-  color: #475569;
-  border: 1px solid #CBD5E1;
+  background: var(--raised, #eef2f5);
+  color: var(--muted, #5d6165);
+  border: 1px solid var(--border, #e2e7eb);
 }
 
 /* Card Body */

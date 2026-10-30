@@ -203,7 +203,10 @@
             class="search-clear-btn"
             @click="$emit('update:search', '')"
           >
-            ✕
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
 
@@ -252,7 +255,12 @@
             <tr v-if="items.length === 0">
               <td colspan="10" class="empty-table-cell">
                 <div class="empty-table-state">
-                  <span class="empty-icon">🔍</span>
+                  <span class="empty-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </span>
                   <p>Tidak ada item harga yang sesuai dengan filter atau pencarian.</p>
                   <button
                     type="button"
@@ -296,10 +304,10 @@
               </td>
               <td class="text-center">
                 <span v-if="item.is_confirmed" class="status-badge-confirmed" title="Harga resmi terkonfirmasi">
-                  ✓ Resmi
+                  Resmi
                 </span>
                 <span v-else class="status-badge-pending" title="Estimasi harga belum dikonfirmasi STA">
-                  ⚠ Pending STA
+                  Pending STA
                 </span>
               </td>
               <td class="source-cell text-slate-500">
@@ -998,8 +1006,8 @@ onUnmounted(() => {
 }
 
 .category-pill.baremetal {
-  background: #EDE9FE;
-  color: #6D28D9;
+  background: var(--pill-neutral-bg, #ebedee);
+  color: var(--accent-teal, #1b6c80);
 }
 
 .category-pill.license {

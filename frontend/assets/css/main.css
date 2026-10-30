@@ -1,34 +1,73 @@
 /* ─────────────────────────────────────────────
-   Clean & Simple Executive Theme — Enterprise Architecture
+   Framed-Sheet Theme — Enterprise Architecture & Sizing Hub
    ───────────────────────────────────────────── */
 :root {
-  --bg: #f8fafc;
-  --bg2: #ffffff;
-  --bg3: #f1f5f9;
+  --ground: #f4f7f9;
   --surface: #ffffff;
-  --surface2: #f8fafc;
-  --border: #e2e8f0;
-  --border2: #cbd5e1;
-  --text: #0f172a;
-  --text2: #334155;
-  --text3: #64748b;
+  --raised: #eef2f5;
+  --active: #e3e8ec;
+  --border: #e2e7eb;
+  --border2: #d1d6db;
+  --rule: #edf1f4;
+  --control: #cbcfd3;
+  --text: #131416;
+  --text2: #383c40;
+  --text3: #6b7075;
+  --muted: #5d6165;
+  --accent: #003b73;
+  --accent-teal: #1b6c80;
+  --positive: #1e7b4f;
+  --negative: #c4242a;
+  --warning: #92400e;
+  --chart-1: #003b73;
+  --chart-2: #1b6c80;
+  --chart-3: #a86f0c;
 
-  --navy: #0f2b48;
+  --pill-positive-bg: #dcfae5;
+  --pill-positive-ink: #04250e;
+  --pill-negative-bg: #ffedea;
+  --pill-negative-ink: #831c1e;
+  --pill-warning-bg: #fffbeb;
+  --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #ebedee;
+  --pill-neutral-ink: #353736;
+
+  --radius-sm: 4px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-sheet: 16px;
+  --sheet-inset: 8px;
+
+  --row-height: 48px;
+  --sidebar-w: 228px;
+  --sidebar-width: 228px;
+  --gap: 24px;
+  --pad: 24px;
+  --control-height: 32px;
+
+  --fs-title: 22px;
+  --fs-section: 16px;
+  --fs-kpi: 28px;
+  --fs-body: 14px;
+  --fs-small: 12px;
+
+  /* Aliases for backwards compatibility */
+  --bg: var(--ground);
+  --bg2: var(--surface);
+  --bg3: var(--raised);
+  --surface2: var(--raised);
+  --navy: #003b73;
   --brand-blue: #003b73;
-  --blue: #2563eb;
-  --blue-soft: #eff6ff;
-  --green: #16a34a;
-  --green-soft: #f0fdf4;
-  --amber: #d97706;
+  --blue: #1b6c80;
+  --blue-soft: #f0f7f9;
+  --green: #1e7b4f;
+  --green-soft: #dcfae5;
+  --amber: #a86f0c;
   --amber-soft: #fffbeb;
-
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 12px;
-
-  --sidebar-w: 260px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --radius: var(--radius-card);
+  --radius-lg: var(--radius-sheet);
+  --shadow-sm: none;
+  --shadow-md: none;
 }
 
 /* ── Reset ── */
@@ -46,12 +85,20 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: var(--ground);
   color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100dvh;
   overflow-x: hidden;
+}
+
+table, .tabular, .mono-nums, [data-num] {
+  font-variant-numeric: tabular-nums;
+}
+
+code, kbd, samp, pre, .font-mono {
+  font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 a {

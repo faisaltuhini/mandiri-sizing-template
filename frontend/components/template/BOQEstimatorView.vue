@@ -189,7 +189,7 @@ onMounted(() => {
 }
 
 .boq-header {
-  background: linear-gradient(135deg, #002060 0%, #001233 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 24px 28px;
   border-radius: 12px;
@@ -282,7 +282,7 @@ onMounted(() => {
 }
 
 .cost-card.card-total {
-  background: linear-gradient(135deg, #002060 0%, #003399 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   border-color: #ffc000;
 }

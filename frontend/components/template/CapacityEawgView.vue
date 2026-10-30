@@ -3,7 +3,7 @@
     <!-- Preset & Mode Toolbar -->
     <div class="eawg-toolbar">
       <div class="toolbar-left">
-        <span class="doc-badge">🏛️ Enterprise Architecture EAWG Standard Format</span>
+        <span class="doc-badge"> Enterprise Architecture EAWG Standard Format</span>
         <h3 class="doc-title-mini">Bab 10. Business Capacity Plan Deliverable</h3>
       </div>
 
@@ -33,7 +33,7 @@
             @click="isEditMode = !isEditMode"
             :title="isEditMode ? 'Kunci tampilan (Read-Only Preview)' : 'Buka input untuk ubah angka'"
           >
-            {{ isEditMode ? '🔒 Selesai Edit' : '✏️ Mode Edit & Adjust' }}
+            {{ isEditMode ? ' Selesai Edit' : '️ Mode Edit & Adjust' }}
           </button>
           <button
             type="button"
@@ -41,7 +41,7 @@
             @click="showGrafanaModal = true"
             title="Tarik metrik utilisasi realtime dari Grafana API"
           >
-            📡 Grafana API Sync
+             Grafana API Sync
           </button>
           <button
             type="button"
@@ -49,7 +49,7 @@
             @click="showGrafanaCols = !showGrafanaCols"
             title="Tampilkan / Sembunyikan kolom utilisasi Grafana di tabel"
           >
-            📊 Kolom Utilisasi
+             Kolom Utilisasi
           </button>
         </div>
       </div>
@@ -59,7 +59,7 @@
     <div v-if="isGrafanaSynced" class="grafana-live-banner">
       <div class="banner-left">
         <span class="pulse-dot"></span>
-        <span class="banner-title">📡 Terhubung ke Grafana API Monitoring:</span>
+        <span class="banner-title"> Terhubung ke Grafana API Monitoring:</span>
         <span class="banner-meta">Span: <strong>{{ lastSyncMeta.timeSpanLabel }}</strong></span>
         <span class="banner-meta">Agregasi: <strong>{{ lastSyncMeta.aggregation.toUpperCase() }}</strong></span>
         <span class="banner-meta">Host Tersinkron: <strong>{{ activeData.hostSizing.length }} Node</strong></span>
@@ -67,7 +67,7 @@
       <div class="banner-right">
         <span class="banner-time">Terakhir update: {{ lastSyncTimeFormatted }}</span>
         <button type="button" class="btn-resync" @click="executeGrafanaSync">
-          🔄 Sync Ulang
+           Sync Ulang
         </button>
       </div>
     </div>
@@ -76,7 +76,7 @@
     <div v-if="showGrafanaCols || isGrafanaSynced" class="grafana-assistant-card">
       <div class="grafana-header">
         <div class="grafana-title-wrap">
-          <span class="grafana-icon">📈</span>
+          <span class="grafana-icon"></span>
           <div>
             <h4>Grafana & APM Monitoring Sizing Assistant</h4>
             <p>
@@ -115,7 +115,7 @@
               class="grafana-apply-btn"
               @click="applyGrafanaExtrapolationAll"
             >
-              ⚡ Auto-Scale Y2 & Y3 dari Grafana
+               Auto-Scale Y2 & Y3 dari Grafana
             </button>
           </div>
         </div>
@@ -128,7 +128,7 @@
       <div class="doc-section-header">
         <div class="section-title-wrap">
           <h2 class="section-num">10. Business Capacity Plan</h2>
-          <span v-if="isEditMode" class="edit-badge">✏️ Mode Edit Aktif — Klik angka / teks untuk mengubah</span>
+          <span v-if="isEditMode" class="edit-badge">️ Mode Edit Aktif — Klik angka / teks untuk mengubah</span>
         </div>
         <p class="section-intro">
           Detail capacity plan berdasarkan proyeksi bisnis tertera pada EAWG, Asumsi bisnis terkait
@@ -147,7 +147,7 @@
               + Tambah Baris Metrik
             </button>
             <button type="button" class="mini-btn copy-btn" @click="copyBusinessTable">
-              📋 Salin Tabel Bisnis
+               Salin Tabel Bisnis
             </button>
           </div>
         </div>
@@ -256,7 +256,7 @@
                       title="Hitung otomatis 2026-2029 dari 2025 & % Growth"
                       @click="autoProjectRow(idx)"
                     >
-                      ⚡
+                      
                     </button>
                   </div>
                 </td>
@@ -269,7 +269,7 @@
                     title="Hapus baris"
                     @click="deleteBusinessRow(idx)"
                   >
-                    🗑️
+                    ️
                   </button>
                 </td>
               </tr>
@@ -292,7 +292,7 @@
               + Tambah Host / VM
             </button>
             <button type="button" class="mini-btn copy-btn" @click="copyHostTable">
-              📋 Salin Tabel Sizing
+               Salin Tabel Sizing
             </button>
           </div>
         </div>
@@ -309,7 +309,7 @@
 
                 <!-- Optional Grafana Header -->
                 <th v-if="showGrafanaCols || isGrafanaSynced" colspan="3" class="th-grafana">
-                  📊 Grafana Util ({{ lastSyncMeta.timeSpanLabel }})
+                   Grafana Util ({{ lastSyncMeta.timeSpanLabel }})
                 </th>
 
                 <th colspan="3" class="th-year y1-header">Year 1</th>
@@ -505,7 +505,7 @@
                     title="Hapus baris host"
                     @click="deleteHostRow(hIdx)"
                   >
-                    🗑️
+                    ️
                   </button>
                 </td>
               </tr>
@@ -538,17 +538,17 @@
       <!-- Action Footer -->
       <div class="eawg-doc-actions">
         <div class="action-desc">
-          <span>📄 Format resmi Bab 10 ini siap disalin ke Dokumen ASDF atau Slide Review EAWG / DRB.</span>
+          <span> Format resmi Bab 10 ini siap disalin ke Dokumen ASDF atau Slide Review EAWG / DRB.</span>
         </div>
         <div class="action-buttons">
           <button type="button" class="btn-reset" @click="resetToDefault">
-            🔄 Reset ke Default Preset
+             Reset ke Default Preset
           </button>
           <button type="button" class="btn-export-json" @click="downloadEawgJson">
-            💾 Unduh JSON Spesifikasi
+             Unduh JSON Spesifikasi
           </button>
           <button type="button" class="btn-copy-full" @click="copyFullAsdfDoc">
-            📋 Salin Seluruh Format Bab 10 (Word / Markdown)
+             Salin Seluruh Format Bab 10 (Word / Markdown)
           </button>
         </div>
       </div>
@@ -559,13 +559,13 @@
       <div class="modal-card">
         <div class="modal-header">
           <div class="modal-title-wrap">
-            <span class="modal-icon">📡</span>
+            <span class="modal-icon"></span>
             <div>
               <h3>Grafana API Real-Time Synchronization</h3>
               <p>Tarik data metrik CPU & RAM riil per host dari Grafana</p>
             </div>
           </div>
-          <button type="button" class="close-btn" @click="showGrafanaModal = false">✕</button>
+          <button type="button" class="close-btn" @click="showGrafanaModal = false">x</button>
         </div>
 
         <div class="modal-body">
@@ -643,8 +643,8 @@
             :disabled="isSyncing"
             @click="executeGrafanaSync"
           >
-            <span v-if="isSyncing">⏳ Menghubungkan & Menarik Metrik...</span>
-            <span v-else>🚀 Tarik Data Realtime Sekarang</span>
+            <span v-if="isSyncing"> Menghubungkan & Menarik Metrik...</span>
+            <span v-else> Tarik Data Realtime Sekarang</span>
           </button>
         </div>
       </div>
@@ -712,7 +712,7 @@ function selectPreset(id: string) {
   const target = eawgPresets.find(p => p.id === id)
   if (target) {
     Object.assign(activeData, JSON.parse(JSON.stringify(target)))
-    showToast(`📋 Memuat format EAWG ${target.name}`, 'info')
+    showToast(` Memuat format EAWG ${target.name}`, 'info')
   }
 }
 
@@ -721,7 +721,7 @@ function resetToDefault() {
   if (target) {
     Object.assign(activeData, JSON.parse(JSON.stringify(target)))
     isGrafanaSynced.value = false
-    showToast(`🔄 Data preset ${target.name} dikembalikan ke default`, 'success')
+    showToast(` Data preset ${target.name} dikembalikan ke default`, 'success')
   }
 }
 
@@ -733,14 +733,14 @@ function isNewChannel(idx: number): boolean {
 
 function getUsageIcon(usage: string): string {
   const u = usage.toLowerCase()
-  if (u.includes('web')) return '🌐'
-  if (u.includes('master')) return '👑'
-  if (u.includes('infra') || u.includes('router')) return '🔀'
-  if (u.includes('worker')) return '⚙️'
-  if (u.includes('redis')) return '⚡'
-  if (u.includes('nfs')) return '📁'
-  if (u.includes('oracle') || u.includes('postgres') || u.includes('db')) return '🗄️'
-  return '🖥️'
+  if (u.includes('web')) return ''
+  if (u.includes('master')) return ''
+  if (u.includes('infra') || u.includes('router')) return ''
+  if (u.includes('worker')) return ''
+  if (u.includes('redis')) return ''
+  if (u.includes('nfs')) return ''
+  if (u.includes('oracle') || u.includes('postgres') || u.includes('db')) return ''
+  return '️'
 }
 
 function getRowCategoryClass(usage: string): string {
@@ -756,9 +756,9 @@ function getUtilStatus(cpu?: number, ram?: number) {
   const c = cpu || 0
   const r = ram || 0
 
-  if (c >= 70 || r >= 85) return { label: '🔴 Critical', class: 'status-red' }
-  if (c >= 45 || r >= 70) return { label: '🟡 Warning', class: 'status-yellow' }
-  return { label: '🟢 Normal', class: 'status-green' }
+  if (c >= 70 || r >= 85) return { label: ' Critical', class: 'status-red' }
+  if (c >= 45 || r >= 70) return { label: ' Warning', class: 'status-yellow' }
+  return { label: ' Normal', class: 'status-green' }
 }
 
 // Execute Grafana API Sync
@@ -812,10 +812,10 @@ async function executeGrafanaSync() {
       // Auto scale Year 2 and Year 3
       applyGrafanaExtrapolationAll(false)
 
-      showToast(`📡 Berhasil sinkronisasi ${activeData.hostSizing.length} host dari Grafana API (Span: ${res.timeSpanLabel})!`, 'success')
+      showToast(` Berhasil sinkronisasi ${activeData.hostSizing.length} host dari Grafana API (Span: ${res.timeSpanLabel})!`, 'success')
     }
   } catch (err: any) {
-    showToast(`⚠️ Gagal sinkronisasi Grafana: ${err.message}`, 'error')
+    showToast(` Gagal sinkronisasi Grafana: ${err.message}`, 'error')
   } finally {
     isSyncing.value = false
   }
@@ -831,7 +831,7 @@ function autoProjectRow(idx: number) {
   row.y2027 = Math.round(base * Math.pow(1 + g, 2))
   row.y2028 = Math.round(base * Math.pow(1 + g, 3))
   row.y2029 = Math.round(base * Math.pow(1 + g, 4))
-  showToast(`⚡ Proyeksi tahun 2026–2029 berhasil dihitung (${row.growthPercent}% CAGR)!`, 'info')
+  showToast(` Proyeksi tahun 2026–2029 berhasil dihitung (${row.growthPercent}% CAGR)!`, 'info')
 }
 
 // Apply Grafana sizing extrapolation across all host rows
@@ -863,7 +863,7 @@ function applyGrafanaExtrapolationAll(notify = true) {
   }
 
   if (notify) {
-    showToast(`⚡ Sizing Year 2 & 3 untuk ${updatedCount} host berhasil disesuaikan dengan utilisasi Grafana!`, 'success')
+    showToast(` Sizing Year 2 & 3 untuk ${updatedCount} host berhasil disesuaikan dengan utilisasi Grafana!`, 'success')
   }
 }
 
@@ -879,12 +879,12 @@ function addBusinessRow() {
     y2029: 20736,
     growthPercent: 20,
   })
-  showToast('➕ Baris metrik bisnis ditambahkan', 'info')
+  showToast(' Baris metrik bisnis ditambahkan', 'info')
 }
 
 function deleteBusinessRow(idx: number) {
   activeData.businessMetrics.splice(idx, 1)
-  showToast('🗑️ Baris metrik bisnis dihapus', 'info')
+  showToast('️ Baris metrik bisnis dihapus', 'info')
 }
 
 function addHostRow() {
@@ -901,12 +901,12 @@ function addHostRow() {
     y2: { cpu: 12, memory: 24, disk: 120 },
     y3: { cpu: 16, memory: 32, disk: 150 },
   })
-  showToast('➕ Baris Host / VM ditambahkan', 'info')
+  showToast(' Baris Host / VM ditambahkan', 'info')
 }
 
 function deleteHostRow(idx: number) {
   activeData.hostSizing.splice(idx, 1)
-  showToast('🗑️ Baris host dihapus', 'info')
+  showToast('️ Baris host dihapus', 'info')
 }
 
 // Totals calculation
@@ -942,7 +942,7 @@ function copyBusinessTable() {
   }
 
   navigator.clipboard.writeText(text)
-  showToast('✅ Tabel 10.1 Proyeksi Bisnis berhasil disalin ke clipboard!', 'success')
+  showToast(' Tabel 10.1 Proyeksi Bisnis berhasil disalin ke clipboard!', 'success')
 }
 
 function copyHostTable() {
@@ -953,7 +953,7 @@ function copyHostTable() {
   }
 
   navigator.clipboard.writeText(text)
-  showToast('✅ Tabel 10.2 Sizing Host berhasil disalin ke clipboard!', 'success')
+  showToast(' Tabel 10.2 Sizing Host berhasil disalin ke clipboard!', 'success')
 }
 
 function copyFullAsdfDoc() {
@@ -979,7 +979,7 @@ function copyFullAsdfDoc() {
   doc += `| **TOTAL** | - | - | - | **${formatNumber(totals.value.y1.cpu)}** | **${formatNumber(totals.value.y1.memory)}** | **${formatNumber(totals.value.y1.disk)}** | **${formatNumber(totals.value.y2.cpu)}** | **${formatNumber(totals.value.y2.memory)}** | **${formatNumber(totals.value.y2.disk)}** | **${formatNumber(totals.value.y3.cpu)}** | **${formatNumber(totals.value.y3.memory)}** | **${formatNumber(totals.value.y3.disk)}** |\n`
 
   navigator.clipboard.writeText(doc)
-  showToast('📋 Format Lengkap Bab 10 ASDF berhasil disalin ke clipboard!', 'success')
+  showToast(' Format Lengkap Bab 10 ASDF berhasil disalin ke clipboard!', 'success')
 }
 
 function downloadEawgJson() {
@@ -1000,7 +1000,7 @@ function downloadEawgJson() {
   downloadAnchor.click()
   downloadAnchor.remove()
 
-  showToast('💾 Berkas JSON Spesifikasi EAWG berhasil diunduh!', 'success')
+  showToast(' Berkas JSON Spesifikasi EAWG berhasil diunduh!', 'success')
 }
 </script>
 
@@ -1012,7 +1012,7 @@ function downloadEawgJson() {
 }
 
 .eawg-toolbar {
-  background: linear-gradient(135deg, #0f2b48 0%, #003b73 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 16px 24px;
   border-radius: var(--radius-lg);
@@ -1140,7 +1140,7 @@ function downloadEawgJson() {
 
 /* Live Banner */
 .grafana-live-banner {
-  background: linear-gradient(90deg, #1e3a8a 0%, #1e40af 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 10px 18px;
   border-radius: var(--radius);
@@ -1968,7 +1968,7 @@ function downloadEawgJson() {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #0f2b48 0%, #003b73 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 20px 24px;
   display: flex;

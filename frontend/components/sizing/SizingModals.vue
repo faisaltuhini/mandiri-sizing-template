@@ -20,7 +20,12 @@
               <p class="modal-hdr-sub">Master tarif infrastruktur &amp; lisensi resmi Enterprise Architecture</p>
             </div>
           </div>
-          <button type="button" class="modal-close" @click="$emit('close-pricing-modal')">✕</button>
+          <button type="button" class="modal-close" @click="$emit('close-pricing-modal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <form @submit.prevent="$emit('save-pricing')" class="modal-content form-grid">
@@ -95,7 +100,7 @@
               <span class="chk-text">Harga Resmi Terkonfirmasi oleh Tim STA / Procurement Enterprise Architecture</span>
             </label>
             <span v-if="!pricingForm.is_confirmed" class="sta-warn-hint">
-              ⚠ Jika belum dikonfirmasi, harga akan disimpan sebagai pending dan muncul sebagai peringatan resmi pada Sizing BOQ.
+              Jika belum dikonfirmasi, harga akan disimpan sebagai pending dan muncul sebagai peringatan resmi pada Sizing BOQ.
             </span>
           </div>
 
@@ -155,7 +160,12 @@
             </svg>
             <h3>Konfirmasi Hapus Item Katalog</h3>
           </div>
-          <button type="button" class="modal-close" @click="$emit('close-delete-modal')">✕</button>
+          <button type="button" class="modal-close" @click="$emit('close-delete-modal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <div class="modal-content">
@@ -197,7 +207,12 @@
             </svg>
             <h3>Upload Data Sizing / Telemetri</h3>
           </div>
-          <button type="button" class="modal-close" @click="$emit('close-upload-modal')">✕</button>
+          <button type="button" class="modal-close" @click="$emit('close-upload-modal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <div class="modal-content">
@@ -217,7 +232,11 @@
               accept=".xlsx,.csv,.xls"
               @change="$emit('file-change', $event)"
             />
-            <div class="drop-icon">📁</div>
+            <div class="drop-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
             <div class="drop-text">
               <strong>Klik untuk memilih berkas</strong> atau seret file ke sini
             </div>
@@ -233,7 +252,11 @@
           </div>
 
           <div v-if="uploadedFileName" class="uploaded-status">
-            <span class="check-icon">✓</span> Berkas terpilih: <strong>{{ uploadedFileName }}</strong>
+            <span class="check-icon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span> Berkas terpilih: <strong>{{ uploadedFileName }}</strong>
           </div>
         </div>
 
@@ -263,7 +286,12 @@
               <p class="modal-hdr-sub">Rekapitulasi 13 Layer Arsitektur &amp; Proyeksi Biaya Resmi Enterprise Architecture</p>
             </div>
           </div>
-          <button type="button" class="modal-close" @click="$emit('close-generate-modal')">✕</button>
+          <button type="button" class="modal-close" @click="$emit('close-generate-modal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
 
         <div class="modal-content modal-content-boq">

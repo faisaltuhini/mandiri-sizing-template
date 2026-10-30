@@ -18,21 +18,21 @@
             class="hero-btn primary-btn"
             @click="openLocal('template/SOLARWIND', 'finder')"
           >
-            📂 Buka Folder SOLARWIND di Finder
+             Buka Folder SOLARWIND di Finder
           </button>
           <button
             type="button"
             class="hero-btn secondary-btn"
             @click="openLocal('template/SOLARWIND/raw_cpu_usage_DB_node_1.csv', 'antigravity')"
           >
-            📄 Buka Raw CSV di AGY
+             Buka Raw CSV di AGY
           </button>
           <button
             type="button"
             class="hero-btn ghost-btn"
             @click="refreshData"
           >
-            🔄 Refresh Data Ingestion
+             Refresh Data Ingestion
           </button>
         </div>
       </div>
@@ -55,17 +55,17 @@
 
     <!-- Loading / Error States -->
     <div v-if="pending" class="state-card loading">
-      ⏳ Sedang membaca dan mem-parsing data SolarWinds CSV...
+       Sedang membaca dan mem-parsing data SolarWinds CSV...
     </div>
     <div v-else-if="error" class="state-card error">
-      ⚠️ Gagal memuat data SolarWinds: {{ error.message }}
+       Gagal memuat data SolarWinds: {{ error.message }}
     </div>
 
     <div v-else-if="activeNodeData" class="dashboard-body">
       <!-- Node Selector & Cluster Simulator Controls -->
       <div class="control-panel">
         <div class="panel-left">
-          <span class="panel-label">🖥️ Mode Tampilan Arsitektur:</span>
+          <span class="panel-label">️ Mode Tampilan Arsitektur:</span>
           <div class="node-toggle-group">
             <button
               v-for="node in (data?.nodes || [])"
@@ -74,14 +74,14 @@
               :class="['node-btn', { active: selectedNodeMode === node.nodeId }]"
               @click="selectedNodeMode = node.nodeId"
             >
-              🟢 {{ node.nodeName }} (Node 1)
+               {{ node.nodeName }} (Node 1)
             </button>
             <button
               type="button"
               :class="['node-btn cluster-btn', { active: selectedNodeMode === 'cluster_sim' }]"
               @click="selectedNodeMode = 'cluster_sim'"
             >
-              ⚡ Multi-Node Cluster Aggregation & Simulation (2-Node RAC)
+               Multi-Node Cluster Aggregation & Simulation (2-Node RAC)
             </button>
           </div>
         </div>
@@ -99,10 +99,10 @@
       <div class="spec-adjuster-card">
         <div class="adjuster-header" @click="showConfig = !showConfig">
           <div class="adjuster-title">
-            <span>⚙️ Parameter Baseline Hardware DB & Ambang Batas Utilisasi</span>
+            <span> Parameter Baseline Hardware DB & Ambang Batas Utilisasi</span>
             <span class="adjuster-note">(Klik untuk menyesuaikan spek server fisik/VM)</span>
           </div>
-          <button type="button" class="toggle-icon-btn">{{ showConfig ? '▲ Tutup' : '▼ Ubah Parameter' }}</button>
+          <button type="button" class="toggle-icon-btn">{{ showConfig ? ' Tutup' : ' Ubah Parameter' }}</button>
         </div>
 
         <div v-if="showConfig" class="adjuster-grid">
@@ -139,7 +139,7 @@
 
       <!-- Milestone Event Alert Banner: 5 August Memory Upgrade -->
       <div class="milestone-alert-banner">
-        <div class="milestone-icon">🚀</div>
+        <div class="milestone-icon"></div>
         <div class="milestone-content">
           <div class="milestone-header">
             <span class="milestone-title">Infrastruktur Milestone Terdeteksi: Penambahan Memory (RAM Upgrade) pada 5 Agustus 2026</span>
@@ -155,7 +155,7 @@
             </div>
             <div class="m-metric">
               <span class="m-lbl">Setelah 5 Agustus:</span>
-              <span class="m-val text-safe">46.8% ➔ 37.6% (Saat Ini)</span>
+              <span class="m-val text-safe">46.8%  37.6% (Saat Ini)</span>
             </div>
             <div class="m-metric">
               <span class="m-lbl">Total RAM Fisik:</span>
@@ -170,7 +170,7 @@
         <!-- Card 1: CPU Utilization -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-icon">💻</span>
+            <span class="kpi-icon"></span>
             <span :class="['kpi-status-badge', cpuHealthStatus.class]">{{ cpuHealthStatus.label }}</span>
           </div>
           <div class="kpi-main">
@@ -202,8 +202,8 @@
         <!-- Card 2: Memory Utilization -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-icon">🧠</span>
-            <span class="kpi-status-badge status-normal">🚀 50.831 GB Terverifikasi</span>
+            <span class="kpi-icon"></span>
+            <span class="kpi-status-badge status-normal"> 50.831 GB Terverifikasi</span>
           </div>
           <div class="kpi-main">
             <div class="kpi-value">{{ currentMemStats.currentPercent || 37.6 }}%</div>
@@ -231,7 +231,7 @@
         <!-- Card 3: Storage Growth & Oradata -->
         <div class="kpi-card">
           <div class="kpi-top">
-            <span class="kpi-icon">💾</span>
+            <span class="kpi-icon"></span>
             <span :class="['kpi-status-badge', oradataStorageStatus.class]">{{ oradataStorageStatus.label }}</span>
           </div>
           <div class="kpi-main">
@@ -260,7 +260,7 @@
         <!-- Card 4: N-1 Failover & Capacity Runway -->
         <div class="kpi-card highlight-card">
           <div class="kpi-top">
-            <span class="kpi-icon">🛡️</span>
+            <span class="kpi-icon"></span>
             <span class="kpi-status-badge status-normal">HA Passed</span>
           </div>
           <div class="kpi-main">
@@ -284,7 +284,7 @@
             </div>
           </div>
           <div class="kpi-bar-bg">
-            <div class="kpi-bar-fill" :style="{ width: '85%', backgroundColor: '#8b5cf6' }"></div>
+            <div class="kpi-bar-fill" :style="{ width: '85%', backgroundColor: '#1b6c80' }"></div>
           </div>
         </div>
       </div>
@@ -295,7 +295,7 @@
         <div class="detail-card">
           <div class="card-title-bar">
             <div class="bar-title">
-              <h3>🗄️ Rincian Utilisasi Mount-Point Storage (Data Eksisting vs Shared Cluster)</h3>
+              <h3> Rincian Utilisasi Mount-Point Storage (Data Eksisting vs Shared Cluster)</h3>
               <p>Pemisahan antara Shared Storage (diakses bersama cluster) dan Local Storage per-node</p>
             </div>
             <div class="storage-tag">
@@ -325,7 +325,7 @@
                   :class="{ 'shared-row': mount.isShared }"
                 >
                   <td class="font-bold">
-                    <span class="mount-icon">{{ mount.isShared ? '🌐' : '📁' }}</span>
+                    <span class="mount-icon">{{ mount.isShared ? '' : '' }}</span>
                     {{ mount.name }}
                   </td>
                   <td>
@@ -337,7 +337,7 @@
                   <td class="mono-num">{{ mount.usedStr || '-' }}</td>
                   <td class="font-bold">
                     {{ mount.currentPercent }}%
-                    <span v-if="mount.startPercent > mount.currentPercent" class="chip-expanded">🚀 Disk Expanded</span>
+                    <span v-if="mount.startPercent > mount.currentPercent" class="chip-expanded"> Disk Expanded</span>
                   </td>
                   <td>
                     <span :class="mount.startPercent > mount.currentPercent ? 'text-expanded' : mount.deltaPercent > 0 ? 'growth-pos' : 'growth-zero'">
@@ -357,7 +357,7 @@
                   </td>
                   <td>
                     <span :class="['status-chip', `chip-${mount.status}`]">
-                      {{ mount.status === 'critical' ? '🔴 Kritis (>85%)' : mount.status === 'warning' ? '🟡 Waspada (>75%)' : '🟢 Aman' }}
+                      {{ mount.status === 'critical' ? ' Kritis (>85%)' : mount.status === 'warning' ? ' Waspada (>75%)' : ' Aman' }}
                     </span>
                   </td>
                 </tr>
@@ -370,7 +370,7 @@
         <div class="detail-card">
           <div class="card-title-bar">
             <div class="bar-title">
-              <h3>📊 Proyeksi Kebutuhan Database (Single Node) 5 Tahun (2025–2029)</h3>
+              <h3> Proyeksi Kebutuhan Database (Single Node) 5 Tahun (2025–2029)</h3>
               <p>Kalkulasi berbasis data aktual SolarWinds Node 1 (DOGDDSB1DBD21LP) dengan pertumbuhan bisnis $g = 15\%$ per tahun</p>
             </div>
             <button
@@ -378,7 +378,7 @@
               class="copy-btn"
               @click="copyCapPlanSummary"
             >
-              {{ copied ? '✅ Tersalin ke Clipboard' : '📋 Salin Ringkasan CapPlan' }}
+              {{ copied ? ' Tersalin ke Clipboard' : ' Salin Ringkasan CapPlan' }}
             </button>
           </div>
 
@@ -456,7 +456,7 @@
         <div class="detail-card audit-card">
           <div class="card-title-bar">
             <div class="bar-title">
-              <h3>🏛️ Audit Log Perubahan CPU, Memory & Storage dari Waktu ke Waktu (90 Hari)</h3>
+              <h3> Audit Log Perubahan CPU, Memory & Storage dari Waktu ke Waktu (90 Hari)</h3>
               <p>Kronologi riil perubahan beban transaksi, penambahan hardware RAM pada 5 Agustus, dan ekspansi storage /oradata</p>
             </div>
             <div class="audit-filters">
@@ -472,14 +472,14 @@
                 :class="['filter-chip', { active: auditFilter === 'upgrade' }]"
                 @click="auditFilter = 'upgrade'"
               >
-                🚀 Event Upgrade
+                 Event Upgrade
               </button>
               <button
                 type="button"
                 :class="['filter-chip', { active: auditFilter === 'spike' }]"
                 @click="auditFilter = 'spike'"
               >
-                🔥 Peak Load
+                 Peak Load
               </button>
             </div>
           </div>
@@ -567,7 +567,7 @@
         <div class="detail-card">
           <div class="card-title-bar">
             <div class="bar-title">
-              <h3>📈 Sampel Data Historis SolarWinds (CPU, RAM & Storage 90 Hari)</h3>
+              <h3> Sampel Data Historis SolarWinds (CPU, RAM & Storage 90 Hari)</h3>
               <p>Cuplikan 10 titik data sampling aktual dari file CSV SolarWinds PerfStack</p>
             </div>
             <span class="sample-badge">144 Data Points Loaded</span>
@@ -771,7 +771,7 @@ function copyCapPlanSummary() {
 }
 
 .solarwind-hero {
-  background: linear-gradient(135deg, #0b1e36 0%, #11355e 100%);
+  background: var(--surface, #ffffff);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #ffffff;
   padding: 28px 32px;
@@ -1037,7 +1037,7 @@ function copyCapPlanSummary() {
 
 /* Milestone Alert Banner */
 .milestone-alert-banner {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(16, 185, 129, 0.1) 100%);
+  background: var(--surface, #ffffff);
   border: 1.5px solid rgba(37, 99, 235, 0.35);
   border-radius: var(--radius);
   padding: 16px 20px;
@@ -1135,8 +1135,8 @@ function copyCapPlanSummary() {
 }
 
 .kpi-card.highlight-card {
-  border-color: #8b5cf6;
-  background: linear-gradient(180deg, var(--surface) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-color: #1b6c80;
+  background: var(--surface, #ffffff);
 }
 
 .kpi-top {
@@ -1523,7 +1523,7 @@ td {
 }
 
 .card-status-current {
-  border-left: 3px solid #8b5cf6;
+  border-left: 3px solid #1b6c80;
   background: rgba(139, 92, 246, 0.03);
 }
 

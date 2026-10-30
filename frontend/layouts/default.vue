@@ -10,10 +10,10 @@
 
 <style>
 .sizing-layout-root {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc;
-  color: #1e293b;
+  background-color: var(--ground, #f4f7f9);
+  color: var(--text, #131416);
 }
 </style>

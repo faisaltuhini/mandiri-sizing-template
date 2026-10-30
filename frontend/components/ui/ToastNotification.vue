@@ -6,7 +6,19 @@
     >
       <div class="toast-content">
         <span class="toast-icon">
-          {{ toastState.type === 'success' ? '✅' : toastState.type === 'error' ? '⚠️' : 'ℹ️' }}
+          <svg v-if="toastState.type === 'success'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <svg v-else-if="toastState.type === 'error'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
         </span>
         <span class="toast-message">{{ toastState.message }}</span>
       </div>
@@ -16,7 +28,7 @@
         class="toast-vscode-link"
         title="Paksa Buka di VS Code"
       >
-        💻 VS Code
+        <span>VS Code</span>
       </a>
     </div>
   </Transition>

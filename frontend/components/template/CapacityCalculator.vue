@@ -54,7 +54,7 @@
         <!-- Section 1: Business Growth & Peak TPS -->
         <div class="calc-card">
         <div class="card-header">
-          <span class="card-icon">📈</span>
+          <span class="card-icon"></span>
           <div>
             <h3>1. Proyeksi Transaksi & Peak TPS</h3>
             <p>Estimasi beban puncak di jam sibuk operasional</p>
@@ -117,7 +117,7 @@
       <!-- Section 2: Power-Law Extrapolation (PT Baseline) -->
       <div class="calc-card span-2">
         <div class="card-header">
-          <span class="card-icon">🧪</span>
+          <span class="card-icon"></span>
           <div>
             <h3>2. Baseline Uji Beban (PT) & Model Power-Law (a · TPSᵇ)</h3>
             <p>Input 2 titik data hasil stress test untuk menurunkan eksponen scaling non-linear</p>
@@ -223,7 +223,7 @@
             <span class="chip-val">{{ formatNumber(scalingB, { decimals: 4 }) }}</span>
             <span class="chip-desc">b = ln(C₂/C₁) / ln(TPS₂/TPS₁)</span>
             <span :class="['scaling-tag', scalingB > 1.1 ? 'warn' : 'good']">
-              {{ scalingB > 1.1 ? '⚠️ Non-linear Overhead' : '✅ Efficient Scaling' }}
+              {{ scalingB > 1.1 ? ' Non-linear Overhead' : ' Efficient Scaling' }}
             </span>
           </div>
 
@@ -244,7 +244,7 @@
       <!-- Section 3: OpenShift Worker Node & Container Sizing -->
       <div class="calc-card">
         <div class="card-header">
-          <span class="card-icon">☸️</span>
+          <span class="card-icon">️</span>
           <div>
             <h3>3. OpenShift Worker Node Sizing</h3>
             <p>Penentuan vCPU aman & jumlah fisik node</p>
@@ -305,7 +305,7 @@
       <!-- Section 4: Database Storage & Redis RAM Sizing -->
       <div class="calc-card">
         <div class="card-header">
-          <span class="card-icon">🗄️</span>
+          <span class="card-icon"></span>
           <div>
             <h3>4. Database & Redis Cache Sizing</h3>
             <p>Proyeksi storage 5 tahun & RAM Redis Enterprise</p>
@@ -365,7 +365,7 @@
       <!-- Section 5: 5-Year Executive Projection Table -->
       <div class="calc-card span-2">
         <div class="card-header">
-          <span class="card-icon">📊</span>
+          <span class="card-icon"></span>
           <div>
             <h3>5. Matriks Proyeksi Kapasitas 5 Tahun (2025–2029)</h3>
             <p>Tabel ekstrapolasi CAGR {{ params.growthRatePercent }}% per tahun untuk pengajuan EAWG & DAC</p>
@@ -407,18 +407,18 @@
     <!-- Footer Summary Actions -->
     <div class="calc-summary-bar">
       <div class="summary-info">
-        <span>📌 Target Peak Load: <strong>{{ formatNumber(peakTps, { maxDecimals: 1 }) }} TPS</strong></span>
-        <span>🖥️ OpenShift Workers: <strong>{{ formatNumber(workerNodeQty) }} Nodes ({{ formatNumber(requiredCores) }} vCPU)</strong></span>
-        <span>💾 Storage 5-Yr: <strong>{{ formatNumber(dbStorage5YearsGb, { maxDecimals: 0 }) }} GB</strong></span>
-        <span>⚡ Power-Law (b): <strong>{{ formatNumber(scalingB, { decimals: 4 }) }}</strong></span>
+        <span> Target Peak Load: <strong>{{ formatNumber(peakTps, { maxDecimals: 1 }) }} TPS</strong></span>
+        <span>️ OpenShift Workers: <strong>{{ formatNumber(workerNodeQty) }} Nodes ({{ formatNumber(requiredCores) }} vCPU)</strong></span>
+        <span> Storage 5-Yr: <strong>{{ formatNumber(dbStorage5YearsGb, { maxDecimals: 0 }) }} GB</strong></span>
+        <span> Power-Law (b): <strong>{{ formatNumber(scalingB, { decimals: 4 }) }}</strong></span>
       </div>
 
       <div class="summary-actions">
         <button type="button" class="copy-btn secondary-btn" @click="downloadJson">
-          💾 Download JSON Spec
+           Download JSON Spec
         </button>
         <button type="button" class="copy-btn" @click="copySummary">
-          📋 Copy Ringkasan BOM (EAWG Format)
+           Copy Ringkasan BOM (EAWG Format)
         </button>
       </div>
     </div>
@@ -441,10 +441,10 @@ const activeViewMode = ref<'engine' | 'eawg'>('eawg')
 const activePreset = ref<string>('lm')
 
 const presets = [
-  { id: 'lm', name: "Livin' Merchant (LM)", icon: '🛍️' },
-  { id: 'kopra', name: 'Kopra Cash Management', icon: '🏦' },
-  { id: 'rmt', name: 'RM Tools (RMT)', icon: '💼' },
-  { id: 'custom', name: 'Custom Parameters', icon: '⚙️' },
+  { id: 'lm', name: "Livin' Merchant (LM)", icon: '️' },
+  { id: 'kopra', name: 'Kopra Cash Management', icon: '' },
+  { id: 'rmt', name: 'RM Tools (RMT)', icon: '' },
+  { id: 'custom', name: 'Custom Parameters', icon: '' },
 ]
 
 const params = reactive({
@@ -495,7 +495,7 @@ function applyPreset(presetId: string) {
     params.avgRowSizeKb = 2.5
     params.redisKeysMillions = 5.0
     params.redisPayloadKb = 4.0
-    showToast("🛍️ Preset Livin' Merchant dimuat!", 'info')
+    showToast("️ Preset Livin' Merchant dimuat!", 'info')
   } else if (presetId === 'kopra') {
     params.trxDaily = 8500000
     params.peakHours = 7
@@ -514,7 +514,7 @@ function applyPreset(presetId: string) {
     params.avgRowSizeKb = 3.5
     params.redisKeysMillions = 8.0
     params.redisPayloadKb = 5.0
-    showToast('🏦 Preset Kopra Cash Management dimuat!', 'info')
+    showToast(' Preset Kopra Cash Management dimuat!', 'info')
   } else if (presetId === 'rmt') {
     params.trxDaily = 3200000
     params.peakHours = 9
@@ -533,7 +533,7 @@ function applyPreset(presetId: string) {
     params.avgRowSizeKb = 1.8
     params.redisKeysMillions = 2.5
     params.redisPayloadKb = 3.0
-    showToast('💼 Preset RM Tools (RMT) dimuat!', 'info')
+    showToast(' Preset RM Tools (RMT) dimuat!', 'info')
   }
 }
 
@@ -666,7 +666,7 @@ ${projectionRows.value
   .join('\n')}`
 
   navigator.clipboard.writeText(text)
-  showToast('✅ Ringkasan Kalkulasi Kapasitas berhasil disalin ke clipboard!', 'success')
+  showToast(' Ringkasan Kalkulasi Kapasitas berhasil disalin ke clipboard!', 'success')
 }
 
 function downloadJson() {
@@ -695,7 +695,7 @@ function downloadJson() {
   downloadAnchor.click()
   downloadAnchor.remove()
 
-  showToast('💾 Berkas JSON Spesifikasi Kapasitas berhasil diunduh!', 'success')
+  showToast(' Berkas JSON Spesifikasi Kapasitas berhasil diunduh!', 'success')
 }
 </script>
 
@@ -707,7 +707,7 @@ function downloadJson() {
 }
 
 .calc-header {
-  background: linear-gradient(135deg, #0f2b48 0%, #003b73 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 24px 28px;
   border-radius: var(--radius-lg);
@@ -1107,7 +1107,7 @@ function downloadJson() {
 
 .gauge-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #16a34a 0%, #2563eb 100%);
+  background: var(--surface, #ffffff);
   border-radius: 4px;
   transition: width 0.3s ease;
 }

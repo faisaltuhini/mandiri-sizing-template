@@ -362,7 +362,7 @@
                   <div class="form-label-row">
                     <label class="form-label">Nama Software / Produk Lisensi <span class="req">*</span></label>
                     <span v-if="matchedCatalogComponent" class="label-match-tag match-yes">
-                      ✓ Master Arsitektur
+                      Master Arsitektur
                     </span>
                   </div>
                   <BaseAutocomplete
@@ -452,7 +452,7 @@
               <!-- DYNAMIC SIMULATION & EXPLANATION CALLOUT -->
               <div class="metric-human-guide-box">
                 <div class="guide-header">
-                  <span class="guide-lamp-icon">💡</span>
+                  <span class="guide-lamp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
                   <span class="guide-heading">Simulasi &amp; Ketentuan Perhitungan Otomatis:</span>
                 </div>
                 <p class="guide-body-text">
@@ -462,7 +462,7 @@
 
               <!-- CONTEXTUAL ADJUSTERS (ONLY SHOWN IF RELEVANT) -->
               <div v-if="form.metric_type === 'per_5_pods'" class="contextual-adjuster-panel">
-                <div class="adjuster-icon">📦</div>
+                <div class="adjuster-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
                 <div class="adjuster-content">
                   <label class="adjuster-title">Ukuran Kelipatan Pod per Paket Lisensi (Pack Size):</label>
                   <p class="adjuster-hint">Setiap kelipatan 5 pods dihitung 1 paket lisensi (contoh: 12 pods = 3 paket).</p>
@@ -479,7 +479,7 @@
               </div>
 
               <div v-if="form.metric_type === 'per_shard'" class="contextual-adjuster-panel alert-quorum">
-                <div class="adjuster-icon">🛡️</div>
+                <div class="adjuster-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <div class="adjuster-content">
                   <label class="adjuster-title">Syarat Minimal Node Cluster (Quorum High Availability):</label>
                   <p class="adjuster-hint">Ketentuan arsitektur HA Enterprise Architecture mewajibkan minimal 3 node untuk auto-failover sentinel/raft.</p>
@@ -515,7 +515,7 @@
                       <span class="req">*</span>
                     </label>
                     <span v-if="matchedCatalogItem" class="label-match-tag match-yes">
-                      ✓ Terverifikasi Katalog
+                      Terverifikasi Katalog
                     </span>
                     <span v-else-if="form.pricing_sku" class="label-match-tag match-custom">
                       SKU Kustom
@@ -552,7 +552,7 @@
                       </div>
                     </div>
                     <p v-if="matchedCatalogItem.source" class="matched-source-note">
-                      📋 Ref: {{ matchedCatalogItem.source }}
+                      Ref: {{ matchedCatalogItem.source }}
                     </p>
                   </div>
                   <div v-else-if="form.pricing_sku" class="sku-custom-card">
@@ -569,7 +569,7 @@
                   <div class="form-label-row">
                     <label class="form-label">Tarif Satuan Lisensi Resmi (IDR / Tahun)</label>
                     <span class="label-match-tag match-locked">
-                      🔒 Murni Dari Master Katalog
+                      Murni Dari Master Katalog
                     </span>
                   </div>
 
@@ -591,7 +591,7 @@
                       <span>Tarif resmi aktif otomatis terkunci dari katalog master Enterprise Architecture</span>
                     </div>
                     <div v-else class="price-sync-status status-pending">
-                      <span>⚠️ Belum ada tarif kontrak (Menunggu konfirmasi Tim STA / Procurement)</span>
+                      <span>Belum ada tarif kontrak (Menunggu konfirmasi Tim STA / Procurement)</span>
                     </div>
                   </div>
 
@@ -781,7 +781,7 @@ const metricCardsList = [
     title: 'Paket Pods (Microservices)',
     badge: 'e.g. AppDynamics APM',
     desc: 'Dihitung per kelipatan 5 Pods container (dibulatkan ke atas)',
-    icon: '📦',
+    icon: 'container',
     defaultPack: 5,
     defaultMinNode: 1,
     suggestedSku: 'APPDYN_POD_PROD',
@@ -792,7 +792,7 @@ const metricCardsList = [
     title: 'Per Node Database Agent',
     badge: 'e.g. AppDynamics DB Agent',
     desc: '1 agent monitoring per instance database aktif',
-    icon: '🗄️',
+    icon: 'database',
     defaultPack: 1,
     defaultMinNode: 1,
     suggestedSku: 'APPDYN_DB_PROD',
@@ -803,7 +803,7 @@ const metricCardsList = [
     title: 'Per Shard Data (Cluster HA)',
     badge: 'e.g. Redis Enterprise',
     desc: 'Dihitung per shard data (Wajib min. 3 node cluster quorum)',
-    icon: '⚡',
+    icon: 'cache',
     defaultPack: 1,
     defaultMinNode: 3,
     suggestedSku: 'LIC_REDIS_PROD',
@@ -814,7 +814,7 @@ const metricCardsList = [
     title: 'Per Worker Node',
     badge: 'e.g. Red Hat OpenShift',
     desc: 'Per server worker (Master, Router & Bastion gratis)',
-    icon: '🏢',
+    icon: 'baremetal',
     defaultPack: 1,
     defaultMinNode: 1,
     suggestedSku: 'LIC_OCP_PROD',
@@ -825,7 +825,7 @@ const metricCardsList = [
     title: 'Per Core Processor',
     badge: 'e.g. Oracle Enterprise RAC',
     desc: 'Dihitung per core CPU fisik / vCPU dengan Core Factor',
-    icon: '🧠',
+    icon: 'cpu',
     defaultPack: 1,
     defaultMinNode: 1,
     suggestedSku: 'LIC_ORACLE_PROD',
@@ -836,7 +836,7 @@ const metricCardsList = [
     title: 'Per Instance Server / VM',
     badge: 'e.g. NGINX Plus',
     desc: 'Dihitung per unit VM load balancer / reverse proxy',
-    icon: '🖥️',
+    icon: 'server',
     defaultPack: 1,
     defaultMinNode: 1,
     suggestedSku: 'LIC_NGINX_PROD',
@@ -921,16 +921,16 @@ const fetchCatalogComponents = async () => {
 
 function getSkuIcon(sku: string): string {
   const s = (sku || '').toUpperCase()
-  if (s.includes('APPDYN')) return '📈'
-  if (s.includes('REDIS')) return '⚡'
-  if (s.includes('OCP') || s.includes('OPENSHIFT')) return '🏢'
-  if (s.includes('ORACLE')) return '🧠'
-  if (s.includes('NGINX')) return '🌐'
-  if (s.includes('KAFKA')) return '📬'
-  if (s.includes('RUBRIK')) return '💾'
-  if (s.includes('VCPU') || s.includes('BM_')) return '🖥️'
-  if (s.includes('STG_')) return '💿'
-  return '📦'
+  if (s.includes('APPDYN')) return 'telemetry'
+  if (s.includes('REDIS')) return 'cache'
+  if (s.includes('OCP') || s.includes('OPENSHIFT')) return 'baremetal'
+  if (s.includes('ORACLE')) return 'cpu'
+  if (s.includes('NGINX')) return 'web'
+  if (s.includes('KAFKA')) return 'messaging'
+  if (s.includes('RUBRIK')) return 'backup'
+  if (s.includes('VCPU') || s.includes('BM_')) return 'server'
+  if (s.includes('STG_')) return 'storage'
+  return 'container'
 }
 
 // Pricing SKU Autocomplete Options
@@ -966,7 +966,7 @@ const softwareNameOptions = computed<AutocompleteOption[]>(() => {
         category: comp.layer_name || 'Komponen Arsitektur',
         badge: `Layer ${comp.layer_no || ''}`,
         description: comp.description || comp.notes || '',
-        icon: '🏛️',
+        icon: 'architecture',
         meta: { type: 'component', ...comp }
       })
     }
@@ -979,7 +979,7 @@ const softwareNameOptions = computed<AutocompleteOption[]>(() => {
             category: comp.layer_name || 'Lisensi Produk',
             badge: lic.vendor || 'Vendor',
             description: `SKU: ${lic.pricing_sku || 'Belum di-mapping'} • Metrik: ${formatMetricType(lic.metric)}`,
-            icon: '📜',
+            icon: 'license',
             meta: { type: 'license', component: comp, license: lic }
           })
         }
@@ -1470,7 +1470,7 @@ onMounted(() => {
 
 .highlight-card {
   border-color: #BAE6FD;
-  background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+  background: var(--surface, #ffffff);
 }
 
 .kpi-icon-wrap {

@@ -3,7 +3,7 @@
     <!-- Top Hero Banner -->
     <div class="hub-hero">
       <div class="hero-left">
-        <div class="hero-tag">📁 Architecture Deliverable Hub</div>
+        <div class="hero-tag">Architecture Deliverable Hub</div>
         <h1 class="hero-title">Master Enterprise Templates & Capacity Tools</h1>
         <p class="hero-desc">
           Kumpulan template resmi (.xlsx, .docx, .md) arsitektur bank, panduan komprehensif ekstrapolasi Power-Law, dan kalkulator sizing server otomatis.
@@ -33,35 +33,35 @@
         :class="['tab-btn', { active: activeTab === 'techstack' }]"
         @click="activeTab = 'techstack'"
       >
-        🏛️ Baseline Tech Stack & Sizing Pattern
+        Baseline Tech Stack & Sizing Pattern
       </button>
       <button
         type="button"
         :class="['tab-btn', { active: activeTab === 'catalog' }]"
         @click="activeTab = 'catalog'"
       >
-        📦 Deliverable Templates Catalog
+        Deliverable Templates Catalog
       </button>
       <button
         type="button"
         :class="['tab-btn', { active: activeTab === 'calculator' }]"
         @click="activeTab = 'calculator'"
       >
-        🧮 Interactive Capacity Calculator
+        Interactive Capacity Calculator
       </button>
       <button
         type="button"
         :class="['tab-btn', { active: activeTab === 'solarwind' }]"
         @click="activeTab = 'solarwind'"
       >
-        🛰️ SolarWinds Multi-Node DB Analytics
+        SolarWinds Multi-Node DB Analytics
       </button>
       <button
         type="button"
         :class="['tab-btn', { active: activeTab === 'guide' }]"
         @click="activeTab = 'guide'"
       >
-        📖 Comprehensive Guide & Formulas
+        Comprehensive Guide & Formulas
       </button>
     </div>
 
@@ -70,11 +70,11 @@
       <!-- TAB 1: Catalog -->
       <div v-if="activeTab === 'catalog'" class="catalog-view">
         <div v-if="pending" class="loading-state">
-          ⏳ Memuat katalog template...
+           Memuat katalog template...
         </div>
 
         <div v-else-if="error" class="error-state">
-          ⚠️ Gagal memuat daftar template: {{ error.message }}
+           Gagal memuat daftar template: {{ error.message }}
         </div>
 
         <div v-else-if="data" class="categories-list">
@@ -108,8 +108,8 @@
                 <p class="file-desc">{{ file.description }}</p>
 
                 <div class="file-meta">
-                  <span>📄 {{ file.filename }}</span>
-                  <span>⚖️ {{ file.sizeFormatted }}</span>
+                  <span> {{ file.filename }}</span>
+                  <span>️ {{ file.sizeFormatted }}</span>
                 </div>
 
                 <div class="file-actions">
@@ -118,7 +118,7 @@
                     class="action-btn download-btn"
                     title="Download Langsung Berkas"
                   >
-                    📥 Download
+                     Download
                   </a>
                   <button
                     type="button"
@@ -126,7 +126,7 @@
                     title="Buka di Antigravity IDE"
                     @click="openLocal(file.relativePath, 'antigravity')"
                   >
-                    ✨ AGY
+                     AGY
                   </button>
                   <button
                     type="button"
@@ -134,7 +134,7 @@
                     title="Buka di System Finder"
                     @click="openLocal(file.relativePath, 'finder')"
                   >
-                    📂 Finder
+                     Finder
                   </button>
                 </div>
               </div>
@@ -189,7 +189,7 @@ function openLocal(pathStr: string, app: 'antigravity' | 'vscode' | 'finder') {
 }
 
 .hub-hero {
-  background: linear-gradient(135deg, #0f2b48 0%, #003b73 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 32px 36px;
   border-radius: var(--radius-lg);
@@ -399,7 +399,7 @@ function openLocal(pathStr: string, app: 'antigravity' | 'vscode' | 'finder') {
 
 .badge-md {
   background: #f5f3ff;
-  color: #7c3aed;
+  color: #2f70bb;
 
   border: 1px solid #ddd6fe;
 }
@@ -472,13 +472,13 @@ function openLocal(pathStr: string, app: 'antigravity' | 'vscode' | 'finder') {
 
 .agy-btn {
   background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  color: #003b73;
 
   border-color: rgba(99, 102, 241, 0.3);
 }
 
 .agy-btn:hover {
-  background: #6366f1;
+  background: #003b73;
   color: #ffffff;
 }
 

@@ -14,8 +14,12 @@
       >
         <div class="size-top-row">
           <span class="size-name">{{ p.name }}</span>
-          <span v-if="p.id === recommendedPresetId" class="rec-badge-inline" title="Rekomendasi Standar Arsitektur">★ Standar EA</span>
-          <span v-if="!forceCustomMode && currentPresetId === p.id" class="active-check">✓</span>
+          <span v-if="p.id === recommendedPresetId" class="rec-badge-inline" title="Rekomendasi Standar Arsitektur">Standar EA</span>
+          <span v-if="!forceCustomMode && currentPresetId === p.id" class="active-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
         </div>
         <span class="size-sub">{{ p.sublabel }}</span>
       </button>
@@ -28,7 +32,11 @@
       >
         <div class="size-top-row">
           <span class="size-name">Kustom</span>
-          <span v-if="forceCustomMode || currentPresetId === 'custom'" class="active-check">✓</span>
+          <span v-if="forceCustomMode || currentPresetId === 'custom'" class="active-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </span>
         </div>
         <span class="size-sub">Atur Angka Manual</span>
       </button>
@@ -36,7 +44,13 @@
 
     <!-- Active size summary statement -->
     <div class="active-size-statement">
-      <span class="statement-icon">💡</span>
+      <span class="statement-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      </span>
       <div class="statement-body">
         <span class="statement-text">
           Spesifikasi per 1 unit server: <strong>{{ vcpu }} vCPU</strong> (otak pemroses) &amp; <strong>{{ ram }} GB RAM</strong> (memori kerja).

@@ -7,13 +7,13 @@
         :title="isCollapsed ? 'Klik untuk memperluas sidebar' : 'Enterprise Architecture Sizing Suite'"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L3 7V12C3 17.5 7 21.5 12 22C17 21.5 21 17.5 21 12V7L12 2Z" fill="#D4A017" fill-opacity="0.25" stroke="#D4A017" stroke-width="2"/>
-          <path d="M12 6L7 11H10V17H14V11H17L12 6Z" fill="#D4A017"/>
+          <path d="M12 2L3 7V12C3 17.5 7 21.5 12 22C17 21.5 21 17.5 21 12V7L12 2Z" fill="#003b73" fill-opacity="0.12" stroke="#003b73" stroke-width="2"/>
+          <path d="M12 6L7 11H10V17H14V11H17L12 6Z" fill="#003b73"/>
         </svg>
       </div>
       <div v-if="!isCollapsed" class="brand-text">
-        <span class="bank-lbl">ENTERPRISE</span>
-        <span class="app-lbl">Sizing Suite</span>
+        <span class="bank-lbl">MANDIRI</span>
+        <span class="app-lbl">Sizing &amp; Capacity Hub</span>
       </div>
     </div>
 
@@ -33,7 +33,7 @@
         </svg>
         <div v-if="!isCollapsed" class="menu-btn-text">
           <span>Katalog</span>
-          <small class="menu-btn-sub">Master Harga &amp; CRUD</small>
+          <small class="menu-btn-sub">Master SKU &amp; Harga</small>
         </div>
       </button>
 
@@ -85,7 +85,7 @@
               {{ newCatalogCount }} Baru
             </span>
           </div>
-          <small class="menu-btn-sub">Formula Baseline &amp; Tier</small>
+          <small class="menu-btn-sub">Formula &amp; Baseline</small>
         </div>
       </button>
 
@@ -102,7 +102,7 @@
         </svg>
         <div v-if="!isCollapsed" class="menu-btn-text">
           <span>Lisensi</span>
-          <small class="menu-btn-sub">Aturan &amp; Metrik CRUD</small>
+          <small class="menu-btn-sub">Aturan &amp; Metrik</small>
         </div>
       </button>
     </nav>
@@ -113,7 +113,7 @@
         type="button"
         class="collapse-action-btn"
         @click="$emit('toggle-collapse')"
-        :title="isCollapsed ? 'Perluas Sidebar' : 'Kecilkan / Minimize Sidebar'"
+        :title="isCollapsed ? 'Perluas Sidebar' : 'Ciutkan Sidebar'"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline v-if="!isCollapsed" points="11 17 6 12 11 7"></polyline>
@@ -121,14 +121,14 @@
           <polyline v-if="isCollapsed" points="13 17 18 12 13 7"></polyline>
           <polyline v-if="isCollapsed" points="6 17 11 12 6 7"></polyline>
         </svg>
-        <span v-if="!isCollapsed">Minimize Sidebar</span>
+        <span v-if="!isCollapsed">Ciutkan Sidebar</span>
       </button>
     </div>
 
     <div class="sidebar-footer">
       <span class="sys-status" :title="'Engine Ready · :8089'">
         <span class="status-pulse"></span>
-        <span v-if="!isCollapsed" class="status-text">Engine Ready · :8089</span>
+        <span v-if="!isCollapsed" class="status-text">EA Engine Active</span>
       </span>
     </div>
   </aside>
@@ -151,56 +151,54 @@ defineEmits<{
 
 <style scoped>
 .sketch-sidebar {
-  width: 220px;
-  background: #002060;
-  color: #FFFFFF;
+  width: var(--sidebar-width, 228px);
+  background: var(--ground, #f4f7f9);
+  color: var(--text, #131416);
   display: flex;
   flex-direction: column;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 2px 0 10px rgba(0, 32, 96, 0.1);
+  border-right: none;
+  box-shadow: none;
   flex-shrink: 0;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.2s ease;
   overflow: hidden;
 }
 
 .sketch-sidebar.collapsed {
-  width: 68px;
+  width: 64px;
 }
 
 .sidebar-brand {
-  padding: 18px 14px;
+  padding: 16px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  min-height: 72px;
+  border-bottom: 1px solid var(--rule, #edf1f4);
+  height: 56px;
   box-sizing: border-box;
 }
 
 .sketch-sidebar.collapsed .sidebar-brand {
-  padding: 16px 8px;
+  padding: 14px 8px;
   justify-content: center;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .brand-shield {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(212, 160, 23, 0.5);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-control, 6px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e7eb);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .brand-shield:hover {
-  transform: scale(1.05);
+  border-color: var(--accent, #003b73);
 }
 
 .brand-text {
@@ -212,87 +210,63 @@ defineEmits<{
 }
 
 .bank-lbl {
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent, #003b73);
 }
 
 .app-lbl {
-  font-size: 11px;
-  color: #D4A017;
-  font-weight: 600;
-}
-
-.sidebar-toggle-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #CBD5E1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-
-.sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.sketch-sidebar.collapsed .sidebar-toggle-btn {
-  width: 24px;
-  height: 24px;
+  font-size: 12px;
+  color: var(--text, #131416);
+  font-weight: 500;
 }
 
 .sidebar-menu {
-  padding: 16px 10px;
+  padding: 12px 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
   flex: 1;
 }
 
 .sketch-sidebar.collapsed .sidebar-menu {
-  padding: 16px 6px;
+  padding: 12px 6px;
 }
 
 .menu-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
-  padding: 10px 14px;
+  padding: 8px 10px;
   background: transparent;
-  color: #CBD5E1;
+  color: var(--muted, #5d6165);
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-left: 2px solid transparent;
+  border-radius: var(--radius-control, 6px);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   text-align: left;
 }
 
 .sketch-sidebar.collapsed .menu-btn {
-  padding: 12px 0;
+  padding: 10px 0;
   justify-content: center;
   gap: 0;
 }
 
 .menu-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #FFFFFF;
+  background: var(--raised, #eef2f5);
+  color: var(--text, #131416);
 }
 
 .menu-btn.active {
-  background: #FFFFFF;
-  color: #002060;
-  border-color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  background: var(--surface, #ffffff);
+  color: var(--text, #131416);
+  border-color: var(--border, #e2e7eb);
+  border-left: 2px solid var(--accent, #003b73);
+  box-shadow: none;
 }
 
 .menu-btn-text {
@@ -304,7 +278,8 @@ defineEmits<{
 
 .menu-btn-text span {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
 .menu-icon-wrap {
@@ -318,11 +293,10 @@ defineEmits<{
   position: absolute;
   top: -2px;
   right: -2px;
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #F59E0B;
-  box-shadow: 0 0 0 2px #002060;
+  background: var(--warning, #92400e);
 }
 
 .preset-label-row {
@@ -335,77 +309,63 @@ defineEmits<{
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
-  background: #D97706;
-  color: #FFFFFF;
+  background: var(--pill-warning-bg, #fffbeb);
+  color: var(--pill-warning-ink, #92400e);
+  border: 1px solid rgba(146, 64, 14, 0.2);
   border-radius: 10px;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  animation: pulse-badge 2.4s infinite;
-}
-
-@keyframes pulse-badge {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  font-weight: 600;
 }
 
 .menu-btn-sub {
-  font-size: 10px;
-  color: #94A3B8;
-  font-weight: 500;
+  font-size: 11px;
+  color: var(--muted, #5d6165);
+  font-weight: 400;
 }
 
 .menu-btn.active .menu-btn-sub {
-  color: #64748B;
+  color: var(--muted, #5d6165);
 }
 
 .sidebar-collapse-bar {
-  padding: 8px 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sketch-sidebar.collapsed .sidebar-collapse-bar {
-  padding: 8px 6px;
+  padding: 8px;
+  border-top: 1px solid var(--rule, #edf1f4);
 }
 
 .collapse-action-btn {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #94A3B8;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted, #5d6165);
+  border-radius: var(--radius-control, 6px);
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .sketch-sidebar.collapsed .collapse-action-btn {
   justify-content: center;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .collapse-action-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #FFFFFF;
+  background: var(--raised, #eef2f5);
+  color: var(--text, #131416);
 }
 
 .sidebar-footer {
-  padding: 14px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 14px;
+  border-top: 1px solid var(--rule, #edf1f4);
 }
 
 .sketch-sidebar.collapsed .sidebar-footer {
-  padding: 14px 8px;
+  padding: 12px 6px;
   display: flex;
   justify-content: center;
 }
@@ -413,10 +373,10 @@ defineEmits<{
 .sys-status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  color: #94A3B8;
+  gap: 7px;
+  color: var(--muted, #5d6165);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -425,10 +385,9 @@ defineEmits<{
 }
 
 .status-pulse {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 6px #10B981;
+  background: var(--positive, #1e7b4f);
 }
 </style>

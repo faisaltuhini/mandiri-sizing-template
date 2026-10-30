@@ -32,7 +32,7 @@
 
       <div v-if="opt.badge || opt.recommended || modelValue === opt.value" class="opt-badge-strip">
         <span v-if="modelValue === opt.value" class="opt-badge selected-pill">Terpilih</span>
-        <span v-if="opt.recommended" class="opt-badge std-pill">★ Standar EA</span>
+        <span v-if="opt.recommended" class="opt-badge std-pill">Standar EA</span>
         <span v-if="opt.badge" :class="['opt-badge', opt.badgeType || 'info']">{{ opt.badge }}</span>
       </div>
     </div>

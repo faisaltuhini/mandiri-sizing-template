@@ -3,7 +3,7 @@
     <!-- Header bar -->
     <div class="guide-header">
       <div class="header-left">
-        <span class="guide-badge">📖 Enterprise Architecture Manual</span>
+        <span class="guide-badge"> Enterprise Architecture Manual</span>
         <h2>Panduan Komprehensif Rumus, Teori & Metodologi Capacity Planning</h2>
         <p class="guide-subtitle">
           Dokumen standar metodologi matematis arsitektur IT Digital Channel Delivery — Enterprise Architecture
@@ -16,7 +16,7 @@
           title="Buka File MD Asli di Antigravity IDE"
           @click="openInAgy"
         >
-          ✨ Open in Antigravity
+           Open in Antigravity
         </button>
         <button
           type="button"
@@ -24,32 +24,32 @@
           title="Buka Folder di Finder"
           @click="openInFinder"
         >
-          📂 Open in Finder
+           Open in Finder
         </button>
       </div>
     </div>
 
     <!-- Loading / Error / Main View -->
     <div v-if="pending" class="loading-box">
-      ⏳ Memuat dokumen panduan...
+       Memuat dokumen panduan...
     </div>
 
     <div v-else-if="error" class="error-box">
-      ⚠️ Gagal memuat dokumen panduan: {{ error.message }}
+       Gagal memuat dokumen panduan: {{ error.message }}
     </div>
 
     <div v-else class="guide-body">
       <!-- Section Navigation Sidebar -->
       <div class="guide-toc">
-        <div class="toc-title">📌 DAFTAR ISI & BAB</div>
+        <div class="toc-title"> DAFTAR ISI & BAB</div>
         <a
           v-for="(heading, index) in headings"
           :key="index"
           :href="`#section-${index}`"
           :class="['toc-link', `toc-level-${heading.level}`]"
         >
-          <span v-if="heading.level === 2" class="toc-bullet">▪</span>
-          <span v-else class="toc-bullet sub">▫</span>
+          <span v-if="heading.level === 2" class="toc-bullet"></span>
+          <span v-else class="toc-bullet sub"></span>
           {{ heading.text }}
         </a>
       </div>
@@ -72,14 +72,14 @@
 
           <!-- Block Math Formula -->
           <div v-else-if="block.type === 'formula'" class="math-display-card">
-            <div class="math-card-badge">📐 FORMULA EKSTRAPOLASI</div>
+            <div class="math-card-badge"> FORMULA EKSTRAPOLASI</div>
             <div class="math-katex-container" v-html="renderBlockMath(block.content)"></div>
           </div>
 
           <!-- Code Block -->
           <div v-else-if="block.type === 'code'" class="code-card">
             <div class="code-card-header">
-              <span>📄 Snippet / Konfigurasi</span>
+              <span> Snippet / Konfigurasi</span>
             </div>
             <pre><code>{{ block.content }}</code></pre>
           </div>
@@ -417,13 +417,13 @@ function renderInline(text?: string): string {
 }
 
 .agy-action {
-  background: #6366f1;
+  background: #003b73;
   color: #ffffff;
-  border-color: #6366f1;
+  border-color: #003b73;
 }
 
 .agy-action:hover {
-  background: #4f46e5;
+  background: #1b6c80;
 }
 
 .finder-action {
@@ -555,7 +555,7 @@ h4.content-heading {
 
 /* Display Math Card */
 .math-display-card {
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  background: var(--surface, #ffffff);
   color: #f8fafc;
   padding: 24px 28px;
   border-radius: var(--radius-lg);

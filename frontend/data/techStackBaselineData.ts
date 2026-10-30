@@ -82,7 +82,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 1,
     layer: 'Web Ingress',
     component: 'NGINX Web Server',
-    icon: '🌐',
+    icon: 'web',
     moderate: {
       nodes: '2N (2 Nodes)',
       type: 'Virtual Machine (VM)',
@@ -105,7 +105,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 2,
     layer: 'App Container',
     component: 'Red Hat OCP Worker',
-    icon: '📦',
+    icon: 'container',
     moderate: {
       nodes: '1W (1 Worker)',
       type: 'Shared / VM Worker',
@@ -128,7 +128,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 3,
     layer: 'Container Router',
     component: 'OCP Infra Router & Bastion',
-    icon: '🔀',
+    icon: 'loadbalancer',
     moderate: {
       nodes: '3 Infra + 1 Bastion',
       type: 'VM Router / HA Proxy',
@@ -151,7 +151,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 4,
     layer: 'Core Database',
     component: 'Database Engine (Oracle)',
-    icon: '🗄️',
+    icon: 'database',
     moderate: {
       nodes: 'Single Node, VM',
       type: 'Virtual Machine (VM)',
@@ -174,7 +174,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 5,
     layer: 'Database Storage',
     component: 'Oracle ASM Shared SAN',
-    icon: '💾',
+    icon: 'storage',
     moderate: {
       nodes: 'SAN Virtual Disk LUN',
       type: 'Storage SAN Tier 2',
@@ -197,7 +197,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 6,
     layer: 'Distributed Cache',
     component: 'Redis Caching Cluster',
-    icon: '⚡',
+    icon: 'cache',
     moderate: {
       nodes: '1-3 Nodes',
       type: 'Virtual Machine (VM)',
@@ -220,7 +220,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 7,
     layer: 'Cache Sentinel',
     component: 'Redis Sentinel Quorum',
-    icon: '🛡️',
+    icon: 'security',
     moderate: {
       nodes: 'Co-located / Sentinel',
       type: 'Shared VM',
@@ -243,7 +243,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 8,
     layer: 'Message Bus',
     component: 'Confluent / Apache Kafka',
-    icon: '📨',
+    icon: 'messaging',
     moderate: {
       nodes: '3 Nodes (Shared/VM)',
       type: 'VM Broker Cluster',
@@ -266,7 +266,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 9,
     layer: 'Log Analytics',
     component: 'Elasticsearch Analytics Node',
-    icon: '🔍',
+    icon: 'search',
     moderate: {
       nodes: 'Combined dgn Logstash',
       type: 'Shared VM / Combined',
@@ -289,7 +289,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 10,
     layer: 'Log Shipper',
     component: 'Logstash Pipeline Shipper',
-    icon: '🪵',
+    icon: 'streaming',
     moderate: {
       nodes: 'Combined / Co-located',
       type: 'Shared VM',
@@ -312,7 +312,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 11,
     layer: 'Log Dashboard',
     component: 'Kibana Observability Portal',
-    icon: '📊',
+    icon: 'telemetry',
     moderate: {
       nodes: 'Shared Portal',
       type: 'Shared VM Portal',
@@ -335,7 +335,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 12,
     layer: 'Document Storage',
     component: 'SFTP / Object Storage / RDM',
-    icon: '🗂️',
+    icon: 'filestore',
     moderate: {
       nodes: 'SFTP Server VM',
       type: 'Virtual Machine (VM)',
@@ -358,7 +358,7 @@ export const BASELINE_TECH_STACK_ITEMS: TechStackItem[] = [
     no: 13,
     layer: 'Batch Engine',
     component: 'BMC Control-M / OCP Cron',
-    icon: '⚙️',
+    icon: 'scheduler',
     moderate: {
       nodes: 'Scheduled Cron on OCP',
       type: 'Shared OCP Worker',

@@ -148,7 +148,7 @@
           class="clear-btn"
           @click="searchQuery = ''"
         >
-          ✕
+          x
         </button>
       </div>
 
@@ -352,7 +352,7 @@
             class="modal-close"
             @click="selectedItemData = null"
           >
-            ✕
+            x
           </button>
         </div>
 
@@ -536,7 +536,7 @@ async function copyTableMarkdown() {
    Executive Corporate Header
    ───────────────────────────────────────────── */
 .baseline-header {
-  background: linear-gradient(135deg, #002060 0%, #00143d 100%);
+  background: var(--surface, #ffffff);
   color: #ffffff;
   padding: 28px 36px;
   border-radius: 12px;

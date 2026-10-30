@@ -230,7 +230,7 @@ const layerItems = computed<TechStackItem[]>(() => {
     no: p.no,
     layer: p.layer,
     component: p.component,
-    icon: p.icon || '📦',
+    icon: p.icon || 'layer',
     moderate: {
       nodes: `${p.moderate.nodeCount} Node`,
       type: p.moderate.computeType === 'baremetal' ? 'Baremetal Dedicated' : (p.moderate.computeType === 'shared' ? 'Shared SAN' : 'Virtual Machine (VM)'),
@@ -374,7 +374,7 @@ async function handleAddCatalogToSizing(catalogItem: PricingItemRecord) {
     no: nextNo,
     layer: suggestedLayer,
     component: catalogItem.name,
-    icon: isLicenseOnly ? '📜' : (catalogItem.category === 'storage' ? '💾' : (catalogItem.category === 'backup' ? '🛡️' : '📦')),
+    icon: isLicenseOnly ? 'license' : (catalogItem.category === 'storage' ? 'storage' : (catalogItem.category === 'backup' ? 'backup' : 'package')),
     licenseFree: 'Community OSS',
     licenseEnterprise: catalogItem.name,
     pricingSku: catalogItem.sku,
@@ -1038,17 +1038,24 @@ async function downloadOfficialExcel() {
 <style scoped>
 .sketch-sizing-app {
   display: flex;
-  min-height: 100vh;
-  background-color: #F8FAFC;
-  color: #0F172A;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100dvh;
+  height: 100dvh;
+  background-color: var(--ground, #f4f7f9);
+  color: var(--text, #131416);
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
 }
 
 .sketch-main-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: calc(100dvh - (var(--sheet-inset, 8px) * 2));
+  margin: var(--sheet-inset, 8px) var(--sheet-inset, 8px) var(--sheet-inset, 8px) 0;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e2e7eb);
+  border-radius: var(--radius-sheet, 16px);
   overflow: hidden;
+  box-shadow: none;
 }
 </style>
