@@ -557,7 +557,8 @@ function runOptimisticQuoteCalculation() {
   const vcpuRate = isDev ? 7150000 : 8250000
   const stgT2Rate = isDev ? 28600 : 33000
   const stgT3Rate = 48000
-  const nbuRate = 27000
+  const rubrikRate = pricingList.value.find(p => p.sku === 'RUBRIK_PROD')?.unit_price_idr || 35000
+  const nbuRate = pricingList.value.find(p => p.sku === 'NBU_ALL')?.unit_price_idr || 27000
   const bmRate = 794000000
 
   let totalNodes = 0
@@ -590,7 +591,9 @@ function runOptimisticQuoteCalculation() {
 
     const stgRate = cfg.storageClass === 'Tier 3' ? stgT3Rate : stgT2Rate
     const storageCost = isNoneCompute ? 0 : itemStorage * stgRate
-    const backupCost = (!isNoneCompute && cfg.backupEnabled) ? itemStorage * nbuRate : 0
+    const isNginx = l.component.toLowerCase().includes('nginx') || l.layer.toLowerCase().includes('web ingress')
+    const itemBackupRate = isNginx ? rubrikRate : nbuRate
+    const backupCost = (!isNoneCompute && cfg.backupEnabled) ? itemStorage * itemBackupRate : 0
 
     let licenseCost = 0
     const unconfirmedPrices: string[] = []
@@ -788,7 +791,7 @@ function openAddPricingModal() {
   pricingForm.name = ''
   pricingForm.category = 'compute'
   pricingForm.environment = 'Production'
-  pricingForm.unit = 'vCPU / Thn'
+  pricingForm.unit = 'vCPU'
   pricingForm.unit_price_idr = 0
   pricingForm.is_confirmed = true
   pricingForm.source = 'Template Sizing.xlsx!Pricing'
@@ -969,11 +972,11 @@ Project: ${projectName.value}
 Environment: ${q.environment} | DRC: ${q.include_drc ? 'Active-Active (2x)' : 'Single DC'}
 Total Nodes: ${q.total_nodes} Node | Total vCPU: ${q.total_vcpu} Core | Total Storage: ${(q.total_storage_gb / 1000).toFixed(1)} TB
 
-RINCIAN BIAYA TAHUNAN:
-- Compute Subtotal: Rp ${formatSimpleIDR(q.subtotal_compute_annual)} / thn
-- Storage Subtotal: Rp ${formatSimpleIDR(q.subtotal_storage_annual)} / thn
-- Lisensi Subtotal: Rp ${formatSimpleIDR(q.subtotal_license_annual)} / thn
-- TOTAL ANNUAL OPEX: Rp ${formatSimpleIDR(q.grand_total_annual)} / thn
+RINCIAN BIAYA (PERPETUAL):
+- Compute Subtotal: Rp ${formatSimpleIDR(q.subtotal_compute_annual)}
+- Storage Subtotal: Rp ${formatSimpleIDR(q.subtotal_storage_annual)}
+- Lisensi Subtotal: Rp ${formatSimpleIDR(q.subtotal_license_annual)}
+- TOTAL BIAYA SIZING: Rp ${formatSimpleIDR(q.grand_total_annual)}
 
 ESTIMASI TCO:
 - 3-Year TCO: Rp ${formatSimpleIDR(q.tco_3year)}

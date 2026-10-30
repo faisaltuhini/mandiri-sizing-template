@@ -139,9 +139,9 @@ defineEmits<{
 }
 
 .opt-tech-pill {
-  font-size: 9.5px;
+  font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
-  color: #64748B;
+  color: #475569;
   margin-top: 1px;
 }
 
@@ -166,7 +166,7 @@ defineEmits<{
 
 .opt-desc {
   margin: 0;
-  font-size: 11px;
+  font-size: 11.5px;
   color: #475569;
   line-height: 1.45;
   flex: 1;
@@ -181,9 +181,9 @@ defineEmits<{
 }
 
 .opt-badge {
-  font-size: 9px;
-  font-weight: 800;
-  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.02em;

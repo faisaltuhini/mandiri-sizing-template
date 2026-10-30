@@ -14,10 +14,10 @@
       >
         <div class="size-top-row">
           <span class="size-name">{{ p.name }}</span>
+          <span v-if="p.id === recommendedPresetId" class="rec-badge-inline" title="Rekomendasi Standar Arsitektur">★ Standar EA</span>
           <span v-if="!forceCustomMode && currentPresetId === p.id" class="active-check">✓</span>
         </div>
         <span class="size-sub">{{ p.sublabel }}</span>
-        <span v-if="p.id === recommendedPresetId" class="rec-badge" title="Rekomendasi Standar Arsitektur">★ Standar EA</span>
       </button>
 
       <button
@@ -192,43 +192,42 @@ function selectCustom() {
 }
 
 .size-sub {
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 600;
-  color: #64748B;
+  color: #475569;
   margin-top: 3px;
   white-space: nowrap;
 }
 
-.rec-badge {
-  position: absolute;
-  top: -8px;
-  right: 6px;
-  background: #D97706;
-  color: #FFFFFF;
-  font-size: 8px;
+.rec-badge-inline {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  font-size: 11px;
   font-weight: 800;
-  padding: 1.5px 5px;
+  padding: 1px 6px;
   border-radius: 4px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .active-size-statement {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  padding: 8px 12px;
-  border-radius: 6px;
+  align-items: flex-start;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid #F1F5F9;
+  padding: 10px 2px 2px 2px;
   font-size: 11.5px;
   color: #334155;
+  margin-top: 4px;
 }
 
 .statement-icon {
-  font-size: 14px;
+  font-size: 13px;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .statement-body {
@@ -239,8 +238,8 @@ function selectCustom() {
 }
 
 .statement-hint {
-  color: #64748B;
-  font-size: 11px;
+  color: #475569;
+  font-size: 11.5px;
 }
 
 @media (max-width: 1100px) {

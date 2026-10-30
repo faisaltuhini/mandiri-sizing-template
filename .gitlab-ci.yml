@@ -1,0 +1,147 @@
+# ==============================================================================
+# GitLab CI/CD Pipeline - Mandiri Sizing & Capacity Planning Suite
+# High-Performance BuildKit Rootless + Kubernetes (k3s) Rollout
+# ==============================================================================
+
+default:
+  tags:
+    - k3s
+
+stages:
+  - build
+  - deploy
+
+variables:
+  INTERNAL_REGISTRY: "docker-registry.infra.svc.cluster.local:5000"
+  BUILDKITD_FLAGS: "--oci-worker-no-process-sandbox"
+
+# ------------------------------------------------------------------------------
+# Reusable BuildKit Rootless Template
+# ------------------------------------------------------------------------------
+.buildkit_template:
+  stage: build
+  image:
+    name: moby/buildkit:rootless
+    entrypoint: [""]
+  before_script:
+    - mkdir -p ~/.config/buildkit
+    - |
+      cat <<EOF > ~/.config/buildkit/buildkitd.toml
+      [registry."${INTERNAL_REGISTRY}"]
+        http = true
+        insecure = true
+
+      [registry."docker-registry.infra:5000"]
+        http = true
+        insecure = true
+      EOF
+
+# ------------------------------------------------------------------------------
+# 1. BUILD BACKEND (Golang Fiber Sizing Engine)
+# ------------------------------------------------------------------------------
+build-backend:
+  extends: .buildkit_template
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^(main|master|dev)$/'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+  script:
+    - echo "=================================================="
+    - echo "🚀 Building & Pushing Backend Image via BuildKit"
+    - echo "=================================================="
+    - |
+      EXTRA_TAG=""
+      if [ -n "${CI_COMMIT_TAG}" ]; then
+        EXTRA_TAG=",${INTERNAL_REGISTRY}/sizing-backend:${CI_COMMIT_TAG}"
+      fi
+      buildctl-daemonless.sh build \
+        --frontend=dockerfile.v0 \
+        --local context=backend \
+        --local dockerfile=backend \
+        --output "type=image,\"name=${INTERNAL_REGISTRY}/sizing-backend:${CI_COMMIT_SHORT_SHA},${INTERNAL_REGISTRY}/sizing-backend:latest${EXTRA_TAG}\",push=true,registry.insecure=true" \
+        --export-cache type=registry,ref=${INTERNAL_REGISTRY}/sizing-backend-cache,mode=max,registry.insecure=true \
+        --import-cache type=registry,ref=${INTERNAL_REGISTRY}/sizing-backend-cache
+    - echo "✅ Backend Docker image built and pushed to internal registry!"
+
+# ------------------------------------------------------------------------------
+# 2. BUILD FRONTEND (Nuxt 3 Sizing Suite)
+# ------------------------------------------------------------------------------
+build-frontend:
+  extends: .buildkit_template
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^(main|master|dev)$/'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+  script:
+    - echo "=================================================="
+    - echo "🚀 Building & Pushing Frontend Image via BuildKit"
+    - echo "=================================================="
+    - |
+      EXTRA_TAG=""
+      if [ -n "${CI_COMMIT_TAG}" ]; then
+        EXTRA_TAG=",${INTERNAL_REGISTRY}/sizing-frontend:${CI_COMMIT_TAG}"
+      fi
+      buildctl-daemonless.sh build \
+        --frontend=dockerfile.v0 \
+        --local context=frontend \
+        --local dockerfile=frontend \
+        --output "type=image,\"name=${INTERNAL_REGISTRY}/sizing-frontend:${CI_COMMIT_SHORT_SHA},${INTERNAL_REGISTRY}/sizing-frontend:latest${EXTRA_TAG}\",push=true,registry.insecure=true" \
+        --export-cache type=registry,ref=${INTERNAL_REGISTRY}/sizing-frontend-cache,mode=max,registry.insecure=true \
+        --import-cache type=registry,ref=${INTERNAL_REGISTRY}/sizing-frontend-cache
+    - echo "✅ Frontend Docker image built and pushed to internal registry!"
+
+# ------------------------------------------------------------------------------
+# 3. DEPLOY K3S (Automatic on branch: main / master -> Namespace: sizing)
+# ------------------------------------------------------------------------------
+deploy-k3s:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^(main|master)$/'
+    - if: '$CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"'
+  needs:
+    - job: build-backend
+    - job: build-frontend
+  script:
+    - echo "=================================================="
+    - echo "🚀 Deploying to k3s Cluster (Namespace: sizing)"
+    - echo "=================================================="
+    - 'echo "⚡ Setting Atomic Image Tag: ${CI_COMMIT_SHORT_SHA}"'
+    - 'sed -i "s|newTag: .*|newTag: \"${CI_COMMIT_SHORT_SHA}\"|g" deploy/kustomize/overlays/k3s/kustomization.yaml'
+    - kubectl apply -k deploy/kustomize/overlays/k3s
+    - echo "⏳ Waiting for parallel rollouts across backend & frontend..."
+    - 'kubectl rollout status deployment/sizing-backend -n sizing --timeout=180s & PID1=$! ; kubectl rollout status deployment/sizing-frontend -n sizing --timeout=180s & PID2=$! ; wait $PID1 && wait $PID2'
+    - echo "🔎 Pod, Service & Ingress Status in sizing:"
+    - 'kubectl get pods,svc,ingress -l "app.kubernetes.io/part-of=sizing-apps" -n sizing -o wide'
+    - |
+      echo "🧹 Purging Cloudflare Edge Cache..."
+      bash ./scripts/purge_cloudflare_cache.sh || echo "⚠️ Purge Cloudflare warning (non-blocking)."
+    - echo "✅ k3s deployment completed successfully!"
+
+# ------------------------------------------------------------------------------
+# 4. DEPLOY PRODUCTION (Manual trigger strictly on git tag -> Namespace: sizing)
+# ------------------------------------------------------------------------------
+deploy-prod:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
+  needs:
+    - job: build-backend
+    - job: build-frontend
+  script:
+    - echo "=================================================="
+    - 'echo "🚀 Deploying to Production Environment (sizing) [TAG: ${CI_COMMIT_TAG}]"'
+    - echo "=================================================="
+    - 'echo "⚡ Setting Atomic Image Tag: ${CI_COMMIT_SHORT_SHA}"'
+    - 'sed -i "s|newTag: .*|newTag: \"${CI_COMMIT_SHORT_SHA}\"|g" deploy/kustomize/overlays/k3s/kustomization.yaml'
+    - kubectl apply -k deploy/kustomize/overlays/k3s
+    - echo "⏳ Waiting for parallel rollouts across backend & frontend..."
+    - 'kubectl rollout status deployment/sizing-backend -n sizing --timeout=180s & PID1=$! ; kubectl rollout status deployment/sizing-frontend -n sizing --timeout=180s & PID2=$! ; wait $PID1 && wait $PID2'
+    - echo "🔎 Pod, Service & Ingress Status in sizing:"
+    - 'kubectl get pods,svc,ingress -l "app.kubernetes.io/part-of=sizing-apps" -n sizing -o wide'
+    - |
+      echo "🧹 Purging Cloudflare Edge Cache for production..."
+      bash ./scripts/purge_cloudflare_cache.sh || echo "⚠️ Purge Cloudflare warning (non-blocking)."
+    - echo "✅ Production deployment completed successfully!"

@@ -27,25 +27,24 @@
     <div class="cost-bar-center">
       <div class="metric-pill">
         <span class="pill-lbl">Compute Subtotal</span>
-        <BaseMoney :amount="quoteResponse?.subtotal_compute_annual" period="/ thn" />
+        <BaseMoney :amount="quoteResponse?.subtotal_compute_annual" />
       </div>
       <div class="metric-pill">
         <span class="pill-lbl">Storage Subtotal</span>
-        <BaseMoney :amount="quoteResponse?.subtotal_storage_annual" period="/ thn" />
+        <BaseMoney :amount="quoteResponse?.subtotal_storage_annual" />
       </div>
       <div class="metric-pill">
         <span class="pill-lbl">Lisensi Subtotal</span>
-        <BaseMoney :amount="quoteResponse?.subtotal_license_annual" period="/ thn" />
+        <BaseMoney :amount="quoteResponse?.subtotal_license_annual" />
       </div>
     </div>
 
     <div class="cost-bar-right">
       <div class="grand-total-box">
-        <span class="grand-total-lbl">ESTIMASI TOTAL OPEX ARSITEKTUR</span>
+        <span class="grand-total-lbl">ESTIMASI TOTAL BIAYA ARSITEKTUR (PERPETUAL)</span>
         <BaseMoney
           :amount="quoteResponse?.grand_total_annual"
           class="grand-total-val"
-          period="/ thn"
         />
       </div>
 
@@ -144,17 +143,16 @@ defineEmits<{
 .metric-pill {
   display: flex;
   flex-direction: column;
-  background: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  padding: 4px 10px;
-  border-radius: 6px;
+  background: transparent;
+  padding: 0 4px;
 }
 
 .pill-lbl {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: #475569;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .cost-bar-right {
@@ -170,10 +168,10 @@ defineEmits<{
 }
 
 .grand-total-lbl {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #64748B;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #475569;
 }
 
 .grand-total-val {

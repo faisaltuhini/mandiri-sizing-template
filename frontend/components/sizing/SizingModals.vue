@@ -79,7 +79,7 @@
                 v-model="pricingForm.unit"
                 required
                 class="form-input"
-                placeholder="vCPU / Thn, GB / Thn, Node / Thn, Unit"
+                placeholder="vCPU, GB, Node, Unit, Instance, Shard"
               />
             </div>
           </div>
@@ -305,11 +305,10 @@
               <span class="stat-sub">{{ quoteResponse?.total_storage_gb }} GB SAN Storage</span>
             </div>
             <div class="boq-stat-card card-grand-total">
-              <span class="stat-lbl">TOTAL OPEX TAHUNAN</span>
+              <span class="stat-lbl">TOTAL BIAYA SIZING (PERPETUAL)</span>
               <BaseMoney
                 :amount="quoteResponse?.grand_total_annual"
                 class="stat-grand-price"
-                period="/ thn"
               />
               <span class="stat-sub">3-Yr TCO: Rp {{ formatSimpleIDR(quoteResponse?.tco_3year) }}</span>
             </div>
@@ -331,7 +330,7 @@
                   <th class="text-right">Biaya Compute</th>
                   <th class="text-right">Biaya Storage</th>
                   <th class="text-right">Biaya Lisensi</th>
-                  <th class="text-right">Total Biaya/Thn</th>
+                  <th class="text-right">Total Biaya (Perpetual)</th>
                 </tr>
               </thead>
               <tbody>

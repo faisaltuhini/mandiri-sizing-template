@@ -1,10 +1,15 @@
 <template>
-  <div class="base-help-tip-wrapper" @mouseenter="show = true" @mouseleave="show = false">
+  <div
+    ref="wrapperRef"
+    class="base-help-tip-wrapper"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+  >
     <button
       type="button"
       class="help-tip-btn"
       :class="{ active: show }"
-      @click.stop="show = !show"
+      @click.stop="toggleShow"
       aria-label="Bantuan informasi parameter"
     >
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -18,7 +23,10 @@
       <div
         v-if="show"
         class="help-popover"
-        :class="placement === 'top' ? 'pos-top' : 'pos-bottom'"
+        :class="[
+          placement === 'top' ? 'pos-top' : 'pos-bottom',
+          computedAlign === 'right' ? 'align-right' : 'align-left'
+        ]"
         @click.stop
       >
         <div class="popover-hdr">
@@ -38,20 +46,54 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title: string
     subtitle?: string
     content: string
     businessImpact?: string
     placement?: 'bottom' | 'top'
+    align?: 'left' | 'right' | 'auto'
   }>(),
   {
-    placement: 'bottom'
+    placement: 'bottom',
+    align: 'auto'
   }
 )
 
 const show = ref(false)
+const wrapperRef = ref<HTMLElement | null>(null)
+const computedAlign = ref<'left' | 'right'>('left')
+
+function updateAlignment() {
+  if (props.align === 'left' || props.align === 'right') {
+    computedAlign.value = props.align
+    return
+  }
+  if (wrapperRef.value && typeof window !== 'undefined') {
+    const rect = wrapperRef.value.getBoundingClientRect()
+    // If within 310px of the right window edge, or on right half of parent/screen
+    if (window.innerWidth - rect.right < 310 || rect.left > window.innerWidth * 0.52) {
+      computedAlign.value = 'right'
+    } else {
+      computedAlign.value = 'left'
+    }
+  }
+}
+
+function handleMouseEnter() {
+  updateAlignment()
+  show.value = true
+}
+
+function handleMouseLeave() {
+  show.value = false
+}
+
+function toggleShow() {
+  updateAlignment()
+  show.value = !show.value
+}
 </script>
 
 <style scoped>
@@ -87,19 +129,29 @@ const show = ref(false)
   color: #FFFFFF;
   border-radius: 8px;
   padding: 12px 14px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-  z-index: 1000;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+  z-index: 99999;
   pointer-events: auto;
   font-size: 11px;
   line-height: 1.45;
 }
 
+/* Vertical placement */
 .help-popover.pos-bottom {
   top: calc(100% + 8px);
-  left: 0;
 }
 
-.help-popover.pos-bottom::after {
+.help-popover.pos-top {
+  bottom: calc(100% + 8px);
+}
+
+/* Horizontal alignment: Left aligned (default) */
+.help-popover.align-left {
+  left: 0;
+  right: auto;
+}
+
+.help-popover.align-left.pos-bottom::after {
   content: '';
   position: absolute;
   bottom: 100%;
@@ -109,16 +161,37 @@ const show = ref(false)
   border-color: transparent transparent #0F172A transparent;
 }
 
-.help-popover.pos-top {
-  bottom: calc(100% + 8px);
-  left: 0;
-}
-
-.help-popover.pos-top::after {
+.help-popover.align-left.pos-top::after {
   content: '';
   position: absolute;
   top: 100%;
   left: 12px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #0F172A transparent transparent transparent;
+}
+
+/* Horizontal alignment: Right aligned (for elements near right edge) */
+.help-popover.align-right {
+  left: auto;
+  right: 0;
+}
+
+.help-popover.align-right.pos-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 12px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #0F172A transparent;
+}
+
+.help-popover.align-right.pos-top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 12px;
   border-width: 5px;
   border-style: solid;
   border-color: #0F172A transparent transparent transparent;

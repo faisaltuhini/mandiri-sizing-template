@@ -24,7 +24,7 @@
           :value="modelValue"
           :min="min"
           :max="max"
-          :step="step"
+          step="any"
           :disabled="disabled"
           @input="onInput"
         />

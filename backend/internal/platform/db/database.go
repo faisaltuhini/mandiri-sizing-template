@@ -3,13 +3,13 @@ package db
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
@@ -18,31 +18,44 @@ import (
 
 var DB *gorm.DB
 
-// InitDB initializes connection to SQL Server (default) or PostgreSQL with automatic schema migration
+// InitDB initializes connection to PostgreSQL with automatic schema migration
 func InitDB() (*gorm.DB, error) {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		// Default to SQL Server with user sa and password P@ssw0rd.1
-		dsn = "sqlserver://sa:P%40ssw0rd.1@localhost:1433?database=sizing&trustServerCertificate=true"
+		host := os.Getenv("DB_HOST")
+		if host == "" {
+			host = "localhost"
+		}
+		port := os.Getenv("DB_PORT")
+		if port == "" {
+			port = "5432"
+		}
+		user := os.Getenv("DB_USER")
+		if user == "" {
+			user = "postgres"
+		}
+		password := os.Getenv("DB_PASSWORD")
+		if password == "" {
+			password = "postgres"
+		}
+		dbName := os.Getenv("DB_NAME")
+		if dbName == "" {
+			dbName = "sizing"
+		}
+		dsn = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbName)
 	}
 
-	var dialector gorm.Dialector
+	// Ensure PostgreSQL database exists before connecting to specific database
+	ensurePostgresDatabaseExists(dsn)
 
-	if strings.HasPrefix(strings.ToLower(dsn), "postgres://") || strings.HasPrefix(strings.ToLower(dsn), "postgresql://") {
-		dialector = postgres.Open(dsn)
-		log.Println("🔌 Connecting to PostgreSQL...")
-	} else {
-		// Ensure SQL Server database exists before connecting to specific database
-		ensureSQLServerDatabaseExists(dsn)
-		dialector = sqlserver.Open(dsn)
-		log.Println("🔌 Connecting to Microsoft SQL Server...")
-	}
+	log.Println("🔌 Connecting to PostgreSQL...")
+	dialector := postgres.Open(dsn)
 
 	database, err := gorm.Open(dialector, &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("failed to connect to PostgreSQL database: %w", err)
 	}
 
 	sqlDB, err := database.DB()
@@ -50,13 +63,13 @@ func InitDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to get sql.DB handle: %w", err)
 	}
 
-	// High-Performance Connection Pool (eliminates TCP + TDS handshake latency on concurrent requests)
+	// High-Performance Connection Pool
 	sqlDB.SetMaxIdleConns(30)
 	sqlDB.SetMaxOpenConns(60)
 	sqlDB.SetConnMaxLifetime(2 * time.Hour)
 	sqlDB.SetConnMaxIdleTime(30 * time.Minute)
 
-	// Auto-migrate schema (Cross-database compatible with rich indexes)
+	// Auto-migrate schema (PostgreSQL compatible)
 	err = database.AutoMigrate(
 		&model.PriceListVersion{},
 		&model.PricingItem{},
@@ -71,7 +84,7 @@ func InitDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to auto-migrate tables: %w", err)
 	}
 
-	// Ensure fast SQL Server indexing for non-clustered queries
+	// Ensure fast PostgreSQL indexing
 	ensurePerformanceIndexes(database)
 
 	DB = database
@@ -86,67 +99,70 @@ func InitDB() (*gorm.DB, error) {
 		log.Printf("⚠️ Warning seeding license rules: %v", err)
 	}
 
-	log.Println("✅ Database connected, connection pool optimized (30 idle / 60 max), migrated, and indexed!")
+	log.Println("✅ PostgreSQL database connected, connection pool optimized (30 idle / 60 max), migrated, and indexed!")
 	return database, nil
 }
 
-// ensurePerformanceIndexes creates composite and single-column nonclustered indexes if not already present
+// ensurePerformanceIndexes creates composite and single-column indexes if not already present
 func ensurePerformanceIndexes(db *gorm.DB) {
 	indexes := []string{
-		"CREATE NONCLUSTERED INDEX idx_pricing_items_cat_sku ON pricing_items(category, sku)",
-		"CREATE NONCLUSTERED INDEX idx_pricing_items_sku ON pricing_items(sku)",
-		"CREATE NONCLUSTERED INDEX idx_license_rules_cat_name ON license_rules(category, rule_name)",
-		"CREATE NONCLUSTERED INDEX idx_license_rules_sku ON license_rules(pricing_sku)",
-		"CREATE NONCLUSTERED INDEX idx_catalog_components_layer ON catalog_components(layer_no)",
-		"CREATE NONCLUSTERED INDEX idx_component_baselines_comp_tier ON component_baselines(component_id, tier)",
-		"CREATE NONCLUSTERED INDEX idx_license_options_comp_kind ON license_options(component_id, kind)",
+		"CREATE INDEX IF NOT EXISTS idx_pricing_items_cat_sku ON pricing_items(category, sku)",
+		"CREATE INDEX IF NOT EXISTS idx_pricing_items_sku ON pricing_items(sku)",
+		"CREATE INDEX IF NOT EXISTS idx_license_rules_cat_name ON license_rules(category, rule_name)",
+		"CREATE INDEX IF NOT EXISTS idx_license_rules_sku ON license_rules(pricing_sku)",
+		"CREATE INDEX IF NOT EXISTS idx_catalog_components_layer ON catalog_components(layer_no)",
+		"CREATE INDEX IF NOT EXISTS idx_component_baselines_comp_tier ON component_baselines(component_id, tier)",
+		"CREATE INDEX IF NOT EXISTS idx_license_options_comp_kind ON license_options(component_id, kind)",
 	}
 
 	for _, stmt := range indexes {
-		_ = db.Exec(stmt).Error
+		if err := db.Exec(stmt).Error; err != nil {
+			log.Printf("⚠️ Index creation notice: %v", err)
+		}
 	}
 }
 
-// ensureSQLServerDatabaseExists connects to master to create the target database if missing
-func ensureSQLServerDatabaseExists(targetDSN string) {
-	// Parse database name from DSN
-	dbName := "sizing"
-	if idx := strings.Index(targetDSN, "database="); idx != -1 {
-		sub := targetDSN[idx+9:]
-		if ampIdx := strings.Index(sub, "&"); ampIdx != -1 {
-			dbName = sub[:ampIdx]
-		} else {
-			dbName = sub
-		}
+// ensurePostgresDatabaseExists connects to the maintenance 'postgres' database to create the target database if missing
+func ensurePostgresDatabaseExists(targetDSN string) {
+	u, err := url.Parse(targetDSN)
+	if err != nil {
+		return
 	}
-
-	if dbName == "master" || dbName == "" {
+	dbName := strings.TrimPrefix(u.Path, "/")
+	if idx := strings.Index(dbName, "?"); idx != -1 {
+		dbName = dbName[:idx]
+	}
+	if dbName == "" || dbName == "postgres" {
 		return
 	}
 
-	// Build master DSN
-	masterDSN := strings.Replace(targetDSN, "database="+dbName, "database=master", 1)
-	masterDB, err := gorm.Open(sqlserver.Open(masterDSN), &gorm.Config{
+	maintenanceURL := *u
+	maintenanceURL.Path = "/postgres"
+	maintenanceDSN := maintenanceURL.String()
+
+	maintenanceDB, err := gorm.Open(postgres.Open(maintenanceDSN), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})
 	if err != nil {
-		return // If master connection fails, let standard connection attempt proceed
+		return // If maintenance connection fails, let direct connection attempt proceed
 	}
+	defer func() {
+		if sqlDB, err := maintenanceDB.DB(); err == nil {
+			_ = sqlDB.Close()
+		}
+	}()
 
 	var count int
-	masterDB.Raw("SELECT count(*) FROM sys.databases WHERE name = ?", dbName).Scan(&count)
-	if count == 0 {
-		log.Printf("📦 Creating SQL Server database '%s'...", dbName)
-		if err := masterDB.Exec(fmt.Sprintf("CREATE DATABASE [%s]", dbName)).Error; err != nil {
-			log.Printf("⚠️ Warning creating database %s: %v", dbName, err)
-		} else {
-			log.Printf("✅ SQL Server database '%s' created successfully.", dbName)
+	if err := maintenanceDB.Raw("SELECT count(*) FROM pg_database WHERE datname = ?", dbName).Scan(&count).Error; err == nil {
+		if count == 0 {
+			log.Printf("📦 Creating PostgreSQL database '%s'...", dbName)
+			createStmt := fmt.Sprintf(`CREATE DATABASE "%s"`, strings.ReplaceAll(dbName, `"`, `""`))
+			if err := maintenanceDB.Exec(createStmt).Error; err != nil {
+				log.Printf("⚠️ Warning creating database %s: %v", dbName, err)
+			} else {
+				log.Printf("✅ PostgreSQL database '%s' created successfully.", dbName)
+			}
 		}
-	}
-
-	sqlDB, err := masterDB.DB()
-	if err == nil {
-		sqlDB.Close()
 	}
 }
 
@@ -185,26 +201,26 @@ func SeedMasterData(db *gorm.DB) error {
 		IsConfirmed bool
 	}{
 		// Hardware
-		{"VCPU_PROD", "compute", "Compute vCPU", "Production", "vCPU / Thn", int64Ptr(8250000), true},
-		{"VCPU_DEV", "compute", "Compute vCPU", "Dev / Non-Prod", "vCPU / Thn", int64Ptr(7150000), true},
-		{"STG_T2_PROD", "storage", "Storage SAN Tier 2", "Production", "GB / Thn", int64Ptr(33000), true},
-		{"STG_T3_PROD", "storage", "Storage SAN Tier 3", "Production", "GB / Thn", int64Ptr(48000), true},
-		{"STG_T2_DEV", "storage", "Storage SAN Tier 2", "Dev / Non-Prod", "GB / Thn", int64Ptr(28600), true},
-		{"NBU_ALL", "backup", "Backup Netbackup (NBU)", "Production", "GB / Thn", int64Ptr(27000), true},
-		{"RUBRIK_PROD", "backup", "Rubrik Backup", "Production", "GB / Thn", int64Ptr(35000), true},
+		{"VCPU_PROD", "compute", "Compute vCPU", "Production", "vCPU", int64Ptr(8250000), true},
+		{"VCPU_DEV", "compute", "Compute vCPU", "Dev / Non-Prod", "vCPU", int64Ptr(7150000), true},
+		{"STG_T2_PROD", "storage", "Storage SAN Tier 2", "Production", "GB", int64Ptr(33000), true},
+		{"STG_T3_PROD", "storage", "Storage SAN Tier 3", "Production", "GB", int64Ptr(48000), true},
+		{"STG_T2_DEV", "storage", "Storage SAN Tier 2", "Dev / Non-Prod", "GB", int64Ptr(28600), true},
+		{"NBU_ALL", "backup", "Backup Netbackup (NBU)", "Production", "GB", int64Ptr(27000), true},
+		{"RUBRIK_PROD", "backup", "Rubrik Backup", "Production", "GB", int64Ptr(35000), true},
 		{"BM_STD_PROD", "baremetal", "Server Baremetal (Standard)", "Production", "Unit", int64Ptr(794000000), true},
 		{"BM_STD_DEV", "baremetal", "Server Baremetal (Standard)", "Dev / Non-Prod", "Unit", int64Ptr(794000000), true},
 
 		// Licenses
-		{"LIC_NGINX_PROD", "license", "NGINX Plus (F5 Enterprise)", "Production", "Instance / Thn", nil, false},
-		{"LIC_NGINX_DEV", "license", "NGINX Plus (F5 Enterprise)", "Dev / Non-Prod", "Instance / Thn", nil, false},
-		{"LIC_OCP_PROD", "license", "Red Hat Openshift Container Platform", "Production", "Node / Thn", int64Ptr(240000000), true},
-		{"LIC_OCP_DEV", "license", "Red Hat Openshift Container Platform", "Dev / Non-Prod", "Node / Thn", int64Ptr(134000000), true},
-		{"LIC_REDIS_PROD", "license", "Redis Enterprise Software", "Production", "Shard / Thn", int64Ptr(125000000), true},
-		{"LIC_REDIS_DEV", "license", "Redis Enterprise Software", "Dev / Non-Prod", "Shard / Thn", int64Ptr(75000000), true},
-		{"LIC_KAFKA_PROD", "license", "Confluent Kafka Enterprise", "Production", "Broker / Thn", nil, false},
-		{"LIC_KAFKA_DEV", "license", "Confluent Kafka Enterprise", "Dev / Non-Prod", "Broker / Thn", nil, false},
-		{"LIC_ORACLE_PROD", "license", "Oracle Database Enterprise Edition", "Production", "Core / Thn", nil, false},
+		{"LIC_NGINX_PROD", "license", "NGINX Plus (F5 Enterprise)", "Production", "Instance", nil, false},
+		{"LIC_NGINX_DEV", "license", "NGINX Plus (F5 Enterprise)", "Dev / Non-Prod", "Instance", nil, false},
+		{"LIC_OCP_PROD", "license", "Red Hat Openshift Container Platform", "Production", "Node", int64Ptr(240000000), true},
+		{"LIC_OCP_DEV", "license", "Red Hat Openshift Container Platform", "Dev / Non-Prod", "Node", int64Ptr(134000000), true},
+		{"LIC_REDIS_PROD", "license", "Redis Enterprise Software", "Production", "Shard", int64Ptr(125000000), true},
+		{"LIC_REDIS_DEV", "license", "Redis Enterprise Software", "Dev / Non-Prod", "Shard", int64Ptr(75000000), true},
+		{"LIC_KAFKA_PROD", "license", "Confluent Kafka Enterprise", "Production", "Broker", nil, false},
+		{"LIC_KAFKA_DEV", "license", "Confluent Kafka Enterprise", "Dev / Non-Prod", "Broker", nil, false},
+		{"LIC_ORACLE_PROD", "license", "Oracle Database Enterprise Edition", "Production", "Core", nil, false},
 	}
 
 	for _, p := range pricingSeed {
@@ -282,7 +298,7 @@ func SeedMasterData(db *gorm.DB) error {
 		{
 			No: 5, Layer: "Database Storage", Component: "Oracle ASM Shared SAN",
 			Notes:   "Moderate: SAN Tier 2 Virtual LUN 1.0 - 1.5 TB. Critical: SAN Tier 2 ASM 5.5 TB (Reco 500GB, Data 5000GB) pada node bare metal.",
-			ModNode: 1, ModType: "shared", ModVCPU: 0, ModRAM: 0, ModSTG: 1500, ModSTGCls: "Tier 2",
+			ModNode: 1, ModType: "vm", ModVCPU: 0, ModRAM: 0, ModSTG: 1500, ModSTGCls: "Tier 2",
 			CritNode: 1, CritType: "baremetal", CritVCPU: 0, CritRAM: 0, CritSTG: 5500, CritSTGCls: "Tier 3",
 			FreeLic: "SAN LUN Tier 2 Standard", EntLic: "SAN LUN Tier 3 + Oracle ASM", EntVendor: "Enterprise Storage", EntSKU: "", EntMetric: "free",
 		},
@@ -600,4 +616,3 @@ func SeedLicenseRules(db *gorm.DB) error {
 	log.Println("✅ Enterprise License Rules seeded successfully!")
 	return nil
 }
-

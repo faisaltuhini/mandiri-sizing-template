@@ -133,7 +133,8 @@ function toggleCollapse() {
 }
 
 .base-section-card.has-changes {
-  border-left: 3.5px solid #D97706;
+  border-color: #FCD34D;
+  box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);
 }
 
 .section-card-hdr {
@@ -219,9 +220,9 @@ function toggleCollapse() {
 }
 
 .technical-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
-  color: #64748B;
+  color: #334155;
   background: #E2E8F0;
   padding: 1.5px 6px;
   border-radius: 4px;
@@ -229,7 +230,7 @@ function toggleCollapse() {
 }
 
 .change-indicator {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #B45309;
   background: #FEF3C7;
@@ -242,7 +243,7 @@ function toggleCollapse() {
 .section-guide-question {
   margin: 0;
   font-size: 11.5px;
-  color: #64748B;
+  color: #475569;
   line-height: 1.35;
 }
 

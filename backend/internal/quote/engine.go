@@ -74,6 +74,11 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 		nbuPrice = *p.UnitPriceIDR
 	}
 
+	rubrikPrice := int64(35000)
+	if p, ok := e.pricingMap["RUBRIK_PROD"]; ok && p.UnitPriceIDR != nil {
+		rubrikPrice = *p.UnitPriceIDR
+	}
+
 	bmPrice := int64(794000000)
 	if p, ok := e.pricingMap["BM_STD_PROD"]; ok && p.UnitPriceIDR != nil {
 		bmPrice = *p.UnitPriceIDR
@@ -130,10 +135,19 @@ func (e *Engine) CalculateQuote(req model.QuoteRequest) model.QuoteResponse {
 			}
 		}
 
-		// 3. Backup Cost
+		// 3. Backup Cost (NGINX uses Rubrik Backup Rp 35.000 / GB, others use NetBackup Rp 27.000 / GB)
 		var backupCost int64
 		if !isNoneCompute && item.BackupEnabled {
-			backupCost = int64(itemStorage) * nbuPrice
+			isNginx := strings.Contains(strings.ToLower(compName), "nginx") ||
+				strings.Contains(strings.ToLower(layerName), "web ingress") ||
+				strings.Contains(strings.ToLower(item.ComponentName), "nginx") ||
+				strings.Contains(strings.ToLower(item.LayerName), "web ingress") ||
+				item.PricingSKU == "LIC_NGINX_PROD"
+			if isNginx {
+				backupCost = int64(itemStorage) * rubrikPrice
+			} else {
+				backupCost = int64(itemStorage) * nbuPrice
+			}
 		}
 
 		// 4. License Cost

@@ -104,14 +104,8 @@ oc start-build sizing-frontend --from-dir=frontend -n sizing-dev --follow
 Aplikasi membutuhkan Secret untuk string koneksi database (`DATABASE_URL`). Buat secret di namespace tujuan sebelum melakukan apply:
 
 ```bash
-# Untuk Microsoft SQL Server:
 oc create secret generic sizing-db-secret \
-  --from-literal=DATABASE_URL="sqlserver://sa:YourPassword123@sqlserver.database.svc:1433?database=sizing&trustServerCertificate=true" \
-  -n sizing-dev
-
-# Atau untuk PostgreSQL:
-oc create secret generic sizing-db-secret \
-  --from-literal=DATABASE_URL="postgres://sizing_user:YourPassword123@postgres.database.svc:5432/sizing?sslmode=disable" \
+  --from-literal=DATABASE_URL="postgres://postgres:YourPassword123@postgres.database.svc:5432/sizing?sslmode=disable" \
   -n sizing-dev
 ```
 

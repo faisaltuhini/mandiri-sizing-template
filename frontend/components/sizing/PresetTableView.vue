@@ -46,6 +46,7 @@
           <span>Kembalikan Default Pabrik</span>
         </button>
 
+
         <button
           type="button"
           class="btn-add-layer"
@@ -450,7 +451,7 @@
                   </span>
                 </div>
                 <span :class="['backup-badge', item.moderate.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.moderate.backupEnabled ? '✓ NetBackup Aktif' : 'Tanpa NetBackup' }}
+                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik Backup' : '✓ NetBackup Aktif') : 'Tanpa Backup' }}
                 </span>
               </div>
             </div>
@@ -530,7 +531,7 @@
                   </span>
                 </div>
                 <span :class="['backup-badge', item.critical.backupEnabled ? 'active' : 'inactive']">
-                  {{ item.critical.backupEnabled ? '✓ NetBackup Aktif' : 'Tanpa NetBackup' }}
+                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik Backup' : '✓ NetBackup Aktif') : 'Tanpa Backup' }}
                 </span>
               </div>
             </div>
@@ -629,8 +630,8 @@
                 <div class="matrix-lic-text" :title="item.moderate.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
                   {{ item.moderate.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
                 </div>
-                <span :class="['matrix-nbu-dot', item.moderate.backupEnabled ? 'active' : 'inactive']" :title="item.moderate.backupEnabled ? 'NetBackup Aktif' : 'Tanpa NetBackup'">
-                  {{ item.moderate.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                <span :class="['matrix-nbu-dot', item.moderate.backupEnabled ? 'active' : 'inactive']" :title="item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup Aktif' : 'NetBackup Aktif') : 'Tanpa Backup'">
+                  {{ item.moderate.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
                 </span>
               </td>
 
@@ -657,8 +658,8 @@
                 <div class="matrix-lic-text" :title="item.critical.licenseKind === 'enterprise' ? item.licenseEnterprise : item.licenseFree">
                   {{ item.critical.licenseKind === 'enterprise' ? '🛡️ Enterprise' : '🆓 Free OSS' }}
                 </div>
-                <span :class="['matrix-nbu-dot', item.critical.backupEnabled ? 'active' : 'inactive']" :title="item.critical.backupEnabled ? 'NetBackup Aktif' : 'Tanpa NetBackup'">
-                  {{ item.critical.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                <span :class="['matrix-nbu-dot', item.critical.backupEnabled ? 'active' : 'inactive']" :title="item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? 'Rubrik Backup Aktif' : 'NetBackup Aktif') : 'Tanpa Backup'">
+                  {{ item.critical.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
                 </span>
               </td>
               <td class="td-crit-delta">
@@ -957,7 +958,7 @@
                             {{ activeSpec.licenseKind === 'enterprise' ? (item.licenseEnterprise || 'Official Enterprise') : (item.licenseFree || 'Community OSS') }}
                           </span>
                           <span :class="['s-nbu-pill', { on: activeSpec.backupEnabled }]">
-                            {{ activeSpec.backupEnabled ? '✓ NBU' : 'No NBU' }}
+                            {{ activeSpec.backupEnabled ? (item.component.toLowerCase().includes('nginx') ? '✓ Rubrik' : '✓ NBU') : 'No Backup' }}
                           </span>
                         </div>
                       </template>
@@ -1101,7 +1102,7 @@
           </button>
         </div>
 
-        <form @submit.prevent="savePresetLayer" class="modal-content preset-form-clean">
+        <form novalidate @submit.prevent="savePresetLayer" class="modal-content preset-form-clean">
           <!-- ========================================== -->
           <!-- TAB 1: INFORMASI UMUM KOMPONEN             -->
           <!-- ========================================== -->
@@ -1245,11 +1246,12 @@
                     subtitle="SAN Storage"
                     :content="glossary.storage.shortDesc"
                     :business-impact="glossary.storage.businessImpact"
+                    align="right"
                   />
                 </div>
                 <BaseStepper
                   v-model="form.moderate.storageGBPerNode"
-                  :min="10"
+                  :min="0"
                   :max="20000"
                   :step="50"
                   label="Storage"
@@ -1264,7 +1266,7 @@
               <label class="clean-label">Tipe Lingkungan Compute:</label>
               <BaseChoiceCard
                 v-model="form.moderate.computeType"
-                :columns="3"
+                :columns="2"
                 :options="[
                   {
                     value: 'vm',
@@ -1280,19 +1282,12 @@
                     description: 'Mesin fisik dedicated tanpa lapisan virtual.',
                     icon: '🏢',
                     badge: 'Dedicated'
-                  },
-                  {
-                    value: 'shared',
-                    title: 'Penyimpanan Berbagi',
-                    technicalLabel: 'Shared / LUN',
-                    description: 'Hanya ruang disk tanpa compute tambahan.',
-                    icon: '🔗'
                   }
                 ]"
               />
             </div>
 
-            <!-- Storage Class & NetBackup -->
+            <!-- Storage Class & NetBackup / Rubrik -->
             <div class="storage-class-toggle-row">
               <div class="class-picker-half">
                 <label class="clean-label">Kelas Kecepatan Storage:</label>
@@ -1323,8 +1318,8 @@
                 <label class="clean-backup-chk-box" :class="{ active: form.moderate.backupEnabled }">
                   <input type="checkbox" v-model="form.moderate.backupEnabled" class="custom-chk-big" />
                   <div class="chk-desc-wrap">
-                    <span class="chk-title">Sertakan NetBackup NBU</span>
-                    <span class="chk-sub">Pencadangan harian otomatis enterprise Enterprise Architecture.</span>
+                    <span class="chk-title">{{ form.component.toLowerCase().includes('nginx') ? 'Sertakan Rubrik Backup' : 'Sertakan NetBackup NBU' }}</span>
+                    <span class="chk-sub">{{ form.component.toLowerCase().includes('nginx') ? 'Pencadangan Rubrik Backup Rp 35.000 / GB.' : 'Pencadangan NetBackup Rp 27.000 / GB.' }}</span>
                   </div>
                 </label>
               </div>
@@ -1401,11 +1396,12 @@
                     subtitle="SAN Storage"
                     :content="glossary.storage.shortDesc"
                     :business-impact="glossary.storage.businessImpact"
+                    align="right"
                   />
                 </div>
                 <BaseStepper
                   v-model="form.critical.storageGBPerNode"
-                  :min="10"
+                  :min="0"
                   :max="20000"
                   :step="50"
                   label="Storage"
@@ -1420,7 +1416,7 @@
               <label class="clean-label">Tipe Lingkungan Compute:</label>
               <BaseChoiceCard
                 v-model="form.critical.computeType"
-                :columns="3"
+                :columns="2"
                 :options="[
                   {
                     value: 'vm',
@@ -1437,19 +1433,12 @@
                     icon: '🏢',
                     badge: 'Direkomendasikan',
                     badgeType: 'warning'
-                  },
-                  {
-                    value: 'shared',
-                    title: 'Penyimpanan Berbagi',
-                    technicalLabel: 'Shared / LUN',
-                    description: 'Hanya ruang disk tanpa compute tambahan.',
-                    icon: '🔗'
                   }
                 ]"
               />
             </div>
 
-            <!-- Storage Class & NetBackup -->
+            <!-- Storage Class & NetBackup / Rubrik -->
             <div class="storage-class-toggle-row">
               <div class="class-picker-half">
                 <label class="clean-label">Kelas Kecepatan Storage:</label>
@@ -1482,8 +1471,8 @@
                 <label class="clean-backup-chk-box" :class="{ active: form.critical.backupEnabled }">
                   <input type="checkbox" v-model="form.critical.backupEnabled" class="custom-chk-big" />
                   <div class="chk-desc-wrap">
-                    <span class="chk-title">Sertakan NetBackup NBU</span>
-                    <span class="chk-sub">Pencadangan harian otomatis enterprise Enterprise Architecture.</span>
+                    <span class="chk-title">{{ form.component.toLowerCase().includes('nginx') ? 'Sertakan Rubrik Backup' : 'Sertakan NetBackup NBU' }}</span>
+                    <span class="chk-sub">{{ form.component.toLowerCase().includes('nginx') ? 'Pencadangan Rubrik Backup Rp 35.000 / GB.' : 'Pencadangan NetBackup Rp 27.000 / GB.' }}</span>
                   </div>
                 </label>
               </div>
@@ -2830,6 +2819,7 @@ function copyModerateToCritical() {
   form.critical.computeType = form.moderate.computeType
   form.critical.backupEnabled = form.moderate.backupEnabled
 }
+
 
 function openAddLayerModal() {
   modalActiveTab.value = 'general'

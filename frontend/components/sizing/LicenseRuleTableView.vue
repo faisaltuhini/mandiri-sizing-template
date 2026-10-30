@@ -283,7 +283,7 @@
                     <span v-if="rule.pricing_sku" class="sku-code">{{ rule.pricing_sku }}</span>
                     <div v-if="rule.unit_price_idr && rule.unit_price_idr > 0" class="price-val">
                       {{ formatCurrency(rule.unit_price_idr) }}
-                      <small class="price-sub">/ Thn</small>
+                      <small class="price-sub">(Perpetual)</small>
                     </div>
                     <div v-else class="unconfirmed-price">
                       <span class="badge-sta">Menunggu Konfirmasi STA</span>
@@ -502,7 +502,7 @@
                 <span class="section-step-num">3</span>
                 <div>
                   <h4 class="section-title-text">Tautan Katalog Harga &amp; Tarif Resmi</h4>
-                  <p class="section-desc-text">Hubungkan ke SKU master data katalog dan tentukan tarif tahunan resmi</p>
+                  <p class="section-desc-text">Hubungkan ke SKU master data katalog dan tentukan tarif lisensi resmi (perpetual)</p>
                 </div>
               </div>
 
@@ -545,7 +545,7 @@
                     <div class="matched-info-grid">
                       <div class="matched-info-left">
                         <strong class="matched-title">{{ matchedCatalogItem.name }}</strong>
-                        <span class="matched-unit-text">Satuan: {{ matchedCatalogItem.unit || 'Unit / Thn' }}</span>
+                        <span class="matched-unit-text">Satuan: {{ matchedCatalogItem.unit || 'Unit' }}</span>
                       </div>
                       <div class="matched-price-tag">
                         {{ formatCurrency(matchedCatalogItem.unit_price_idr) }}

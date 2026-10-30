@@ -8,7 +8,7 @@ import (
 
 // PriceListVersion represents a versioned pricing catalog
 type PriceListVersion struct {
-	ID            uuid.UUID     `gorm:"primaryKey" json:"id"`
+	ID            uuid.UUID     `gorm:"type:uuid;primaryKey" json:"id"`
 	Name          string        `gorm:"type:varchar(255);not null" json:"name"`
 	EffectiveDate time.Time     `json:"effective_date"`
 	Status        string        `gorm:"type:varchar(50);default:'draft'" json:"status"` // draft, active, archived
@@ -19,8 +19,8 @@ type PriceListVersion struct {
 
 // PricingItem represents an infrastructure or license unit price
 type PricingItem struct {
-	ID                 uuid.UUID `gorm:"primaryKey" json:"id"`
-	PriceListVersionID uuid.UUID `gorm:"not null;index:idx_pricing_version" json:"price_list_version_id"`
+	ID                 uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	PriceListVersionID uuid.UUID `gorm:"type:uuid;not null;index:idx_pricing_version" json:"price_list_version_id"`
 	SKU                string    `gorm:"type:varchar(100);not null;index:idx_pricing_sku;index:idx_pricing_cat_sku,priority:2" json:"sku"`
 	Category           string    `gorm:"type:varchar(50);not null;index:idx_pricing_category;index:idx_pricing_cat_sku,priority:1" json:"category"` // compute, storage, backup, baremetal, license
 	Name               string    `gorm:"type:varchar(255);not null;index:idx_pricing_name" json:"name"`
@@ -35,7 +35,7 @@ type PricingItem struct {
 
 // CatalogComponent represents one of the 13 Enterprise Architecture layers
 type CatalogComponent struct {
-	ID            uuid.UUID           `gorm:"primaryKey" json:"id"`
+	ID            uuid.UUID           `gorm:"type:uuid;primaryKey" json:"id"`
 	LayerNo       int                 `gorm:"not null;index:idx_catalog_layer_no" json:"layer_no"`
 	LayerName     string              `gorm:"type:varchar(100);not null;index:idx_catalog_layer_name" json:"layer_name"`
 	ComponentName string              `gorm:"type:varchar(255);not null;index:idx_catalog_comp_name" json:"component_name"`
@@ -49,8 +49,8 @@ type CatalogComponent struct {
 
 // ComponentBaseline represents default baseline specs for moderate vs critical
 type ComponentBaseline struct {
-	ID               uuid.UUID `gorm:"primaryKey" json:"id"`
-	ComponentID      uuid.UUID `gorm:"not null;index:idx_baseline_comp;index:idx_baseline_comp_tier,priority:1" json:"component_id"`
+	ID               uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ComponentID      uuid.UUID `gorm:"type:uuid;not null;index:idx_baseline_comp;index:idx_baseline_comp_tier,priority:1" json:"component_id"`
 	Tier             string    `gorm:"type:varchar(50);not null;index:idx_baseline_comp_tier,priority:2" json:"tier"` // moderate, critical
 	ComputeType      string    `gorm:"type:varchar(50);not null" json:"compute_type"`                                  // vm, baremetal, shared
 	NodeCount        int       `gorm:"not null" json:"node_count"`
@@ -66,8 +66,8 @@ type ComponentBaseline struct {
 
 // LicenseOption defines free community vs enterprise licensed options
 type LicenseOption struct {
-	ID          uuid.UUID `gorm:"primaryKey" json:"id"`
-	ComponentID uuid.UUID `gorm:"not null;index:idx_licopt_comp;index:idx_licopt_comp_kind,priority:1" json:"component_id"`
+	ID          uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ComponentID uuid.UUID `gorm:"type:uuid;not null;index:idx_licopt_comp;index:idx_licopt_comp_kind,priority:1" json:"component_id"`
 	Kind        string    `gorm:"type:varchar(50);not null;index:idx_licopt_comp_kind,priority:2" json:"kind"` // free, enterprise
 	ProductName string    `gorm:"type:varchar(255);not null" json:"product_name"`
 	Vendor      string    `gorm:"type:varchar(100);index:idx_licopt_vendor" json:"vendor"`
@@ -77,7 +77,7 @@ type LicenseOption struct {
 
 // LicenseRule defines business rules for software licenses (e.g. per 5 pods, per node db, per shard with min cluster)
 type LicenseRule struct {
-	ID             uuid.UUID `gorm:"primaryKey" json:"id"`
+	ID             uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
 	RuleName       string    `gorm:"type:varchar(255);not null;index:idx_license_rule_name;index:idx_license_cat_name,priority:2" json:"rule_name"` // e.g. "AppDynamics APM Microservices (5-pack)"
 	Vendor         string    `gorm:"type:varchar(100);not null;index:idx_license_vendor" json:"vendor"`                                             // Cisco / AppDynamics, Redis Ltd, Red Hat, Oracle, F5
 	Category       string    `gorm:"type:varchar(50);default:'apm';index:idx_license_category;index:idx_license_cat_name,priority:1" json:"category"` // apm, database, cache, platform, ingress
@@ -95,10 +95,10 @@ type LicenseRule struct {
 
 // Scenario represents a saved sizing configuration
 type Scenario struct {
-	ID                 uuid.UUID      `gorm:"primaryKey" json:"id"`
+	ID                 uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	Name               string         `gorm:"type:varchar(255);not null" json:"name"`
 	ProjectName        string         `gorm:"type:varchar(255)" json:"project_name"`
-	PriceListVersionID uuid.UUID      `gorm:"not null" json:"price_list_version_id"`
+	PriceListVersionID uuid.UUID      `gorm:"type:uuid;not null" json:"price_list_version_id"`
 	Environment        string         `gorm:"type:varchar(50);default:'Production'" json:"environment"`
 	IncludeDRC         bool           `gorm:"default:true" json:"include_drc"`
 	TotalAnnualIDR     int64          `json:"total_annual_idr"`
@@ -109,9 +109,9 @@ type Scenario struct {
 
 // ScenarioItem represents one configured component inside a scenario
 type ScenarioItem struct {
-	ID               uuid.UUID `gorm:"primaryKey" json:"id"`
-	ScenarioID       uuid.UUID `gorm:"not null;index" json:"scenario_id"`
-	ComponentID      uuid.UUID `gorm:"not null" json:"component_id"`
+	ID               uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ScenarioID       uuid.UUID `gorm:"type:uuid;not null;index" json:"scenario_id"`
+	ComponentID      uuid.UUID `gorm:"type:uuid;not null" json:"component_id"`
 	Tier             string    `gorm:"type:varchar(50);not null" json:"tier"`
 	ComputeType      string    `gorm:"type:varchar(50);not null" json:"compute_type"`
 	NodeCount        int       `gorm:"not null" json:"node_count"`
@@ -120,7 +120,7 @@ type ScenarioItem struct {
 	StorageGBPerNode int       `gorm:"not null" json:"storage_gb_per_node"`
 	StorageClass     string    `gorm:"type:varchar(50)" json:"storage_class"`
 	BackupEnabled    bool      `gorm:"default:true" json:"backup_enabled"`
-	LicenseOptionID  uuid.UUID `json:"license_option_id"`
+	LicenseOptionID  uuid.UUID `gorm:"type:uuid" json:"license_option_id"`
 }
 
 // --- QUOTE ENGINE DTOs ---

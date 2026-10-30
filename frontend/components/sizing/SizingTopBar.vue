@@ -268,7 +268,7 @@ onUnmounted(() => {
 
 .page-subtitle {
   font-size: 12px;
-  color: #64748B;
+  color: #475569;
   margin: 2px 0 0 0;
 }
 

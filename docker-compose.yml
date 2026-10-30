@@ -1,26 +1,26 @@
 services:
   # =========================================================================
-  # Microsoft SQL Server / Azure SQL Edge
-  # Lightweight, high-performance, runs on both ARM64 (Apple Silicon) & AMD64
+  # PostgreSQL Database (Version 16 - Alpine)
+  # Native multi-arch (Apple Silicon ARM64 & AMD64), high-performance
   # =========================================================================
   db:
-    image: mcr.microsoft.com/azure-sql-edge:latest
+    image: postgres:16-alpine
     container_name: sizing-db
     restart: unless-stopped
     ports:
-      - "${DB_PORT:-1433}:1433"
+      - "${DB_PORT:-5432}:5432"
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${DB_PASSWORD:-PasswordKuat123!}
-      - MSSQL_PID=Developer
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-PasswordKuat123!}
+      - POSTGRES_DB=${DB_NAME:-sizing}
     volumes:
-      - sizing_db_data:/var/opt/mssql
+      - sizing_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q 'SELECT 1' || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-sizing}"]
+      interval: 5s
       timeout: 5s
-      retries: 10
-      start_period: 15s
+      retries: 5
+      start_period: 10s
 
   # =========================================================================
   # Golang Sizing Engine Backend (Fiber API)
@@ -36,9 +36,8 @@ services:
       - "${BACKEND_PORT:-8089}:8089"
     environment:
       - PORT=8089
-      - DATABASE_URL=${DATABASE_URL:-sqlserver://sa:${DB_PASSWORD_ENCODED:-PasswordKuat123%21}@db:1433?database=sizing&trustServerCertificate=true}
+      - DATABASE_URL=${DATABASE_URL:-postgres://${DB_USER:-postgres}:${DB_PASSWORD:-PasswordKuat123!}@db:5432/${DB_NAME:-sizing}?sslmode=disable}
       - CORS_ORIGINS=${CORS_ORIGINS:-*}
-      - GODEBUG=x509negativeserial=1
       - TEMPLATES_DIR=/app/templates
       - TZ=${TZ:-Asia/Jakarta}
     volumes:

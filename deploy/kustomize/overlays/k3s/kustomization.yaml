@@ -36,13 +36,3 @@ patches:
       - op: add
         path: /data/BACKEND_URL
         value: "http://sizing-backend:8089"
-
-  - target:
-      kind: Deployment
-      name: sizing-backend
-    patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/env/-
-        value:
-          name: GODEBUG
-          value: "x509negativeserial=1"

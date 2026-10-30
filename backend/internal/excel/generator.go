@@ -597,6 +597,11 @@ func buildSizingSheet(
 		nbuRow = 8
 	}
 
+	rubrikRow := skuRowMap["RUBRIK_PROD"]
+	if rubrikRow == 0 {
+		rubrikRow = 9
+	}
+
 	bmRow := skuRowMap["BM_STD_PROD"]
 	if bmRow == 0 {
 		bmRow = 10
@@ -713,7 +718,13 @@ func buildSizingSheet(
 			_ = f.SetCellFormula(sh, fmt.Sprintf("O%d", r), fmt.Sprintf("M%d*Pricing!$E$%d", r, targetStgRow))
 
 			if backupEnabled && item.BackupCostAnnual > 0 {
-				_ = f.SetCellFormula(sh, fmt.Sprintf("P%d", r), fmt.Sprintf("M%d*0.5*0.8*Pricing!$E$%d", r, nbuRow))
+				isNginx := strings.Contains(strings.ToLower(item.ComponentName), "nginx") ||
+					strings.Contains(strings.ToLower(item.LayerName), "web ingress")
+				targetBackupRow := nbuRow
+				if isNginx {
+					targetBackupRow = rubrikRow
+				}
+				_ = f.SetCellFormula(sh, fmt.Sprintf("P%d", r), fmt.Sprintf("M%d*0.5*0.8*Pricing!$E$%d", r, targetBackupRow))
 			} else {
 				_ = f.SetCellValue(sh, fmt.Sprintf("P%d", r), 0)
 			}

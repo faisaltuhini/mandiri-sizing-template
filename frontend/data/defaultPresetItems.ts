@@ -141,7 +141,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
       ramGBPerNode: 0,
       storageGBPerNode: 1500,
       storageClass: 'Tier 2',
-      computeType: 'shared',
+      computeType: 'vm',
       backupEnabled: true,
       licenseKind: 'free'
     },
@@ -151,7 +151,7 @@ export const DEFAULT_PRESET_ITEMS: SizingPresetItem[] = [
       ramGBPerNode: 0,
       storageGBPerNode: 5500,
       storageClass: 'Tier 3',
-      computeType: 'shared',
+      computeType: 'vm',
       backupEnabled: true,
       licenseKind: 'enterprise'
     }

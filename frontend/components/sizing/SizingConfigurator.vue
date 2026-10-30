@@ -11,6 +11,7 @@
           <span class="item-count">{{ layerItems.length }} Layer</span>
         </div>
         <div class="list-hdr-actions">
+
           <button
             type="button"
             class="btn-add-catalog-layer"
@@ -106,12 +107,13 @@
             </div>
           </div>
 
-          <div class="banner-actions-right">
+          <div class="layer-action-toolbar">
+            <!-- 1. Expand / Collapse Steps -->
             <button
               type="button"
-              class="btn-toggle-all-steps"
+              class="toolbar-action-btn"
               @click="toggleAllSteps"
-              :title="isAllCollapsed ? 'Buka semua langkah konfigurasi' : 'Ringkas semua langkah konfigurasi'"
+              :title="isAllCollapsed ? 'Buka semua 4 langkah konfigurasi' : 'Ringkas semua langkah konfigurasi'"
             >
               <svg v-if="isAllCollapsed" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 3 21 3 21 9"></polyline>
@@ -125,34 +127,16 @@
                 <line x1="14" y1="10" x2="21" y2="3"></line>
                 <line x1="3" y1="21" x2="10" y2="14"></line>
               </svg>
-              <span>{{ isAllCollapsed ? 'Buka Semua Langkah' : 'Ringkas Semua' }}</span>
+              <span>{{ isAllCollapsed ? 'Buka Semua' : 'Ringkas Semua' }}</span>
             </button>
 
-            <div class="filter-status-tags">
-              <button
-                type="button"
-                :class="['active-filter-tag', 'interactive-tag', tierFilter]"
-                title="Klik untuk beralih antara Tier Critical dan Tier Moderat"
-                @click="$emit('update:tier', tierFilter === 'critical' ? 'moderate' : 'critical')"
-              >
-                <span>Tier: {{ tierFilter === 'critical' ? 'CRITICAL' : 'MODERAT' }}</span>
-                <span class="tag-swap-hint">⇄</span>
-              </button>
-              <button
-                type="button"
-                :class="['active-filter-tag', 'interactive-tag', licenseFilter === 'free' ? 'free' : 'license']"
-                title="Klik untuk beralih antara Lisensi Enterprise dan Free OSS"
-                @click="$emit('update:license', licenseFilter === 'free' ? 'license' : 'free')"
-              >
-                <span>Lisensi: {{ licenseFilter === 'free' ? 'FREE (OSS)' : 'ENTERPRISE' }}</span>
-                <span class="tag-swap-hint">⇄</span>
-              </button>
-            </div>
+            <span class="toolbar-separator"></span>
 
+            <!-- 2. Reset Layer Configuration to EA Baseline -->
             <button
               type="button"
-              class="btn-reset-baseline"
-              :class="{ 'highlight-reset': isLayerCustomized(activeItem.id) }"
+              class="toolbar-action-btn btn-reset"
+              :class="{ 'is-customized': isLayerCustomized(activeItem.id) }"
               @click="$emit('reset-active-layer')"
               title="Kembalikan konfigurasi layer ini ke standar resmi Enterprise Architecture"
             >
@@ -160,73 +144,55 @@
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                 <path d="M3 3v5h5"/>
               </svg>
-              <span>Reset ke Standar</span>
+              <span>Reset Standar</span>
+              <span v-if="isLayerCustomized(activeItem.id)" class="custom-dot" title="Layer ini telah disesuaikan dari standar EA"></span>
             </button>
 
+            <span class="toolbar-separator"></span>
+
+            <!-- 3. Delete Layer -->
             <button
               type="button"
-              class="btn-delete-active-layer"
-              title="Hapus layer ini dari arsitektur Sizing jika komponen ini tidak dibutuhkan"
+              class="toolbar-action-btn btn-delete"
+              title="Hapus layer ini dari arsitektur sizing"
               @click="confirmRemoveLayer(activeItem)"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18"/>
                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
                 <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
               </svg>
-              <span>Hapus Layer</span>
+              <span>Hapus</span>
             </button>
           </div>
         </div>
 
-        <!-- 2. PLAIN-LANGUAGE CONTEXT & EA BASELINE BANNER (Replaces confusing "Step 5") -->
-        <div class="context-guide-banner">
-          <div class="context-main-row" @click="showBaselineDetails = !showBaselineDetails">
-            <div class="context-left">
-              <span class="context-badge-icon">ℹ️</span>
-              <div class="context-text-group">
-                <div class="context-headline-row">
-                  <span class="context-title">Fungsi Komponen:</span>
-                  <span class="context-friendly-desc">{{ getFriendlyRoleDescription(activeItem) }}</span>
-                </div>
-                <div class="context-baseline-row">
-                  <span class="baseline-pill-label">★ Acuan Standar EA ({{ tierFilter === 'critical' ? 'Tier Critical' : 'Tier Moderat' }}):</span>
-                  <span class="baseline-pill-spec">{{ cleanBaselineSummary }}</span>
-                </div>
-              </div>
-            </div>
-
-            <button type="button" class="btn-context-detail" @click.stop="showBaselineDetails = !showBaselineDetails">
-              <span>{{ showBaselineDetails ? 'Tutup Detail Acuan' : 'Lihat Catatan EA' }}</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                :class="{ rotated: showBaselineDetails }"
-              >
-                <polyline points="6 9 12 15 18 9"></polyline>
+        <!-- 2. CLEAN & MODERN EA ARCHITECTURE BASELINE BANNER -->
+        <div class="ea-context-banner">
+          <div class="ea-context-left">
+            <div class="ea-icon-badge" title="Informasi Komponen Arsitektur Enterprise">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#002060" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="16" x2="12" y2="12"/>
+                <line x1="12" y1="8" x2="12.01" y2="8"/>
               </svg>
-            </button>
-          </div>
-
-          <!-- Expandable EA Forum Notes & Contract Ref -->
-          <div v-if="showBaselineDetails" class="context-expanded-body">
-            <div class="context-detail-grid">
-              <div class="detail-col">
-                <span class="detail-lbl">Alokasi Node Standar ({{ tierFilter.toUpperCase() }})</span>
-                <span class="detail-val">{{ tierFilter === 'critical' ? activeItem.critical.nodes : activeItem.moderate.nodes }} · {{ tierFilter === 'critical' ? activeItem.critical.type : activeItem.moderate.type }}</span>
+            </div>
+            <div class="ea-context-body">
+              <div class="ea-desc-row">
+                <span class="ea-desc-lead">Fungsi Komponen:</span>
+                <span class="ea-desc-text">{{ getFriendlyRoleDescription(activeItem) }}</span>
               </div>
-              <div class="detail-col">
-                <span class="detail-lbl">Spesifikasi Hardware Acuan</span>
-                <span class="detail-val font-mono">{{ tierFilter === 'critical' ? activeItem.critical.spec : activeItem.moderate.spec }}</span>
-              </div>
-              <div class="detail-col">
-                <span class="detail-lbl">Catatan Arsitektur &amp; Referensi</span>
-                <span class="detail-val">{{ activeItem.notes || 'Mengikuti standar arsitektur Bank Mandiri.' }}</span>
-                <span v-if="activeItem.contractRef" class="contract-mini-pill">Ref: {{ activeItem.contractRef }}</span>
+              <div class="ea-meta-row">
+                <span class="ea-baseline-chip">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  <span>Acuan Standar EA ({{ tierFilter === 'critical' ? 'Tier Critical' : 'Tier Moderat' }}):</span>
+                </span>
+                <span class="ea-baseline-spec">{{ cleanBaselineSummary }}</span>
+                <span v-if="activeItem.contractRef" class="ea-contract-pill">
+                  Ref: {{ activeItem.contractRef }}
+                </span>
               </div>
             </div>
           </div>
@@ -434,7 +400,7 @@
                     {
                       value: 'Tier 2',
                       title: 'Standar Andal',
-                      technicalLabel: 'SAN Tier 2 (Rp 33rb/GB/thn)',
+                      technicalLabel: 'SAN Tier 2 (Rp 33rb/GB)',
                       description: 'Kecepatan standar enterprise untuk web server, container worker, cache, dan log.',
                       icon: '💾',
                       recommended: recommendedStorageClass === 'Tier 2'
@@ -442,7 +408,7 @@
                     {
                       value: 'Tier 3',
                       title: 'Ultra Cepat (Database)',
-                      technicalLabel: 'SAN Tier 3 ASM (Rp 48rb/GB/thn)',
+                      technicalLabel: 'SAN Tier 3 ASM (Rp 48rb/GB)',
                       description: 'Penyimpanan performa tinggi khusus database transaksi utama (Oracle ASM).',
                       icon: '⚡',
                       badge: 'High IOPS',
@@ -453,12 +419,12 @@
                 />
               </div>
 
-              <!-- Toggle Proteksi Backup NetBackup -->
+              <!-- Toggle Proteksi Backup NetBackup / Rubrik -->
               <div class="backup-protection-box">
                 <div class="field-hdr-wrap">
                   <span class="field-title-lbl">Proteksi Cadangan Data (Backup):</span>
                   <BaseHelpTip
-                    title="NetBackup (NBU)"
+                    :title="activeItem.component.toLowerCase().includes('nginx') ? 'Rubrik Backup' : 'NetBackup (NBU)'"
                     subtitle="Enterprise Daily Backup"
                     :content="glossary.backupNBU.shortDesc"
                     :business-impact="glossary.backupNBU.businessImpact"
@@ -473,14 +439,16 @@
                         v-model="activeConfig.backupEnabled"
                         class="custom-chk-large"
                       />
-                      <span class="backup-main-title">Backup Otomatis Harian (NetBackup)</span>
+                      <span class="backup-main-title">
+                        {{ activeItem.component.toLowerCase().includes('nginx') ? 'Backup Otomatis (Rubrik Backup)' : 'Backup Otomatis Harian (NetBackup)' }}
+                      </span>
                     </div>
                     <span :class="['backup-status-pill', activeConfig.backupEnabled ? 'on' : 'off']">
                       {{ activeConfig.backupEnabled ? '✓ Aktif' : 'Nonaktif' }}
                     </span>
                   </div>
                   <span class="backup-desc">
-                    Mencadangkan otomatis <strong>{{ (activeConfig.nodeCount * activeConfig.storageGBPerNode).toLocaleString('id-ID') }} GB</strong> data setiap hari agar aman dari kehilangan data (Tarif: Rp 27.000/GB/thn).
+                    Mencadangkan otomatis <strong>{{ (activeConfig.nodeCount * activeConfig.storageGBPerNode).toLocaleString('id-ID') }} GB</strong> data setiap hari agar aman dari kehilangan data ({{ activeItem.component.toLowerCase().includes('nginx') ? 'Tarif Rubrik: Rp 35.000/GB' : 'Tarif NetBackup: Rp 27.000/GB' }}).
                   </span>
                 </label>
               </div>
@@ -504,7 +472,7 @@
         >
           <BaseChoiceCard
             v-model="activeConfig.computeType"
-            :columns="4"
+            :columns="2"
             :options="[
               {
                 value: 'vm',
@@ -523,24 +491,6 @@
                 badge: 'Dedicated',
                 badgeType: 'warning',
                 recommended: recommendedComputeType === 'baremetal'
-              },
-              {
-                value: 'shared',
-                title: 'Penyimpanan Berbagi',
-                technicalLabel: 'Shared SAN Disk',
-                description: 'Hanya menggunakan ruang penyimpanan bersama terpusat tanpa menyewa mesin server baru.',
-                icon: '🔗',
-                recommended: recommendedComputeType === 'shared'
-              },
-              {
-                value: 'none',
-                title: 'Lisensi / Add-on Saja',
-                technicalLabel: 'Tanpa Server Baru',
-                description: 'Hanya membeli lisensi software/agent yang dipasang pada server yang sudah ada (Biaya Server Rp 0).',
-                icon: '📦',
-                badge: 'Add-on',
-                badgeType: 'info',
-                recommended: recommendedComputeType === 'none'
               }
             ]"
           />
@@ -610,59 +560,6 @@
             </div>
           </div>
 
-          <!-- SKU Selector & Rate Display when Enterprise is selected -->
-          <div v-if="activeConfig.licenseKind === 'enterprise'" class="enterprise-sku-picker-box">
-            <div class="sku-picker-header">
-              <div class="sku-picker-title-wrap">
-                <span class="sku-picker-lbl">Item Katalog Harga Lisensi (Opsional):</span>
-                <span class="sku-picker-sub">Otomatis mengikuti standar komponen, atau pilih SKU katalog spesifik di bawah</span>
-              </div>
-              <span v-if="activeConfig.pricingSku" class="sku-selected-tag">SKU: {{ activeConfig.pricingSku }}</span>
-            </div>
-
-            <div class="sku-picker-control-row">
-              <select
-                :value="activeConfig.pricingSku || ''"
-                class="sku-dropdown-select"
-                @change="onSkuSelectChange(($event.target as HTMLSelectElement).value)"
-              >
-                <option value="">-- Gunakan Standar Bawaan Layer Ini --</option>
-                <optgroup label="Katalog Lisensi Software">
-                  <option
-                    v-for="item in licenseCatalogItems"
-                    :key="item.sku"
-                    :value="item.sku"
-                  >
-                    {{ item.sku }} — {{ item.name }} ({{ formatSimpleIDR(item.unit_price_idr) ? 'Rp ' + formatSimpleIDR(item.unit_price_idr) : 'Pending STA' }} / {{ item.unit }})
-                  </option>
-                </optgroup>
-                <optgroup v-if="otherCatalogItems.length > 0" label="Item Katalog Lainnya">
-                  <option
-                    v-for="item in otherCatalogItems"
-                    :key="item.sku"
-                    :value="item.sku"
-                  >
-                    {{ item.sku }} — {{ item.name }} ({{ formatSimpleIDR(item.unit_price_idr) ? 'Rp ' + formatSimpleIDR(item.unit_price_idr) : 'Pending STA' }} / {{ item.unit }})
-                  </option>
-                </optgroup>
-              </select>
-            </div>
-
-            <!-- Active SKU Detail Pill -->
-            <div v-if="activeCatalogPricingItem" class="active-sku-detail-card">
-              <div class="sku-card-main">
-                <span class="sku-card-name">{{ activeCatalogPricingItem.name }}</span>
-                <span class="sku-card-env-badge">{{ activeCatalogPricingItem.environment }} · Satuan: {{ activeCatalogPricingItem.unit }}</span>
-              </div>
-              <div class="sku-card-price-wrap">
-                <span class="sku-price-title">Tarif Satuan Katalog:</span>
-                <span v-if="activeCatalogPricingItem.unit_price_idr" class="sku-price-val">
-                  Rp {{ formatSimpleIDR(activeCatalogPricingItem.unit_price_idr) }} <span class="sku-price-unit">/ {{ activeCatalogPricingItem.unit }}</span>
-                </span>
-                <span v-else class="sku-price-pending">Pending Konfirmasi STA</span>
-              </div>
-            </div>
-          </div>
         </BaseSectionCard>
 
         <!-- ======================================================== -->
@@ -671,7 +568,7 @@
         <div class="layer-cost-card">
           <div class="cost-card-header">
             <div class="cost-card-title-wrap">
-              <span class="cost-card-title">Ringkasan Biaya Tahunan · Layer {{ activeItem.no }} ({{ activeItem.layer }})</span>
+              <span class="cost-card-title">Ringkasan Biaya Sizing (Perpetual) · Layer {{ activeItem.no }} ({{ activeItem.layer }})</span>
               <span class="cost-card-sub">Dihitung otomatis berdasarkan pilihan kapasitas di atas dan tarif katalog resmi</span>
             </div>
             <div class="cost-card-total-badge">
@@ -679,7 +576,6 @@
               <BaseMoney
                 :amount="activeLayerCost?.total_cost_annual"
                 class="layer-grand-price"
-                period="/ thn"
               />
             </div>
           </div>
@@ -715,7 +611,7 @@
                 <span class="metric-dot dot-compute"></span>
                 <span class="metric-title">Biaya Server (Compute)</span>
               </div>
-              <BaseMoney :amount="activeLayerCost?.compute_cost_annual" period="/ thn" />
+              <BaseMoney :amount="activeLayerCost?.compute_cost_annual" />
               <span class="metric-sub">
                 {{ activeConfig.computeType === 'none' ? 'Tanpa Server Baru' : `${activeConfig.nodeCount} Server · Total ${activeConfig.nodeCount * activeConfig.vcpuPerNode} vCPU` }}
               </span>
@@ -727,7 +623,7 @@
                 <span class="metric-dot dot-storage"></span>
                 <span class="metric-title">Biaya Penyimpanan</span>
               </div>
-              <BaseMoney :amount="activeLayerCost?.storage_cost_annual" period="/ thn" />
+              <BaseMoney :amount="activeLayerCost?.storage_cost_annual" />
               <span class="metric-sub">
                 {{ activeConfig.computeType === 'none' ? '0 GB' : `Total ${(activeConfig.nodeCount * activeConfig.storageGBPerNode).toLocaleString('id-ID')} GB (${activeConfig.storageClass})` }}
               </span>
@@ -737,10 +633,10 @@
             <div class="cost-metric-box">
               <div class="metric-hdr">
                 <span class="metric-dot dot-backup"></span>
-                <span class="metric-title">Biaya Backup (NBU)</span>
+                <span class="metric-title">{{ activeItem.component.toLowerCase().includes('nginx') ? 'Biaya Backup (Rubrik)' : 'Biaya Backup (NBU)' }}</span>
               </div>
-              <BaseMoney :amount="activeLayerCost?.backup_cost_annual" period="/ thn" />
-              <span class="metric-sub">{{ activeConfig.backupEnabled && activeConfig.computeType !== 'none' ? 'NetBackup Harian Aktif' : 'Tanpa Backup' }}</span>
+              <BaseMoney :amount="activeLayerCost?.backup_cost_annual" />
+              <span class="metric-sub">{{ activeConfig.backupEnabled ? (activeItem.component.toLowerCase().includes('nginx') ? 'Rubrik Backup Aktif' : 'NetBackup Harian Aktif') : 'Tanpa Backup' }}</span>
             </div>
 
             <!-- License Cost -->
@@ -756,7 +652,7 @@
                 <BaseMoney :amount="null" :is-unconfirmed="true" unconfirmed-text="Pending STA" />
               </template>
               <template v-else>
-                <BaseMoney :amount="activeLayerCost?.license_cost_annual" period="/ thn" />
+                <BaseMoney :amount="activeLayerCost?.license_cost_annual" />
               </template>
               <span class="metric-sub text-truncate" :title="activeLayerCost?.license_product_name || activeItem.license.enterprise">
                 {{ activeConfig.licenseKind === 'free' ? activeItem.license.free : (activeLayerCost?.license_product_name || activeItem.license.enterprise) }}
@@ -993,7 +889,7 @@
                   <span class="price-num">{{ formatSimpleIDR(cat.unit_price_idr) }}</span>
                 </div>
                 <div v-else class="price-pending-tag">Pending STA Tim</div>
-                <span class="price-period">per {{ cat.unit || 'unit' }} / tahun</span>
+                <span class="price-period">per {{ cat.unit || 'unit' }}</span>
               </div>
 
               <button
@@ -1371,26 +1267,6 @@ const filteredModalCatalogItems = computed<PricingItemRecord[]>(() => {
   })
 })
 
-const otherCatalogItems = computed<PricingItemRecord[]>(() => {
-  return (props.pricingList || []).filter(item => item.category !== 'license')
-})
-
-const activeCatalogPricingItem = computed<PricingItemRecord | undefined>(() => {
-  if (!props.activeConfig?.pricingSku || !props.pricingList) return undefined
-  return props.pricingList.find(p => p.sku === props.activeConfig.pricingSku)
-})
-
-function onSkuSelectChange(sku: string) {
-  props.activeConfig.pricingSku = sku
-  if (sku && props.pricingList) {
-    const found = props.pricingList.find(p => p.sku === sku)
-    if (found) {
-      props.activeConfig.licenseProductName = found.name
-      props.activeConfig.licenseMetric = found.unit
-    }
-  }
-}
-
 // Active preset baseline reference for accurate customization detection
 const activePresetBaseline = computed(() => {
   const isCrit = props.tierFilter === 'critical'
@@ -1484,7 +1360,7 @@ const cleanBaselineSummary = computed(() => {
   const isCrit = props.tierFilter === 'critical'
   const spec = isCrit ? props.activeItem.critical : props.activeItem.moderate
   const nodesText = spec.nodes.replace(/\bNode\s+Node\b/gi, 'Node')
-  return `${nodesText} · ${spec.spec} (${spec.type})`
+  return `${nodesText} · ${spec.spec} · ${spec.type}`
 })
 
 // ========================================================
@@ -1701,9 +1577,9 @@ const step4Summary = computed(() => {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: #F1F5F9;
-  color: #64748B;
-  font-size: 10.5px;
+  background: #E2E8F0;
+  color: #334155;
+  font-size: 11.5px;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
@@ -1753,7 +1629,7 @@ const step4Summary = computed(() => {
 }
 
 .custom-badge {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: #B45309;
   background: #FEF3C7;
@@ -1771,19 +1647,19 @@ const step4Summary = computed(() => {
 
 .bullet-sub {
   font-size: 11px;
-  color: #64748B;
+  color: #475569;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .bullet-cost-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: #002060;
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  padding: 1px 6px;
+  padding: 1.5px 6px;
   border-radius: 4px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -1833,7 +1709,7 @@ const step4Summary = computed(() => {
 }
 
 .badge-layer {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 800;
   color: #002060;
   background: #EFF6FF;
@@ -1845,7 +1721,7 @@ const step4Summary = computed(() => {
 }
 
 .custom-status-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #B45309;
   background: #FEF3C7;
@@ -1855,7 +1731,7 @@ const step4Summary = computed(() => {
 }
 
 .standard-status-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   color: #15803D;
   background: #DCFCE7;
@@ -1883,277 +1759,162 @@ const step4Summary = computed(() => {
   letter-spacing: -0.01em;
 }
 
-.banner-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-toggle-all-steps {
+/* Unified Layer Action Toolbar (Clean, Compact, Rapi) */
+.layer-action-toolbar {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #475569;
   background: #FFFFFF;
   border: 1px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
+  border-radius: 8px;
+  padding: 3px 5px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  gap: 2px;
 }
 
-.btn-toggle-all-steps:hover {
-  color: #002060;
-  border-color: #002060;
-  background: #EFF6FF;
-}
-
-.filter-status-tags {
-  display: flex;
+.toolbar-action-btn {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-}
-
-.active-filter-tag {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 5px 10px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.interactive-tag {
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.interactive-tag:hover {
-  transform: translateY(-1px);
-  filter: brightness(0.97);
-}
-
-.tag-swap-hint {
-  font-size: 10px;
-  opacity: 0.7;
-}
-
-.active-filter-tag.critical {
-  background: #FEF3C7;
-  color: #B45309;
-  border: 1px solid #FDE68A;
-}
-
-.active-filter-tag.moderate {
-  background: #E0F2FE;
-  color: #0369A1;
-  border: 1px solid #BAE6FD;
-}
-
-.active-filter-tag.license {
-  background: #DCFCE7;
-  color: #15803D;
-  border: 1px solid #BBF7D0;
-}
-
-.active-filter-tag.free {
-  background: #F1F5F9;
+  font-size: 11.5px;
+  font-weight: 600;
   color: #475569;
-  border: 1px solid #CBD5E1;
-}
-
-.btn-reset-baseline {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #475569;
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
+  background: transparent;
+  border: none;
   border-radius: 6px;
   padding: 5px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
   white-space: nowrap;
+  transition: all 0.15s ease;
+  line-height: 1;
 }
 
-.btn-reset-baseline:hover {
+.toolbar-action-btn:hover {
   color: #002060;
-  border-color: #002060;
-  background: #F8FAFC;
+  background: #F1F5F9;
 }
 
-.btn-reset-baseline.highlight-reset {
-  background: #FFFBEB;
+.toolbar-action-btn.btn-reset.is-customized {
   color: #B45309;
-  border-color: #FCD34D;
+  background: #FFFBEB;
 }
 
-.btn-reset-baseline.highlight-reset:hover {
+.toolbar-action-btn.btn-reset.is-customized:hover {
   background: #FEF3C7;
-  border-color: #D97706;
+  color: #92400E;
 }
 
-/* 2. Plain-Language Context & Baseline Banner */
-.context-guide-banner {
+.custom-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #F59E0B;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.toolbar-action-btn.btn-delete {
+  color: #64748B;
+}
+
+.toolbar-action-btn.btn-delete:hover {
+  color: #DC2626;
+  background: #FEF2F2;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 16px;
+  background: #E2E8F0;
+  margin: 0 3px;
+}
+
+/* 2. EA Architecture Baseline Banner (Simple, Clean, Rapi) */
+.ea-context-banner {
   background: #F8FAFC;
   border: 1px solid #E2E8F0;
-  border-left: 3.5px solid #002060;
   border-radius: 8px;
-  overflow: hidden;
+  padding: 12px 16px;
 }
 
-.context-main-row {
-  padding: 11px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
-}
-
-.context-left {
+.ea-context-left {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
+}
+
+.ea-icon-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ea-context-body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
   flex: 1;
   min-width: 0;
 }
 
-.context-badge-icon {
-  font-size: 15px;
-  line-height: 1.3;
-  flex-shrink: 0;
-}
-
-.context-text-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.context-headline-row {
+.ea-desc-row {
   display: flex;
   align-items: baseline;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.context-title {
-  font-size: 12px;
-  font-weight: 800;
+.ea-desc-lead {
+  font-size: 12.5px;
+  font-weight: 700;
   color: #002060;
 }
 
-.context-friendly-desc {
-  font-size: 12px;
+.ea-desc-text {
+  font-size: 12.5px;
   color: #334155;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.context-baseline-row {
+.ea-meta-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
-.baseline-pill-label {
-  font-size: 11px;
-  font-weight: 700;
-  color: #B45309;
-  background: #FEF3C7;
-  padding: 1px 7px;
-  border-radius: 4px;
-}
-
-.baseline-pill-spec {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #0F172A;
-}
-
-.btn-context-detail {
-  background: #FFFFFF;
-  border: 1px solid #CBD5E1;
-  color: #475569;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 4px 9px;
-  border-radius: 6px;
-  cursor: pointer;
+.ea-baseline-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.btn-context-detail:hover {
-  color: #002060;
-  border-color: #94A3B8;
-}
-
-.btn-context-detail svg {
-  transition: transform 0.2s ease;
-}
-
-.btn-context-detail svg.rotated {
-  transform: rotate(180deg);
-}
-
-.context-expanded-body {
-  padding: 12px 14px;
-  background: #FFFFFF;
-  border-top: 1px dashed #E2E8F0;
-}
-
-.context-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1.5fr;
-  gap: 14px;
-}
-
-.detail-col {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.detail-lbl {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  text-transform: uppercase;
-  color: #64748B;
+  color: #92400E;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-.detail-val {
+.ea-baseline-spec {
   font-size: 12px;
   font-weight: 600;
-  color: #1E293B;
-  line-height: 1.4;
+  color: #0F172A;
+  letter-spacing: -0.01em;
 }
 
-.font-mono {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  color: #002060;
-}
-
-.contract-mini-pill {
-  align-self: flex-start;
-  margin-top: 2px;
-  font-size: 10px;
-  font-weight: 700;
+.ea-contract-pill {
+  font-size: 11px;
+  font-weight: 600;
   color: #0369A1;
   background: #E0F2FE;
-  padding: 1px 6px;
+  border: 1px solid #BAE6FD;
+  padding: 2px 7px;
   border-radius: 4px;
 }
 
@@ -2187,8 +1948,8 @@ const step4Summary = computed(() => {
 }
 
 .field-sub-hint {
-  font-size: 11px;
-  color: #64748B;
+  font-size: 11.5px;
+  color: #475569;
 }
 
 .server-count-row,
@@ -2248,8 +2009,8 @@ const step4Summary = computed(() => {
 }
 
 .chip-star {
-  color: #D97706;
-  font-size: 10px;
+  color: #92400E;
+  font-size: 11px;
 }
 
 .quick-chip-btn.active .chip-star {
@@ -2340,7 +2101,7 @@ const step4Summary = computed(() => {
 }
 
 .backup-status-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 12px;
@@ -2353,12 +2114,12 @@ const step4Summary = computed(() => {
 }
 
 .backup-status-pill.off {
-  background: #F1F5F9;
-  color: #64748B;
+  background: #E2E8F0;
+  color: #475569;
 }
 
 .backup-desc {
-  font-size: 11px;
+  font-size: 11.5px;
   color: #475569;
   line-height: 1.45;
 }
@@ -2431,9 +2192,9 @@ const step4Summary = computed(() => {
 }
 
 .lic-price-tag {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: #64748B;
+  color: #475569;
 }
 
 .font-emerald {
@@ -2468,10 +2229,9 @@ const step4Summary = computed(() => {
   font-size: 12px;
   font-weight: 700;
   color: #002060;
-  background: #FFFFFF;
-  padding: 5px 9px;
-  border-radius: 5px;
-  border: 1px solid #E2E8F0;
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 
 .lic-card-desc {
@@ -2485,8 +2245,8 @@ const step4Summary = computed(() => {
    Layer Cost Breakdown Card + Visual Proportion Bar
    ───────────────────────────────────────────── */
 .layer-cost-card {
-  background: #F8FAFC;
-  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 10px;
   padding: 16px 18px;
   display: flex;
@@ -2515,18 +2275,17 @@ const step4Summary = computed(() => {
 }
 
 .cost-card-sub {
-  font-size: 11px;
-  color: #64748B;
+  font-size: 11.5px;
+  color: #475569;
 }
 
 .cost-card-total-badge {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  background: #FFFFFF;
-  border: 1px solid #DBEAFE;
-  padding: 6px 12px;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
 .total-lbl {
@@ -2568,13 +2327,18 @@ const step4Summary = computed(() => {
 }
 
 .cost-metric-box {
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid #F1F5F9;
+  border-radius: 0;
+  padding: 2px 10px 2px 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
+}
+
+.cost-metric-box:last-child {
+  border-right: none;
 }
 
 .metric-hdr {
@@ -2596,15 +2360,15 @@ const step4Summary = computed(() => {
 .dot-license { background: #16A34A; }
 
 .metric-title {
-  font-size: 10.5px;
-  font-weight: 800;
-  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
   text-transform: uppercase;
 }
 
 .metric-sub {
-  font-size: 10.5px;
-  color: #64748B;
+  font-size: 11.5px;
+  color: #475569;
   margin-top: 2px;
 }
 
@@ -2693,10 +2457,11 @@ const step4Summary = computed(() => {
 }
 
 .nav-hint {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  color: #64748B;
+  letter-spacing: 0.02em;
+  color: #475569;
 }
 
 .nav-name {
@@ -2713,7 +2478,7 @@ const step4Summary = computed(() => {
   border-radius: 20px;
 }
 
-/* Add Catalog button and left list enhancements */
+
 .btn-add-catalog-layer {
   display: flex;
   align-items: center;
@@ -3041,7 +2806,8 @@ const step4Summary = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 10vh 10vw; /* 20vh vertical & 20vw horizontal total padding from viewport */
+  box-sizing: border-box;
   animation: fadeInModal 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -3054,8 +2820,8 @@ const step4Summary = computed(() => {
   background: #FFFFFF;
   border-radius: 14px;
   width: 100%;
-  max-width: 860px;
-  max-height: 88vh;
+  height: 100%;
+  max-width: 1560px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(15, 23, 42, 0.08);
@@ -3063,12 +2829,13 @@ const step4Summary = computed(() => {
 }
 
 .modal-hdr {
-  padding: 20px 24px;
+  padding: 18px 28px;
   border-bottom: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #FFFFFF;
+  flex-shrink: 0;
 }
 
 .modal-title-wrap {
@@ -3126,12 +2893,13 @@ const step4Summary = computed(() => {
 }
 
 .modal-search-strip {
-  padding: 14px 24px;
+  padding: 14px 28px;
   background: #F8FAFC;
   border-bottom: 1px solid #E2E8F0;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .modal-search-wrap {
@@ -3235,12 +3003,12 @@ const step4Summary = computed(() => {
 
 .modal-items-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 16px 24px;
+  padding: 20px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 480px;
+  gap: 14px;
   background: #F8FAFC;
 }
 
@@ -3579,12 +3347,13 @@ const step4Summary = computed(() => {
 }
 
 .modal-ftr {
-  padding: 14px 24px;
+  padding: 14px 28px;
   border-top: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #FFFFFF;
+  flex-shrink: 0;
 }
 
 .modal-ftr-count {
@@ -3607,6 +3376,25 @@ const step4Summary = computed(() => {
 .btn-modal-cancel:hover {
   background: #F1F5F9;
   color: #0F172A;
+}
+
+@media (max-width: 1024px) {
+  .catalog-modal-backdrop {
+    padding: 6vh 5vw;
+  }
+}
+
+@media (max-width: 640px) {
+  .catalog-modal-backdrop {
+    padding: 12px;
+  }
+  .modal-hdr,
+  .modal-search-strip,
+  .modal-items-scroll,
+  .modal-ftr {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 @media (max-width: 1024px) {
